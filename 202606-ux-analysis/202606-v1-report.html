@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent — UX 分析報告</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F2F0EB;
+  --bg2: #E8E5DE;
+  --surface: #FAFAF8;
+  --ink: #1A1A1A;
+  --ink2: #555550;
+  --ink3: #888882;
+  --accent: #1A2A6C;
+  --accent2: #2D4DB8;
+  --red: #C0392B;
+  --amber: #B7620A;
+  --green: #0F6E56;
+  --blue: #185FA5;
+  --purple: #534AB7;
+  --border: rgba(26,26,26,0.1);
+  --border2: rgba(26,26,26,0.06);
+  --r: 4px;
+  --r2: 8px;
+  --r3: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ── LAYOUT ─────────────────────────────── */
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+/* ── NAV ─────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--accent);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.nav-inner {
+  max-width: 900px; margin: 0 auto;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 24px; overflow-x: auto;
+}
+.nav-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.5);
+  white-space: nowrap; padding: 14px 20px 14px 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  margin-right: 4px; flex-shrink: 0;
+}
+.nav-logo span { color: #fff; font-weight: 500; }
+.nav-link {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  padding: 14px 12px; white-space: nowrap;
+  cursor: pointer; flex-shrink: 0;
+  transition: color .15s;
+  text-decoration: none; border: none; background: none;
+}
+.nav-link:hover, .nav-link.active { color: #fff; }
+
+/* ── HERO ─────────────────────────────────── */
+.hero {
+  background: var(--accent);
+  padding: 64px 0 48px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 39px,
+    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+  ),
+  repeating-linear-gradient(
+    90deg, transparent, transparent 39px,
+    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+  );
+}
+.hero-inner {
+  max-width: 900px; margin: 0 auto;
+  padding: 0 24px; position: relative;
+}
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.5);
+  letter-spacing: .12em; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block; width: 24px; height: 1px;
+  background: rgba(255,255,255,0.3);
+}
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  color: #fff; line-height: 1.15;
+  margin-bottom: 20px;
+}
+.hero-title em {
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+}
+.hero-desc {
+  font-size: 14px; color: rgba(255,255,255,0.65);
+  max-width: 560px; line-height: 1.75;
+  margin-bottom: 32px;
+}
+.hero-meta {
+  display: flex; gap: 24px; flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.hero-meta-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: rgba(255,255,255,0.4);
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.hero-meta-val {
+  font-size: 13px; color: rgba(255,255,255,0.8);
+  font-weight: 500;
+}
+
+/* ── SECTION TITLES ──────────────────────── */
+.section { padding: 48px 0; }
+.section + .section { border-top: 1px solid var(--border); }
+.section-header { margin-bottom: 28px; }
+.section-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--ink3);
+  letter-spacing: .1em; margin-bottom: 6px;
+}
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; color: var(--ink);
+  line-height: 1.25;
+}
+.section-sub {
+  font-size: 13px; color: var(--ink2);
+  margin-top: 8px; max-width: 600px;
+}
+
+/* ── ASSUMPTION BANNER ───────────────────── */
+.assumption-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--r3) var(--r3) 0;
+  padding: 16px 20px; margin-bottom: 16px;
+}
+.assumption-banner .ab-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .08em;
+  color: var(--amber); margin-bottom: 6px;
+}
+.assumption-banner .ab-title {
+  font-size: 14px; font-weight: 500; color: var(--ink);
+  margin-bottom: 4px;
+}
+.assumption-banner .ab-body {
+  font-size: 13px; color: var(--ink2); line-height: 1.65;
+}
+.verdict-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.verdict {
+  font-size: 11px; font-weight: 500;
+  padding: 3px 10px; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.v-green { background: #E1F5EE; color: #0F6E56; }
+.v-amber { background: #FAEEDA; color: #854F0B; }
+.v-red   { background: #FCEBEB; color: #A32D2D; }
+.v-blue  { background: #E6F1FB; color: #185FA5; }
+
+/* ── JOURNEY MAP ─────────────────────────── */
+.journey-wrap { overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+.journey {
+  display: flex; align-items: flex-start;
+  gap: 0; min-width: 640px;
+}
+.jnode { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.jbox {
+  padding: 8px 16px; border-radius: var(--r2);
+  font-size: 12px; font-weight: 500; color: #fff;
+  white-space: nowrap; cursor: pointer;
+  transition: opacity .15s, transform .15s;
+}
+.jbox:hover { opacity: .82; transform: translateY(-1px); }
+.jstep {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--ink3);
+}
+.jarrow {
+  color: var(--ink3); font-size: 16px;
+  padding: 0 4px; margin-top: 10px; flex-shrink: 0;
+}
+.jemo { font-size: 18px; }
+.jfeel {
+  font-size: 10px; color: var(--ink2);
+  max-width: 72px; text-align: center; line-height: 1.4;
+}
+
+/* ── EMOTION BAR ─────────────────────────── */
+.emotion-bar {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px; margin-bottom: 32px;
+}
+.ebar-cell {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.ebar-fill {
+  width: 100%; border-radius: 3px;
+  transition: height .3s;
+}
+.ebar-label { font-size: 9px; color: var(--ink3); text-align: center; }
+
+/* ── CARDS ───────────────────────────────── */
+.cards { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r3);
+  padding: 16px 18px;
+}
+.card.good { border-left: 3px solid var(--green); border-radius: 0 var(--r3) var(--r3) 0; }
+.card.bad  { border-left: 3px solid var(--red);   border-radius: 0 var(--r3) var(--r3) 0; }
+.card.warn { border-left: 3px solid var(--amber);  border-radius: 0 var(--r3) var(--r3) 0; }
+.card.bug  { border-left: 3px solid var(--purple); border-radius: 0 var(--r3) var(--r3) 0; }
+.card.info { border-left: 3px solid var(--blue);   border-radius: 0 var(--r3) var(--r3) 0; }
+.badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  padding: 2px 8px; border-radius: var(--r);
+  margin-bottom: 8px; letter-spacing: .04em;
+}
+.bg-red    { background: #FCEBEB; color: #A32D2D; }
+.bg-green  { background: #E1F5EE; color: #0F6E56; }
+.bg-amber  { background: #FAEEDA; color: #854F0B; }
+.bg-blue   { background: #E6F1FB; color: #185FA5; }
+.bg-purple { background: #EEEDFE; color: #3C3489; }
+.card-h { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+.card-p { font-size: 13px; color: var(--ink2); line-height: 1.65; }
+.fix {
+  background: var(--bg2);
+  border-radius: var(--r2); padding: 12px 14px; margin-top: 12px;
+}
+.fix-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  color: var(--blue); letter-spacing: .06em; margin-bottom: 5px;
+}
+.fix-body { font-size: 12px; color: var(--ink2); line-height: 1.65; }
+.fix-body code {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  background: var(--surface); padding: 1px 5px;
+  border-radius: 3px; border: 1px solid var(--border);
+}
+
+/* ── QUOTE ───────────────────────────────── */
+.quote {
+  background: var(--surface);
+  border-radius: var(--r3); padding: 16px 20px;
+  border: 1px solid var(--border2); margin-bottom: 20px;
+  position: relative;
+}
+.quote::before {
+  content: '"';
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; color: var(--bg2);
+  position: absolute; top: 8px; left: 14px;
+  line-height: 1;
+}
+.quote-text {
+  font-size: 13px; color: var(--ink2);
+  line-height: 1.7; font-style: italic;
+  padding-left: 20px;
+}
+.quote-from {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--ink3);
+  margin-top: 8px; padding-left: 20px;
+}
+
+/* ── STEP HEADER ─────────────────────────── */
+.step-header {
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.step-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 40px; color: var(--bg2);
+  line-height: 1; flex-shrink: 0;
+}
+.step-info {}
+.step-title {
+  font-size: 18px; font-weight: 500; color: var(--ink);
+  margin-bottom: 2px;
+}
+.step-sub { font-size: 12px; color: var(--ink3); }
+.emo-big { font-size: 22px; margin-left: auto; flex-shrink: 0; }
+
+/* ── GRID 2 ──────────────────────────────── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:600px){ .grid2 { grid-template-columns: 1fr; } }
+
+/* ── COPY COMPARE ────────────────────────── */
+.compare {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 10px;
+}
+@media(max-width:600px){ .compare { grid-template-columns: 1fr; } }
+.copy-box {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2); padding: 12px 14px;
+}
+.copy-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  margin-bottom: 7px; display: block;
+}
+.copy-label.old { color: #A32D2D; }
+.copy-label.new { color: #0F6E56; }
+.copy-text { font-size: 13px; color: var(--ink); line-height: 1.65; }
+.copy-text em { color: var(--ink2); font-style: normal; font-size: 12px; }
+
+/* ── PRIORITY TABLE ──────────────────────── */
+.ptable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ptable th {
+  padding: 9px 12px; text-align: left;
+  font-weight: 500; color: var(--ink2);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .05em;
+}
+.ptable td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border2);
+  vertical-align: top;
+  font-size: 12px;
+}
+.ptable tr:last-child td { border-bottom: none; }
+.ptable tr:hover td { background: var(--bg2); }
+.p0 { color: #A32D2D; font-weight: 600; font-size: 11px; }
+.p1 { color: #854F0B; font-weight: 600; font-size: 11px; }
+.p2 { color: #185FA5; font-size: 11px; }
+
+/* ── NORTH STAR ──────────────────────────── */
+.northstar {
+  background: var(--accent); border-radius: var(--r3);
+  padding: 36px 32px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.northstar::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 20px,
+    rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px
+  );
+}
+.ns-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: rgba(255,255,255,0.45);
+  letter-spacing: .1em; margin-bottom: 14px;
+  position: relative;
+}
+.ns-copy {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(22px, 4vw, 32px);
+  color: #fff; line-height: 1.3;
+  margin-bottom: 12px; position: relative;
+}
+.ns-sub {
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  line-height: 1.7; max-width: 520px; margin: 0 auto;
+  position: relative;
+}
+
+/* ── QUESTION BOX ────────────────────────── */
+.qbox {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--r3); padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.qbox-q {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500; color: var(--blue);
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.qbox-q::before {
+  content: 'Q';
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  background: var(--blue); color: #fff;
+  border-radius: 50%; font-size: 10px; flex-shrink: 0;
+}
+.qbox-a { font-size: 13px; color: var(--ink2); line-height: 1.65; }
+.qbox-a strong { color: var(--ink); font-weight: 500; }
+
+/* ── TABS (for page sections) ────────────── */
+.page-tabs {
+  display: flex; gap: 0; overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.page-tab {
+  padding: 8px 14px; font-size: 12px; font-weight: 500;
+  color: var(--ink2); cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  flex-shrink: 0; transition: color .15s;
+  background: none; border-top: none; border-left: none; border-right: none;
+}
+.page-tab:hover { color: var(--ink); }
+.page-tab.on { color: var(--accent2); border-bottom-color: var(--accent2); }
+.page-pane { display: none; }
+.page-pane.on { display: block; }
+
+/* ── MISC ─────────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+.inline-badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; padding: 1px 6px; border-radius: 3px;
+  vertical-align: middle;
+}
+.tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.tag {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  background: var(--bg2); color: var(--ink2);
+  border: 1px solid var(--border);
+}
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+  gap: 10px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r3); padding: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--ink3); letter-spacing: .06em;
+}
+.stat-val { font-size: 24px; font-weight: 600; color: var(--ink); line-height: 1.1; }
+.stat-desc { font-size: 11px; color: var(--ink2); }
+.highlight-box {
+  background: var(--accent); color: #fff;
+  border-radius: var(--r2); padding: 12px 16px;
+  margin: 12px 0;
+}
+.highlight-box p { font-size: 13px; line-height: 1.65; color: rgba(255,255,255,0.85); }
+.highlight-box strong { color: #fff; }
+
+/* ── PRINT ───────────────────────────────── */
+@media print {
+  nav { display: none; }
+  .section { page-break-inside: avoid; }
+}
+
+/* ── ANIMATIONS ──────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-title  { animation: fadeUp .5s ease both; }
+.hero-desc   { animation: fadeUp .5s .1s ease both; }
+.hero-meta   { animation: fadeUp .5s .2s ease both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo"><span>AI Agent</span> UX Report</div>
+    <a class="nav-link active" href="#overview">總覽</a>
+    <a class="nav-link" href="#assumption">定位假設</a>
+    <a class="nav-link" href="#journey">使用者旅程</a>
+    <a class="nav-link" href="#pages">逐頁分析</a>
+    <a class="nav-link" href="#copy">文案建議</a>
+    <a class="nav-link" href="#priority">修改清單</a>
+    <a class="nav-link" href="#questions">主管問題</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">UX ANALYSIS REPORT — 2026</div>
+    <h1 class="hero-title">
+      AI Agent<br>
+      <em>體驗平台全面分析</em>
+    </h1>
+    <p class="hero-desc">
+      從一般使用者視角，對整個 8 步體驗旅程進行完整的流程分析、文案評估與改善建議。
+      涵蓋定位假設確認、體感問題診斷、優先修復清單，以及會議前應詢問主管的關鍵問題。
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">分析頁面數</span>
+        <span class="hero-meta-val">11 個截圖 × 8 個節點</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">前提說明</span>
+        <span class="hero-meta-val">無正式需求文件，以推測為基礎</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">立場</span>
+        <span class="hero-meta-val">客觀分析者，供主管參考</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ① OVERVIEW -->
+<section class="section" id="overview">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">01 — OVERVIEW</div>
+    <h2 class="section-title">整體診斷</h2>
+    <p class="section-sub">這個平台的方向是對的，但好內容被埋在高摩擦流程後面。</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">體驗旅程步驟數</div>
+      <div class="stat-val">8</div>
+      <div class="stat-desc">首頁 → 結束頁完整流程</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">確認 BUG</div>
+      <div class="stat-val" style="color:var(--red);">1</div>
+      <div class="stat-desc">圓桌對話區雙重捲動</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">P0/P1 優先修復</div>
+      <div class="stat-val" style="color:var(--amber);">7</div>
+      <div class="stat-desc">高影響 UX 問題</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">推測轉換目標</div>
+      <div class="stat-val" style="color:var(--green);">諮詢</div>
+      <div class="stat-desc">結束頁 CTA 佐證</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card good">
+      <div class="badge bg-green">整體優點</div>
+      <div class="card-h">體驗閉環設計完整，轉換邏輯正確</div>
+      <div class="card-p">從首頁進入到結束頁預約諮詢，漏斗在概念上完整。結束頁的雷達圖＋「3天 vs 3分鐘」量化對比是全站最有說服力的設計，放對了節點。場景文案情境代入感極強，是明顯的競爭優勢。</div>
+      <div class="tag-row">
+        <span class="tag">情境文案強</span>
+        <span class="tag">轉換節點正確</span>
+        <span class="tag">多角色 AI 協作差異化</span>
+      </div>
+    </div>
+    <div class="card bad">
+      <div class="badge bg-red">整體問題</div>
+      <div class="card-h">好內容被埋在高摩擦流程後面</div>
+      <div class="card-p">使用者需要走過 6 個選擇步驟才能到達核心體驗，且每一步都缺乏進度感知與清楚說明。最精彩的內容在最後，但很多使用者在看到之前就已放棄。</div>
+      <div class="tag-row">
+        <span class="tag">無進度指示</span>
+        <span class="tag">重複選擇步驟</span>
+        <span class="tag">術語不親民</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card warn" style="margin-bottom:0">
+    <div class="badge bg-amber">最高流失點推測</div>
+    <div class="card-h">Step 2–3：選模式 + 選職能，使用者最容易在這裡放棄</div>
+    <div class="card-p">使用者連續面對兩個無說明的選擇步驟（「職能？場景？差在哪？」→「業務？然後呢？」），卻還沒看到任何有價值的內容。加上完全沒有進度指示，這是整個流程最危險的流失區段。</div>
+  </div>
+</div>
+</section>
+
+<!-- ② ASSUMPTION -->
+<section class="section" id="assumption">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">02 — ASSUMPTION</div>
+    <h2 class="section-title">定位假設確認</h2>
+    <p class="section-sub">以下分析建立在推測上，需與主管確認後才能成立。</p>
+  </div>
+
+  <div class="assumption-banner">
+    <div class="ab-label">前提聲明</div>
+    <div class="ab-title">本報告無法取得正式需求文件或設計說明</div>
+    <div class="ab-body">所有「網站目的」的判斷，都是根據現有畫面與流程的推測。分析目的是提供觀察框架，供團隊確認方向時參考。若假設有誤，修改建議方向亦需隨之調整。</div>
+  </div>
+
+  <div class="cards">
+    <div class="qbox">
+      <div class="qbox-q">這個網站的主要受眾是誰？</div>
+      <div class="qbox-a">
+        <strong>推測：潛在客戶 / 評估中的企業決策者</strong><br>
+        依據：結束頁的 CTA 是「預約免費諮詢」，不是「開始使用」或「升級方案」——這是典型的銷售前置設計，指向尚未購買的潛在客戶，而非現有客戶的教育工具。
+      </div>
+      <div class="verdict-row">
+        <span class="verdict v-amber">⚠ 待主管確認</span>
+        <span class="verdict v-blue">影響：決定整體說服邏輯</span>
+      </div>
+    </div>
+
+    <div class="qbox">
+      <div class="qbox-q">「職能入口」和「場景入口」的內容有沒有真正的差異？</div>
+      <div class="qbox-a">
+        <strong>推測：差異目前不大，但可能是個性化設計的基礎</strong><br>
+        從截圖看，兩個入口都進入相同的場景卡片列表，頂部只是多了職能說明條。若無實質差異，這個選擇步驟只是認知成本，沒有個性化回報，應考慮合併。
+      </div>
+      <div class="verdict-row">
+        <span class="verdict v-amber">⚠ 待確認</span>
+        <span class="verdict v-blue">影響：是否需要簡化流程</span>
+      </div>
+    </div>
+
+    <div class="qbox">
+      <div class="qbox-q">這個平台是「自助體驗」還是「業務陪同展示」？</div>
+      <div class="qbox-a">
+        <strong>推測：設計偏向自助體驗，但部分設計更適合業務陪同說明</strong><br>
+        圓桌的輸入框說明、側邊欄的無標籤數字、Bridge 頁說明不足——這些如果有業務在旁解釋都不是問題；但對自助使用者來說是很高的認知門檻。這個假設影響所有互動設計的標準。
+      </div>
+      <div class="verdict-row">
+        <span class="verdict v-red">最關鍵假設</span>
+        <span class="verdict v-blue">影響：所有互動設計標準</span>
+      </div>
+    </div>
+
+    <div class="qbox">
+      <div class="qbox-q">你描述的定位符合現有網站嗎？</div>
+      <div class="qbox-a">
+        <strong>完全符合，而且比現有網站說得更清楚。</strong><br>
+        「引導不同職能使用者，理解當工作發生問題時，如何搭配其他職務的 AI Agent 先行完成工作」——這個定位有明確的對象、情境與解法三要素。現有網站的「企業數智分身」「全新工作樣貌」是結果描述，使用者需要自己腦補「這和我有什麼關係」。
+      </div>
+      <div class="verdict-row">
+        <span class="verdict v-green">✓ 定位符合</span>
+        <span class="verdict v-amber">問題：文案沒有把定位說出來</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ③ JOURNEY -->
+<section class="section" id="journey">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">03 — USER JOURNEY</div>
+    <h2 class="section-title">使用者情緒旅程圖</h2>
+    <p class="section-sub">以第一次進入、什麼都不知道的使用者視角，逐步描述體感變化。</p>
+  </div>
+
+  <div class="journey-wrap">
+    <div class="journey">
+      <div class="jnode">
+        <div class="jbox" style="background:#1a2a6c;" onclick="document.getElementById('pages').scrollIntoView({behavior:'smooth'})">首頁</div>
+        <div class="jstep">Step 1</div>
+        <div class="jemo">😮</div>
+        <div class="jfeel">視覺震撼 但不知道能做什麼</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#2d4db8;">選模式</div>
+        <div class="jstep">Step 2</div>
+        <div class="jemo">😕</div>
+        <div class="jfeel">職能？場景？差在哪？</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#2d4db8;">選職能</div>
+        <div class="jstep">Step 3</div>
+        <div class="jemo">🤔</div>
+        <div class="jfeel">選了業務然後呢？</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#0e7490;">場景卡</div>
+        <div class="jstep">Step 4</div>
+        <div class="jemo">😯</div>
+        <div class="jfeel">這場景說到我心坎裡！</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#0e7490;">橋接頁</div>
+        <div class="jstep">Step 5</div>
+        <div class="jemo">😐</div>
+        <div class="jfeel">好像說了什麼但不知道接下來要做什麼</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#0e7490;">選角色</div>
+        <div class="jstep">Step 6</div>
+        <div class="jemo">😵</div>
+        <div class="jfeel">我不是選過了嗎？又要選？</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#534AB7;">圓桌</div>
+        <div class="jstep">Step 7</div>
+        <div class="jemo">😳</div>
+        <div class="jfeel">哇這個厲害！但要輸入什麼？</div>
+      </div>
+      <div class="jarrow">→</div>
+      <div class="jnode">
+        <div class="jbox" style="background:#059669;">結束頁</div>
+        <div class="jstep">Step 8</div>
+        <div class="jemo">🤩</div>
+        <div class="jfeel">3天 vs 3分鐘！ 我想預約！</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card bad">
+      <div class="badge bg-red">最高流失點</div>
+      <div class="card-h">Step 2–3：「我不知道我在選什麼」</div>
+      <div class="card-p">連續兩個無說明的選擇步驟，使用者還沒看到任何有價值的內容，耐心已開始消耗。這是整個流程最危險的區段，建議優先處理。</div>
+    </div>
+    <div class="card warn">
+      <div class="badge bg-amber">次高流失點</div>
+      <div class="card-h">Step 6：「我已經選過了，為什麼還要選？」</div>
+      <div class="card-p">Step 3 選職能、Step 6 又選角色分身，兩步之間的邏輯關係完全沒有說明。使用者開始懷疑「是不是系統壞了？我做錯什麼了嗎？」</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="highlight-box">
+    <p><strong>關鍵發現：</strong>整個旅程裡最有說服力的三個設計——場景卡的情境文案、選角色的心聲台詞、結束頁的「3天 vs 3分鐘」——都在後半段。前半段流程的任何一個流失點，都讓使用者看不到這些亮點。修復前段流程的摩擦，是讓更多使用者走到轉換節點的最直接路徑。</p>
+  </div>
+</div>
+</section>
+
+<!-- ④ PAGES -->
+<section class="section" id="pages">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">04 — PAGE BY PAGE</div>
+    <h2 class="section-title">逐頁分析</h2>
+    <p class="section-sub">每一頁的使用者心理狀態、問題診斷與修改建議。</p>
+  </div>
+
+  <div class="page-tabs">
+    <button class="page-tab on"  onclick="switchPage('pg1',0)">P1 首頁</button>
+    <button class="page-tab"     onclick="switchPage('pg2',1)">P2 選模式</button>
+    <button class="page-tab"     onclick="switchPage('pg3',2)">P3 選職能</button>
+    <button class="page-tab"     onclick="switchPage('pg4',3)">P4 場景卡</button>
+    <button class="page-tab"     onclick="switchPage('pg5',4)">P5 橋接頁</button>
+    <button class="page-tab"     onclick="switchPage('pg6',5)">P6 選角色</button>
+    <button class="page-tab"     onclick="switchPage('pg7',6)">P7 圓桌</button>
+    <button class="page-tab"     onclick="switchPage('pg8',7)">P8 結束頁</button>
+  </div>
+
+  <!-- P1 -->
+  <div class="page-pane on" id="pg1">
+    <div class="step-header">
+      <div class="step-num">01</div>
+      <div class="step-info">
+        <div class="step-title">首頁 Hero</div>
+        <div class="step-sub">第一印象 — 使用者決定要不要繼續的 5 秒</div>
+      </div>
+      <div class="emo-big">😮</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「哇這個畫面好炫。但這是在賣什麼？我能做什麼？那個按鈕在說什麼意思？」</div>
+      <div class="quote-from">— 一般企業使用者，進入首頁後的典型反應</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">視覺衝擊力強，品牌調性一致，單一 CTA 設計乾淨</div>
+        <div class="card-p">3D 角色配光效背景，傳遞未來感 AI 品牌定位。「展開體驗旅程」的單一 CTA 不讓使用者做多餘決定。右下角引導泡泡提供非主線的輔助入口，對猶豫型使用者友善。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">文案說的是產品，不是使用者的問題</div>
+        <div class="card-p">「未來企業體驗空間，改變已經成真」是品牌宣告，使用者需要自己腦補「這和我的工作有什麼關係」。使用者在 5 秒內無法判斷相關性，就會離開。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">主標題改成使用者痛點：「跨部門的事，不用再等人」。副標說清楚解法：「業務、採購、生管的 AI 分身，同步替你推進——3 分鐘完成跨部門決策」。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">無導覽列，第二次來訪要重走全部流程</div>
+        <div class="card-p">頁面完全沒有導覽。使用者上次體驗了「急單接案」，這次想直接試「圖紙報價」，沒有任何辦法跳轉，只能重走六個步驟。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">頁面頂部加極簡導覽，至少包含「場景總覽」入口，讓回訪使用者可直接跳到場景選擇頁。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P2 -->
+  <div class="page-pane" id="pg2">
+    <div class="step-header">
+      <div class="step-num">02</div>
+      <div class="step-info">
+        <div class="step-title">選擇模式 — 職能 vs 場景</div>
+        <div class="step-sub">關鍵分岔點 — 選錯了嗎？選哪個有差嗎？</div>
+      </div>
+      <div class="emo-big">😕</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「職能？場景？這兩個有什麼差？我要選哪個？選錯了會怎樣？這是第二個畫面了，我還沒看到任何東西……」</div>
+      <div class="quote-from">— 面對抽象選項、缺乏說明時的典型困惑</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">二分法對應真實用戶思維方式</div>
+        <div class="card-p">「職能」對應「我是誰」、「場景」對應「我遇到什麼問題」，概念設計合理，兩種思維模式都照顧到。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">兩個選項無說明，使用者不知道選了有什麼不同</div>
+        <div class="card-p">「職能」和「場景」是內部術語，對新使用者太抽象。若兩個入口最終進入相同的場景列表，這個選擇步驟就是純粹的認知負擔。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">標題改成：「你想從哪個角度開始？」。職能按鈕下加說明：「我是＿＿，想看我的工作怎麼被 AI 支援」。場景按鈕下加說明：「我現在遇到一個問題，想看 AI 怎麼幫我解決」。若兩條路進入相同內容，建議直接合併，移除這一步。</div>
+        </div>
+      </div>
+      <div class="card warn">
+        <div class="badge bg-amber">疑慮</div>
+        <div class="card-h">這是第二個畫面，使用者還沒看到任何有價值的內容</div>
+        <div class="card-p">首頁點了按鈕 → 這頁又要選。此時還有 4 個選擇步驟等著他，但他完全不知道。加上進度條是最低成本的防流失手段。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">頂部加進度條：「選角色 → 選情境 → 開始模擬」，讓使用者知道終點在哪。即使流程沒有縮短，光是知道進度就能大幅降低放棄率。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P3 -->
+  <div class="page-pane" id="pg3">
+    <div class="step-header">
+      <div class="step-num">03</div>
+      <div class="step-info">
+        <div class="step-title">職能選擇 — 角色輪播</div>
+        <div class="step-sub">選了「業務」但不知道選了之後有什麼不同</div>
+      </div>
+      <div class="emo-big">🤔</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「好，我選業務。然後呢？這樣選了之後我會看到什麼不一樣的東西？那個右邊的採購是灰的，我能不能點？」</div>
+      <div class="quote-from">— 選了職能後仍感到茫然的使用者</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">3D 角色有視覺記憶點，選中置中放大回饋直觀</div>
+        <div class="card-p">每個職能角色用不同 3D 造型呈現，選中後置中放大的互動回饋清楚。水平輪播加底部指示點符合使用者熟悉的互動模式。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">每個職能只有一個詞，沒有職責說明</div>
+        <div class="card-p">「業務」在不同產業企業代表的職責差異很大，使用者需要猜這個詞是不是對應自己的工作。選錯職能，後面的個性化體驗就失去意義。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">每個職能加一行職責描述。業務：「負責開發客戶、維護關係、推進成交」。採購：「管供應商、控成本、確認交期」。生管：「排產能、調排程、盯進度」。決策者：「跨部門決策、資源分配、風險判斷」。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">右側「採購」透明度降低，視覺像 disabled 狀態</div>
+        <div class="card-p">輪播最右側角色透明度明顯較低，容易被誤認為不可點擊，使用者可能以為採購功能「還沒開放」。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">改用縮小（<code>scale: 0.85</code>）而非降低透明度來表示「非當前選中」。縮小傳遞「可選但未聚焦」，透明度傳遞「不可用」，語意完全不同。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P4 -->
+  <div class="page-pane" id="pg4">
+    <div class="step-header">
+      <div class="step-num">04</div>
+      <div class="step-info">
+        <div class="step-title">場景選擇 — 情境卡片列表</div>
+        <div class="step-sub">情境共鳴強，但被錯誤的 CTA 打斷</div>
+      </div>
+      <div class="emo-big">😯</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「哦！『日本客戶緊急下單，數量是平常3倍』——這就是我上個月的噩夢！那個『前往訂閱』是什麼意思，我都還沒看呢……還有下面不知道還有幾個場景。」</div>
+      <div class="quote-from">— 情境共鳴後立刻被其他問題打斷的使用者</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">場景文案情境敘事極強，是全站最有代入感的設計</div>
+        <div class="card-p">「日本客戶緊急下單，數量是平常的 3 倍，週五就要求出貨」——直接觸發目標使用者的職場記憶，是 B2B 產品中少見的高品質情境文案。應該保留並強化。</div>
+      </div>
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">「本季主推」橫幅製造時效感，頂部職能說明條保留上下文</div>
+        <div class="card-p">顯示「你選了什麼職能」＋描述文字，讓使用者確認自己在正確的脈絡裡。本季主推提供快速入口，降低選擇疲勞。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點（嚴重）</div>
+        <div class="card-h">「前往訂閱」出現時機完全錯誤</div>
+        <div class="card-p">使用者還沒體驗任何內容，就在場景卡上看到訂閱按鈕。體感是「這個 Demo 要先付錢」，產生防衛心，情境文案剛剛建立的共鳴立刻被破壞。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">從場景卡完全移除「前往訂閱」，統一放到結束頁（結束頁已有正確的諮詢 CTA）。主 CTA 改為：「模擬這個場景 →」。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">進去之前完全不知道會遇到幾個分身、什麼互動方式</div>
+        <div class="card-p">不同場景規模差異大：有的只有 2 個分身（圖紙報價），有的有 4 個（急單接案）；有的是圓桌協作，有的是單對話。場景卡完全沒有這個資訊。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">場景卡標題下加兩個小標籤：「N 個分身」+ 「圓桌協作 / 專項對話」，讓使用者選之前就有正確預期。同時在篩選標籤加數量（如「生產管理（3）」）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P5 -->
+  <div class="page-pane" id="pg5">
+    <div class="step-header">
+      <div class="step-num">05</div>
+      <div class="step-info">
+        <div class="step-title">橋接頁 — 場景說明</div>
+        <div class="step-sub">全站最強文案藏在第五步</div>
+      </div>
+      <div class="emo-big">😐</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「『跨部門喬三天的事，現在同步算好等你拍板』——對！這就是我想要的！……但點了『下一步』之後我要做什麼？」</div>
+      <div class="quote-from">— 被文案打動，但仍不知道接下來互動方式的使用者</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點（強烈建議提升至首頁）</div>
+        <div class="card-h">「跨部門喬三天的事，現在同步算好等你拍板」是全站最強價值主張</div>
+        <div class="card-p">這句話說的是結果，不是功能，是使用者語言而不是產品術語。問題是它出現在第五步，很多使用者根本走不到這裡就已經放棄了。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">沒有說明接下來要怎麼互動，CTA「下一步」無任何描述</div>
+        <div class="card-p">使用者看完說明後點「下一步」，完全不知道接下來要選角色、進入圓桌、要輸入什麼。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">CTA 改為「選擇你的角色分身 →」，按鈕上方加一句說明：「接下來選一個最接近你的角色，以他的視角參與這場 AI 協作會議。」</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P6 -->
+  <div class="page-pane" id="pg6">
+    <div class="step-header">
+      <div class="step-num">06</div>
+      <div class="step-info">
+        <div class="step-title">選角色分身</div>
+        <div class="step-sub">最嚴重的體感問題——感覺被繞圈子</div>
+      </div>
+      <div class="emo-big">😵</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「等等，我剛才不是選了『業務』嗎？現在又要我選『業務主管』？這有什麼差？我是不是做錯了什麼？還是這個網站壞了？」</div>
+      <div class="quote-from">— 遭遇第二次職能選擇的使用者，開始懷疑流程設計</div>
+    </div>
+    <div class="cards">
+      <div class="card bad">
+        <div class="badge bg-red">缺點（最嚴重體感問題）</div>
+        <div class="card-h">連續兩次選擇職能，沒有說明兩步之間的邏輯關係</div>
+        <div class="card-p">Step 3 選「業務」、Step 6 選「業務主管」，差異完全沒有說明。使用者合理推測「我剛才選的難道沒有用？」在自助體驗情境下，這個困惑很容易讓人直接放棄。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">頁面頂部加橋接說明：「你選擇了以業務視角體驗這個場景。現在選一個具體角色，以他的立場加入 AI 協作會議。」讓使用者理解「前一步選視角框架，這步選具體身份」，兩步有邏輯關係，而不是重複。</div>
+        </div>
+      </div>
+      <div class="card good">
+        <div class="badge bg-green">優點（保留）</div>
+        <div class="card-h">角色心聲台詞是全站最有溫度的設計</div>
+        <div class="card-p">「這個客戶跟了兩年，不能讓他跑掉」「料不夠又要趕，品質一定有風險」——第一人稱心聲讓使用者選角時有情感代入。這是競品很少做到的設計細節，應該保留並強化。</div>
+      </div>
+      <div class="card warn">
+        <div class="badge bg-amber">缺點</div>
+        <div class="card-h">四個角色頭像視覺幾乎一樣，失去辨識度</div>
+        <div class="card-p">與前面步驟的 3D 精緻角色相比，卡通頭像視覺品質落差太大，且四個造型幾乎相同。使用者必須靠文字辨識角色，失去視覺引導作用。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">用不同顏色的頭像背景區分四個角色（業務主管＝藍、採購主管＝橘、廠長＝綠、專案經理＝紫），讓使用者一眼能視覺辨識。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P7 -->
+  <div class="page-pane" id="pg7">
+    <div class="step-header">
+      <div class="step-num">07</div>
+      <div class="step-info">
+        <div class="step-title">圓桌會議室</div>
+        <div class="step-sub">核心功能震撼，但互動說明嚴重不足</div>
+      </div>
+      <div class="emo-big">😳</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「哇，這個 AI 討論好厲害！……但我要輸入什麼？『由分身代替你發言』是什麼意思？左邊那些數字 5、16、38 是什麼？我在哪裡、要做什麼、做完之後會怎樣？」</div>
+      <div class="quote-from">— 被 AI 協作震撼，但立刻陷入操作困惑的使用者</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點</div>
+        <div class="card-h">多 AI 角色協作是核心差異化功能，底部建議選項降低門檻</div>
+        <div class="card-p">圓桌關係圖清楚顯示當前發言角色，AI 同步討論有真實的跨部門協作感。底部建議選項氣泡大幅降低使用者的輸入門檻，讓互動可以順暢進行。</div>
+      </div>
+      <div class="card bug">
+        <div class="badge bg-purple">已確認 BUG</div>
+        <div class="card-h">對話區雙重捲動問題</div>
+        <div class="card-p">對話區已有獨立 scrollbar，但頁面滾動時對話內容仍跟著捲動。行動裝置觸控時完全無法控制要捲哪一層，是基本操作被干擾的嚴重問題。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議（技術）</div>
+          <div class="fix-body">對話容器設定固定高度 + <code>overflow-y: scroll</code>，父層設定 <code>overflow: hidden</code>，讓兩個捲動區域互相隔離。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">輸入框 placeholder 對新使用者完全不透明</div>
+        <div class="card-p">「由分身代替你發言...」——使用者不知道分身是誰、代替我說什麼、和直接輸入有什麼差別。這是全平台互動頻率最高的元件，卻是說明最弱的地方。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">改為：「以採購主管的立場，說出你的判斷或指令——或直接點選下方建議」。三件事同時說清楚：①你現在是誰 ②要說什麼類型的內容 ③還有備選可以選。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">側邊欄數字無任何標籤說明</div>
+        <div class="card-p">5 對話、16 Fangs、2 訓練、38 記憶、3 知識庫、28 Skills、115 檔案紀實——這些數字沒有 tooltip，圖示也不夠直觀。使用者不知道能不能點、點了會怎樣。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">最低成本：加上 hover tooltip 說明每個圖示的功能與數字含義。較完整：圖示旁直接顯示文字標籤，讓可點擊的項目有明確的 hover 視覺回饋。</div>
+        </div>
+      </div>
+      <div class="card warn">
+        <div class="badge bg-amber">缺點</div>
+        <div class="card-h">「返回」和「首頁」兩個按鈕語意曖昧</div>
+        <div class="card-p">「返回」到哪裡？「首頁」是重頭開始嗎？兩個按鈕對使用者缺乏清楚的空間感。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">改為語意明確的標籤：「← 換個場景」（返回場景卡片頁）和「⌂ 重新開始」（回首頁）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P8 -->
+  <div class="page-pane" id="pg8">
+    <div class="step-header">
+      <div class="step-num">08</div>
+      <div class="step-info">
+        <div class="step-title">體驗結束 — 分身能力總結</div>
+        <div class="step-sub">轉換節點正確，但細節有減損說服力的問題</div>
+      </div>
+      <div class="emo-big">🤩</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">「3天 vs 3分鐘！這個數字真的很有感。我想多了解一下……但這個按鈕好長，我是要領方案還是要預約？那個時空維度 25 分是什麼意思，是說功能不夠好嗎？」</div>
+      <div class="quote-from">— 即將轉換但被細節卡住的使用者</div>
+    </div>
+    <div class="cards">
+      <div class="card good">
+        <div class="badge bg-green">優點（保留強化）</div>
+        <div class="card-h">「3天 vs 3分鐘」是全站最有說服力的量化對比</div>
+        <div class="card-p">具體數字＋對比＋時間感，是使用者決定要不要預約諮詢時最強的推力。放在轉換節點的時機完全正確。建議讓這個數字更大、更突出地展示。</div>
+      </div>
+      <div class="card good">
+        <div class="badge bg-green">優點（保留）</div>
+        <div class="card-h">「換個角色再體驗一次」回流設計正確</div>
+        <div class="card-p">讓使用者從不同職能視角再走一遍，增加停留時間與多面向理解。這是提升平台深度使用的有效設計。</div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">大 CTA 按鈕包含兩個行動</div>
+        <div class="card-p">「領取體驗解決方案並預約免費諮詢」——一個按鈕兩件事。使用者可能只想先下載資料、還不想約人，但按鈕讓他感覺這兩件事是綁在一起的，製造猶豫。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">拆成主次兩個按鈕。主要：「預約免費諮詢 →」（深色強調）。次要：「先下載場景報告」（淺色次要）。讓使用者按照自己的意願選擇。</div>
+        </div>
+      </div>
+      <div class="card bad">
+        <div class="badge bg-red">缺點</div>
+        <div class="card-h">雷達圖「時空限制 25 初探」讀起來像承認產品不夠好</div>
+        <div class="card-p">在使用者即將轉換的節點，出現「尚未完整展現…」的負面訊號是最危險的設計。使用者第一反應是「哦，這個產品在這塊還不行」。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">改成正向引導：「時空維度：還有更多可解鎖的能力 →」，把「限制」的框架換成「還有更多值得探索」的框架。</div>
+        </div>
+      </div>
+      <div class="card warn">
+        <div class="badge bg-amber">缺點</div>
+        <div class="card-h">分身能力卡片的「查看能力」意圖不清</div>
+        <div class="card-p">點了「查看能力 ▾」之後去哪裡？是展開說明？跳轉新頁？還是開始體驗？按鈕文字太通用，使用者完全無法預期。</div>
+        <div class="fix">
+          <div class="fix-label">修改建議</div>
+          <div class="fix-body">依實際功能明確化：展開說明→「展開能力說明 ▾」；跳轉→「了解完整能力 →」；體驗→「體驗這個分身 →」。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end wrap -->
+</section>
+
+<!-- ⑤ COPY -->
+<section class="section" id="copy">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">05 — COPY DIRECTION</div>
+    <h2 class="section-title">文案建議方向</h2>
+    <p class="section-sub">現有文案說的是產品，建議改成說使用者的問題與結果。</p>
+  </div>
+
+  <div class="cards">
+    <div class="card info">
+      <div class="badge bg-blue">核心原則 1</div>
+      <div class="card-h">說工作情境，不說產品功能</div>
+      <div class="card-p">「急單插入、備料不足、產線排滿」比「AI 職能分身各自預置專業思維」更讓人立刻感受到共鳴。使用者先認出自己的問題，才會想知道解法。</div>
+    </div>
+    <div class="card info">
+      <div class="badge bg-blue">核心原則 2</div>
+      <div class="card-h">說你得到什麼，不說系統怎麼做</div>
+      <div class="card-p">「跨部門喬三天的事，現在同步算好等你拍板」說的是結果；「業務、廠長、採購、GM 各自預置專業思維」說的是過程。結果才是購買動機的觸發點。</div>
+    </div>
+    <div class="card info">
+      <div class="badge bg-blue">核心原則 3</div>
+      <div class="card-h">說「你」，不說「企業」</div>
+      <div class="card-p">B2B 產品的真實受眾是坐在螢幕前的個人。「企業數智分身」沒有溫度；「當你的採購沒空回、財務還在開會，你的工作不能停」才是讓人想點進去的文字。</div>
+    </div>
+    <div class="card info">
+      <div class="badge bg-blue">核心原則 4</div>
+      <div class="card-h">每個 CTA 都要描述「點了之後去哪」</div>
+      <div class="card-p">現有流程每一步的 CTA 都是通用詞（下一步、開始體驗、返回）。每個 CTA 應該描述「點了之後的狀態」，而不只是一個動作動詞。</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="margin-bottom:16px">
+    <div class="section-num" style="margin-bottom:8px">逐頁文案對比</div>
+  </div>
+
+  <!-- Compare P1 -->
+  <div style="margin-bottom:20px">
+    <div class="badge bg-blue" style="margin-bottom:10px">首頁 Hero</div>
+    <div class="compare">
+      <div class="copy-box">
+        <span class="copy-label old">現有文案</span>
+        <div class="copy-text">「未來企業體驗空間<br>改變，已經成真」<br><em>副標：體驗與各種企業數智分身協同工作 / 親眼看見全新工作樣貌如何運行</em></div>
+      </div>
+      <div class="copy-box" style="border-color:var(--green)">
+        <span class="copy-label new">建議方向</span>
+        <div class="copy-text">「跨部門的事，<br>不用再等人」<br><em>副標：業務、採購、生管的 AI 分身，同步替你推進——3 分鐘完成跨部門決策</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare P3 -->
+  <div style="margin-bottom:20px">
+    <div class="badge bg-blue" style="margin-bottom:10px">職能選擇頁 — 角色按鈕</div>
+    <div class="compare">
+      <div class="copy-box">
+        <span class="copy-label old">現有文案</span>
+        <div class="copy-text">「請選擇你的職能」<br><em>按鈕：業務 / 決策者 / 生管 / 採購（只有一個詞）</em></div>
+      </div>
+      <div class="copy-box" style="border-color:var(--green)">
+        <span class="copy-label new">建議方向</span>
+        <div class="copy-text">「你平常主要負責什麼？」<br><em>業務：「開發客戶、維護關係、推進成交」<br>採購：「管供應商、控成本、確認交期」<br>生管：「排產能、調排程、盯進度」</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare CTA -->
+  <div style="margin-bottom:20px">
+    <div class="badge bg-blue" style="margin-bottom:10px">場景卡片 CTA</div>
+    <div class="compare">
+      <div class="copy-box">
+        <span class="copy-label old">現有文案</span>
+        <div class="copy-text">主要：「開始體驗」<br>次要：「前往訂閱」</div>
+      </div>
+      <div class="copy-box" style="border-color:var(--green)">
+        <span class="copy-label new">建議方向</span>
+        <div class="copy-text">主要：「模擬這個場景 →」<br><em>移除「前往訂閱」，改至體驗完成後才出現</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare input -->
+  <div style="margin-bottom:0">
+    <div class="badge bg-blue" style="margin-bottom:10px">圓桌輸入框</div>
+    <div class="compare">
+      <div class="copy-box">
+        <span class="copy-label old">現有文案</span>
+        <div class="copy-text">「由分身代替你發言...」</div>
+      </div>
+      <div class="copy-box" style="border-color:var(--green)">
+        <span class="copy-label new">建議方向</span>
+        <div class="copy-text">「以採購主管的立場，說出你的判斷或指令——或直接點選下方建議」</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="northstar">
+    <div class="ns-label">建議整個體驗的核心文案主軸</div>
+    <div class="ns-copy">「當你的工作卡住，<br>其他職務的 AI 不等人。」</div>
+    <div class="ns-sub">首頁說問題 → 選職能說自己是誰 → 場景說情境 → 圓桌體驗解法 → 結束頁說價值 → 預約諮詢<br>整條旅程用一個邏輯串起，使用者每一步都知道自己在哪裡、為什麼在這裡。</div>
+  </div>
+</div>
+</section>
+
+<!-- ⑥ PRIORITY -->
+<section class="section" id="priority">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">06 — PRIORITY</div>
+    <h2 class="section-title">完整修改清單</h2>
+    <p class="section-sub">依影響層級排序，P0 為最高優先。</p>
+  </div>
+
+  <div style="overflow-x:auto;">
+  <table class="ptable">
+    <thead>
+      <tr>
+        <th style="width:80px">優先級</th>
+        <th style="width:180px">問題描述</th>
+        <th style="width:80px">所在位置</th>
+        <th>修改方向</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="p0">P0 BUG</span></td>
+        <td>對話區雙重捲動</td>
+        <td>圓桌 P7</td>
+        <td>對話容器固定高度 + <code style="font-family:monospace;font-size:11px">overflow-y: scroll</code>，父層 <code style="font-family:monospace;font-size:11px">overflow: hidden</code></td>
+      </tr>
+      <tr>
+        <td><span class="p0">P0 體感</span></td>
+        <td>全流程無進度指示</td>
+        <td>全流程</td>
+        <td>頂部加步驟條「選角色 → 選情境 → 開始模擬」，讓使用者知道終點</td>
+      </tr>
+      <tr>
+        <td><span class="p0">P0 體感</span></td>
+        <td>選職能 + 選角色無邏輯說明</td>
+        <td>選角色 P6</td>
+        <td>頁面頂部加橋接說明，解釋兩次選擇的關係與差異</td>
+      </tr>
+      <tr>
+        <td><span class="p1">P1 高</span></td>
+        <td>輸入框說明不足</td>
+        <td>圓桌 P7</td>
+        <td>改為「以【角色】立場說出你的判斷，或選下方建議」</td>
+      </tr>
+      <tr>
+        <td><span class="p1">P1 高</span></td>
+        <td>「前往訂閱」時機錯誤</td>
+        <td>場景卡 P4</td>
+        <td>從場景卡移除，統一放結束頁</td>
+      </tr>
+      <tr>
+        <td><span class="p1">P1 高</span></td>
+        <td>結束頁大 CTA 含兩個行動</td>
+        <td>結束頁 P8</td>
+        <td>拆成「預約免費諮詢」主按鈕 + 「先下載報告」次按鈕</td>
+      </tr>
+      <tr>
+        <td><span class="p1">P1 高</span></td>
+        <td>「時空限制 25」語氣負面</td>
+        <td>結束頁 P8</td>
+        <td>改為正向引導：「還有更多可解鎖的能力 →」</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>職能選擇無職責說明</td>
+        <td>選職能 P3</td>
+        <td>每個職能加一行職責描述</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>採購角色透明度像 disabled</td>
+        <td>選職能 P3</td>
+        <td>改用 scale 縮小而非透明度表示「未聚焦」</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>場景卡不說明分身數與類型</td>
+        <td>場景卡 P4</td>
+        <td>加標籤「N 個分身 / 圓桌 or 單對話」</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>場景總數不顯示</td>
+        <td>場景卡 P4</td>
+        <td>篩選標籤加數量，頁面頂部加「共 N 個場景」</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>側邊欄數字無標籤</td>
+        <td>圓桌 P7</td>
+        <td>加 hover tooltip 或直接顯示文字標籤</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>「返回」/「首頁」語意曖昧</td>
+        <td>圓桌 P7</td>
+        <td>改為「← 換個場景」和「⌂ 重新開始」</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>橋接頁 CTA「下一步」無描述</td>
+        <td>橋接頁 P5</td>
+        <td>改為「選擇你的角色分身 →」並加互動說明</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>角色頭像視覺無差異</td>
+        <td>選角色 P6</td>
+        <td>用不同顏色背景區分四個角色</td>
+      </tr>
+      <tr>
+        <td><span class="p2">P2 中</span></td>
+        <td>首頁文案說產品不說痛點</td>
+        <td>首頁 P1</td>
+        <td>主標改為「跨部門的事，不用再等人」</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</section>
+
+<!-- ⑦ QUESTIONS -->
+<section class="section" id="questions">
+<div class="wrap">
+  <div class="section-header">
+    <div class="section-num">07 — FOR YOUR MEETING</div>
+    <h2 class="section-title">會議前應詢問主管的問題</h2>
+    <p class="section-sub">這四個問題問完，就能把所有假設填實，讓後續分析有明確立足點。</p>
+  </div>
+
+  <div class="cards">
+    <div class="qbox">
+      <div class="qbox-q">這個網站主要是給誰看的？</div>
+      <div class="qbox-a">
+        潛在客戶（還沒購買）、現有客戶（已購買），還是業務跑 Demo 時用的展示工具？<br><br>
+        <strong>為什麼問：</strong>受眾不同，設計邏輯完全不同。潛在客戶需要被說服；現有客戶需要被教育；業務 Demo 工具需要被操作。這個問題決定後面所有建議是否成立。
+      </div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">使用者體驗完之後，我們最希望他做什麼？</div>
+      <div class="qbox-a">
+        一個使用者把整個流程走完後，最希望他接下來做什麼？主動聯絡業務、自己去訂閱，還是只要有印象就算達成目的？<br><br>
+        <strong>為什麼問：</strong>結束頁有明確的「預約諮詢」CTA，這暗示轉換目標已有雛形。確認這個問題，就能判斷場景卡的「前往訂閱」按鈕應不應該存在，以及整個漏斗設計是否對齊目標。
+      </div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">這個平台是「使用者自助體驗」還是「業務陪同展示」？</div>
+      <div class="qbox-a">
+        使用者是自己來這個網站探索，還是通常由業務人員陪同、在 Demo 場合中使用？<br><br>
+        <strong>為什麼問：</strong>這是最關鍵的假設，影響所有互動設計標準。如果有業務在旁解釋，圓桌輸入框說明不夠、側邊欄無標籤都不是問題；如果是自助，每一個元件都必須能自我解釋。
+      </div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">選「職能」和選「場景」兩條路，後面的內容有沒有真正的差異？</div>
+      <div class="qbox-a">
+        點「職能入口」進去，和點「場景入口」進去，後面看到的場景排序或內容會不一樣嗎？<br><br>
+        <strong>為什麼問：</strong>如果兩條路進入相同內容，那第二步的「選模式」就是純粹的認知負擔，建議合併。如果有差異，目前完全沒有視覺提示讓使用者感知到，需要補充說明。
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="highlight-box">
+    <p>建議的開場白：「從結束頁的設計來看，這個網站的轉換目標應該是引導使用者預約諮詢，受眾指向潛在客戶。但前面的流程和文案沒有對齊這個目標，所以我想先確認這個假設是不是對的，再提出修改建議。」</p>
+  </div>
+</div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer style="background:var(--accent);padding:32px 0;margin-top:0;">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">AI AGENT — UX ANALYSIS</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);">基於截圖推測，所有假設需與主管確認後才能成立</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);">2026</div>
+  </div>
+</footer>
+
+<script>
+function switchPage(id, idx) {
+  document.querySelectorAll('.page-pane').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.page-tab').forEach(function(t){ t.classList.remove('on'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('on');
+  var tabs = document.querySelectorAll('.page-tab');
+  if (tabs[idx]) tabs[idx].classList.add('on');
+}
+
+// Active nav on scroll
+var sections = document.querySelectorAll('section[id]');
+var navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+window.addEventListener('scroll', function(){
+  var scrollY = window.pageYOffset;
+  sections.forEach(function(sec){
+    var top = sec.offsetTop - 80;
+    var bottom = top + sec.offsetHeight;
+    if (scrollY >= top && scrollY < bottom) {
+      navLinks.forEach(function(a){ a.classList.remove('active'); });
+      var active = document.querySelector('.nav-link[href="#' + sec.id + '"]');
+      if (active) active.classList.add('active');
+    }
+  });
+}, { passive: true });
+</script>
+</body>
+</html>

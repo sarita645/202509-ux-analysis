@@ -1,0 +1,12 @@
+{
+  "name": "company-profile-0225",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "sass": "^1.76.0"
+  },
+  "scripts": {
+    "build:sass": "sass --no-source-map scss/main.scss assets/css/main.css",
+    "watch:sass": "sass --no-source-map --watch scss/main.scss:assets/css/main.css"
+  }
+}

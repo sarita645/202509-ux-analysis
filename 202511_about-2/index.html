@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>關於 | DATASYS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body { font-family: 'Noto Sans TC', sans-serif; background: #f7f8fc; color: #212529; overflow-x: hidden; }
+
+    /* ── SUBNAV ── */
+    .about-subnav {
+      background: white;
+      border-bottom: 1px solid #e4e8f0;
+      display: flex;
+      justify-content: center;
+      position: sticky;
+      top: 80px;
+      z-index: 900;
+      box-shadow: 0 1px 5px rgba(0,0,0,.05);
+      transition: top 0.3s ease;
+    }
+    .about-subnav.header-hidden {
+      top: 0;
+    }
+    .about-subnav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1320px;
+      width: 100%;
+      padding: 0 24px;
+    }
+    .about-subnav-title { font-weight: 700; font-size: 16px; color: #212529; padding: 10px 20px; }
+    .about-subnav-links { display: flex; gap: 4px; }
+    .about-subnav-links a { font-size: 16px; color: #212529; padding: 10px 18px; text-decoration: none; white-space: nowrap; transition: color .2s; }
+    .about-subnav-links a:hover { color: #004b97; }
+
+    /* ── COMMON ── */
+    .gradient-text { background: linear-gradient(163deg,#1a4fe8 15%,#38c1ff 85%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .gradient-text-warm { background: linear-gradient(153deg,#ff9b2a 15%,#ffd138 85%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .section { max-width: 1320px; margin: 0 auto; padding: 80px 60px; }
+    .section-center { text-align: center; }
+    .section-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .display { font-size: clamp(32px, 4vw, 48px); font-weight: 700; line-height: 1.2; color: #212529; }
+    .body-text { font-size: 16px; line-height: 1.7; color: #374151; max-width: 900px; }
+    .bordered-heading { border-left: 4px solid #1a4fe8; padding-left: 16px; font-size: 28px; font-weight: 700; color: #212529; margin-bottom: 24px; }
+
+    /* ── VISION ── */
+    .vision-wrap { background: linear-gradient(180deg,#dbeafe 0%,#f7f8fc 100%); position: relative; overflow: hidden; }
+    .vision-wrap::before { content:''; position:absolute; inset:0; background: linear-gradient(to right,rgba(255,255,255,.9) 40%,transparent 80%); pointer-events:none; }
+
+    /* ── STATS ── */
+    .stats-row { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin: 40px 0; }
+    .stat-card { background: white; padding: 28px 40px; box-shadow: 0 4px 16px rgba(0,0,0,.1); text-align: center; min-width: 140px; }
+    .stat-number { font-size: 38px; font-weight: 700; line-height: 1.2; }
+    .stat-label { font-size: 16px; color: #212529; margin-top: 6px; }
+
+    /* ── TIMELINE ── */
+    .timeline-wrap{--tl-blue:#1a4fe8;--tl-cyan:#38c1ff;position:relative}
+    .timeline-container{background:white;border-radius:0 240px 240px 0;padding:48px 80px 56px 64px;width:92%;max-width:980px;margin:0 auto;box-shadow:0 8px 40px rgba(26,79,232,.07);position:relative;overflow:hidden}
+    .timeline-container::before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,var(--tl-blue) 0%,var(--tl-cyan) 100%)}
+    .timeline-heading{--tl-grad:linear-gradient(163deg,#1a4fe8 15%,#38c1ff 85%);font-size:24px;font-weight:700;margin-bottom:28px;background:var(--tl-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    /* 標籤列 */
+    .timeline-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 12px;
+      margin-bottom: 36px;
+    }
+    .timeline-tab {
+      border: 1px solid #adb5bd;
+      padding: 7px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #6c757d;
+      cursor: pointer;
+      background: transparent;
+      transition: border-color .2s, color .2s, background .2s, transform .15s;
+      position: relative;
+      user-select: none;
+    }
+    .timeline-tab:hover {
+      border-color: #1a4fe8;
+      color: #1a4fe8;
+      transform: translateY(-1px);
+    }
+    .timeline-tab.is-active {
+      border-color: #1a4fe8;
+      color: #1a4fe8;
+      background: rgba(26,79,232,.06);
+    }
+    .timeline-tab.is-active::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 50%; transform: translateX(-50%);
+      width: 6px; height: 6px;
+      background: #1a4fe8;
+      border-radius: 50%;
+    }
+    /* 內容面板 */
+    .timeline-panels { position: relative; min-height: 120px; }
+    .timeline-panel {
+      display: none;
+      animation: tl-fadein .35s ease forwards;
+    }
+    .timeline-panel.is-active { display: block; }
+    @keyframes tl-fadein {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 面板內容佈局 */
+    .tl-panel-inner {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+    .tl-year-badge {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .tl-year-num{font-size:42px;font-weight:900;line-height:1;background:linear-gradient(153deg,var(--tl-blue,#1a4fe8) 15%,var(--tl-cyan,#38c1ff) 85%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px}
+    .tl-year-tag {
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      background: #1a4fe8;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .tl-divider {
+      width: 1px;
+      align-self: stretch;
+      background: linear-gradient(180deg, #1a4fe8 0%, rgba(26,79,232,0) 100%);
+      flex-shrink: 0;
+    }
+    .tl-body { flex: 1; }
+    .tl-body ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tl-body ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #374151;
+    }
+    .tl-body ul li::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #1a4fe8;
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+    /* 進度條 */
+    .tl-progress-bar {
+      height: 3px;
+      background: #e9ecef;
+      border-radius: 2px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .tl-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a4fe8, #38c1ff);
+      border-radius: 2px;
+      transition: width .4s cubic-bezier(.4,0,.2,1);
+    }
+
+
+    /* 桌機隱藏 accordion */
+    @media(min-width:577px){
+      .tl-mobile-accordion { display: none !important; }
+      .map-btn-list { display: none !important; }
+      .map-detail-panel { display: contents; }
+    }
+
+    /* ── 手機 Accordion 樣式 ── */
+    .tl-mobile-accordion {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .tl-acc-item {
+      border-bottom: 1px solid #e9ecef;
+    }
+    /* 按鈕列（每個年份） */
+    .tl-acc-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid #adb5bd;
+      padding: 10px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      color: #6c757d;
+      cursor: pointer;
+      margin-bottom: 8px;
+      display: block;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .tl-acc-item.is-open .tl-acc-btn {
+      border-color: #1a4fe8;
+      color: #1a4fe8;
+      background: rgba(26,79,232,.04);
+      margin-bottom: 0;
+    }
+    /* 展開內容區（預設收合） */
+    .tl-acc-body {
+      display: none;
+      padding: 16px 4px 20px;
+    }
+    .tl-acc-item.is-open .tl-acc-body {
+      display: block;
+      animation: tl-fadein .3s ease forwards;
+    }
+    /* 年份大字 + tag */
+    .tl-acc-year {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(163deg,#1a4fe8 15%,#38c1ff 85%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .tl-acc-tag {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      background: #1a4fe8;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .tl-acc-body ul {
+      list-style: disc;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 8px;
+    }
+    .tl-acc-body ul li {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #374151;
+    }
+    /* 非 active 的按鈕之間有間距 */
+    .tl-acc-item:not(.is-open) .tl-acc-btn {
+      margin-bottom: 8px;
+    }
+
+    /* ── FEATURE CARDS ── */
+    .cards-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-top: 40px; }
+
+    .feature-card { background: #f8f9fa; box-shadow: 0 8px 16px rgba(0,0,0,.12); display: flex; flex-direction: column; }
+    .card-header { padding: 10px 16px; }
+    .card-header-text { font-size: 16px; font-weight: 700; color: white; }
+    .card-img-placeholder { height: 160px; overflow: hidden; }
+    .card-body { padding: 14px 16px; font-size: 16px; line-height: 1.6; color: #6c757d; flex: 1; }
+
+    /* ── MAP（滿版 + 標點彈窗）── */
+    /* ── LEAFLET MAP ── */
+    /* ── LEAFLET MAP ── */
+    .map-section { width:100%; height:70vh; min-height:520px; max-height:780px; position:relative; background:#eef0f3; }
+    #leaflet-map { width:100%; height:100%; }
+
+    /* 隱藏原生控件 */
+    .leaflet-control-attribution,.leaflet-control-zoom { display:none !important; }
+
+    /* ── marker：灰色 pin + 文字（預設） ── */
+    .lf-marker { background:transparent !important; border:none !important; box-shadow:none !important; }
+    .lf-marker-inner {
+      display: flex; align-items: center; gap: 7px;
+      white-space: nowrap; cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+    }
+    /* pin 圖示 */
+    .lf-pin {
+      width: 24px; height: 32px; position: relative; flex-shrink: 0;
+    }
+    .lf-pin::before {
+      content: '';
+      position: absolute; top:0; left:50%;
+      transform: translateX(-50%) rotate(-45deg);
+      width: 22px; height: 22px;
+      border-radius: 50% 50% 50% 0;
+      background: var(--pin-bg, #8a9ab0);
+      transition: background .2s, transform .25s;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    .lf-pin::after {
+      content: '';
+      position: absolute; top: 6px; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      border-radius: 50%; background: white;
+    }
+    .lf-name {
+      font-size: 13px; font-weight: 500; color: #5a6a7a;
+      transition: color .2s;
+    }
+    /* hover 狀態 */
+    .lf-marker-inner:hover .lf-pin::before { background: #1a4fe8; transform: translateX(-50%) rotate(-45deg) scale(1.1); }
+    .lf-marker-inner:hover .lf-name { color: #1a4fe8; font-weight: 700; }
+
+    /* ── active marker：藍色 pin ── */
+    .lf-marker-inner.is-active .lf-pin::before { background: #1a4fe8; }
+    .lf-marker-inner.is-active .lf-name { color: #1a4fe8; font-weight: 700; }
+
+    /* ── 右側浮動資訊面板 ── */
+    .map-info-panel {
+      position: absolute;
+      top: 24px; right: 500px;
+      z-index: 900;
+      width: 280px;
+      background: rgba(255,255,255,0.97);
+      box-shadow: 0 4px 24px rgba(0,0,0,.13);
+      font-family: 'Noto Sans TC', sans-serif;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(12px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .map-info-panel.is-visible {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .map-info-header {
+      background: white;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .map-info-name {
+      font-size: 18px; font-weight: 900; color: #1a4fe8; line-height: 1.2;
+    }
+    .map-info-close {
+      background: transparent; border: none; color: #adb5bd;
+      cursor: pointer; font-size: 20px; line-height: 1; padding: 0;
+      transition: color .15s;
+    }
+    .map-info-close:hover { color: #212529; }
+    .map-info-body {
+      padding: 16px 20px 20px;
+      max-height: calc(70vh - 120px);
+      overflow-y: auto;
+    }
+    .map-info-region {
+      font-size: 12px; font-weight: 700; color: #1a4fe8;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin: 12px 0 4px; border-top: 1px solid #e9ecef; padding-top: 10px;
+    }
+    .map-info-region:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+    .map-info-cities {
+      font-size: 14px; color: #374151; line-height: 1.7;
+    }
+
+    /* ── 手機版 (≤760px)：地圖下方列表 ── */
+    .map-mobile-ui { display: none; }
+    .map-mobile-info { background: white; padding: 20px; border-top: 3px solid #1a4fe8; }
+    .map-mobile-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .map-mobile-tab {
+      border: 1px solid #adb5bd; padding: 6px 14px; font-size: 16px; font-weight: 600;
+      font-family: 'Noto Sans TC', sans-serif; color: #6c757d; background: transparent;
+      cursor: pointer; transition: all .15s;
+    }
+    .map-mobile-tab.is-active { border-color: #1a4fe8; color: #1a4fe8; background: rgba(26,79,232,.05); }
+    .map-mobile-country { font-size: 20px; font-weight: 900; color: #0ea5e9; margin-bottom: 8px; }
+    .map-mobile-cities { font-size: 16px; color: #374151; line-height: 1.7; }
+    .map-mobile-cities p { margin: 0 0 3px; }
+
+
+
+    /* ── BULLETS ── */
+    .bullet-list { display: flex; flex-direction: column; gap: 12px; }
+    .bullet-item { background: white; padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; }
+    .bullet-dot { width: 8px; height: 8px; border-radius: 50%; background: #1a4fe8; flex-shrink: 0; margin-top: 6px; }
+    .bullet-text { font-size: 16px; line-height: 1.6; color: #374151; }
+
+    /* ── COVERAGE（附圖版：圖片上方、文字下方）── */
+    .coverage-grid {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 40px 0;
+    }
+    .coverage-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1;
+      min-width: 220px;
+      max-width: 340px;
+      padding: 0 40px;
+      border-right: 1px solid #e9ecef;
+    }
+    .coverage-item:last-child { border-right: none; }
+    /* 圓餅圖容器（圖片版） */
+    .pie-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+    .pie-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    /* 百分比數字疊在圖片正中央 */
+    .pie-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .pie-pct {
+      font-size: 26px;
+      font-weight: 900;
+      color: white;
+      line-height: 1;
+      text-shadow: 0 1px 4px rgba(0,0,0,.35);
+    }
+    /* 文字區 */
+    .cov-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #212529;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .cov-accent { color: #1a4fe8; }
+    .cov-cat {
+      font-size: 16px;
+      font-weight: 700;
+      color: #e8444a;
+      letter-spacing: 1px;
+      margin-top: 2px;
+      text-align: left;
+    }
+    .cov-src {
+      font-size: 16px;
+      color: #aaa;
+      margin-top: 2px;
+      text-align: left;
+    }
+
+
+
+    /* ── PROMISE ── */
+    .promise-block { font-size: 20px; font-weight: 700; color: #212529; line-height: 1.6; max-width: 700px; margin: 0 auto; text-align: center; }
+
+    /* ── TOP BANNER ── */
+    .page-banner {
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+    .page-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+    /* ── bg-1 背景區（mission → strength → 直到 map） ── */
+    .bg1-wrap {
+      position: relative;
+      background: url('images/bg-1.webp') center center / cover no-repeat;
+    }
+    .bg1-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(247,248,252,0.88);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg1-wrap > * {
+      position: relative;
+      z-index: 1;
+    }
+    /* ── BAND ── */
+    .blue-band { position: relative; width: 100%; height: 400px; overflow: hidden; }
+    .footer-hero { background: linear-gradient(to right,#0c1a4a,#1a4fe8,#0ea5e9,#38c1ff); height: 180px; display: flex; align-items: center; justify-content: center; }
+
+    /* ════════════════════════════════════════
+       RWD BREAKPOINTS
+       1024px  平板橫向
+       768px   平板直向
+       576px   手機
+    ════════════════════════════════════════ */
+
+    /* ── 1024px：平板橫向 ── */
+    @media (max-width: 1024px) {
+      .section { padding: 64px 40px; }
+      .about-subnav-inner { padding: 0 20px; }
+      .display { font-size: clamp(28px, 3.5vw, 40px); }
+
+      /* Timeline */
+      .timeline-container { padding: 40px 48px 48px 48px; }
+
+      /* Feature cards 2 欄 */
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* Map 高度調整 */
+      .map-section { height: 60vh; }
+
+      /* Stats */
+      .stats-row { gap: 24px; }
+      .stat-card { padding: 22px 28px; }
+
+      /* Coverage */
+      .coverage-grid { gap: 32px; }
+      .coverage-item { min-width: 180px; padding: 0 24px; }
+    }
+
+    /* ── 768px：平板直向 ── */
+    @media (max-width: 768px) {
+      .section { padding: 48px 28px; }
+      .display { font-size: clamp(26px, 4vw, 36px); }
+      .body-text { font-size: 16px; }
+      .bordered-heading { font-size: 22px; }
+
+      /* Subnav */
+      .about-subnav-inner { padding: 0 16px; }
+      .about-subnav-links a { padding: 10px 12px; font-size: 16px; }
+
+      /* Banner */
+      .page-banner { height: 280px; }
+
+      /* Timeline */
+      .timeline-container { padding: 32px 32px 40px 36px; border-radius: 0 80px 80px 0; }
+      .timeline-tab { font-size: 16px; padding: 6px 12px; }
+
+      /* Feature cards 2 欄 */
+      .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+      /* Stats */
+      .stats-row { gap: 16px; }
+      .stat-card { padding: 18px 20px; min-width: 100px; }
+      .stat-number { font-size: 30px; }
+
+      /* Map 平板 */
+      .map-section { height: 55vh; min-height: 400px; }
+
+      /* Coverage */
+      .coverage-grid { flex-direction: column; align-items: stretch; gap: 0; }
+      .coverage-item { flex-direction: row; align-items: center; gap: 20px; border-right: none; border-bottom: 1px solid #e9ecef; padding: 20px 16px; max-width: 100%; }
+      .coverage-item:last-child { border-bottom: none; }
+      .pie-wrap { width: 90px; height: 90px; flex-shrink: 0; }
+      .pie-pct { font-size: 18px; }
+      .cov-title { font-size: 16px; }
+
+      /* Blue band */
+      .blue-band { height: 280px; }
+
+      /* Promise */
+      .promise-block { font-size: 17px; }
+    }
+
+    /* ── 800px：隱藏 Leaflet 地圖，只顯示手機版列表 ── */
+    @media (max-width: 800px) {
+      .map-section { display: none; }
+      .map-mobile-ui { display: block; }
+    }
+
+    /* ── 576px：手機 ── */
+    @media (max-width: 576px) {
+      .section { padding: 40px 20px; }
+      .display { font-size: clamp(24px, 6vw, 32px); }
+      .body-text { font-size: 16px; max-width: 100%; }
+      .section-label { font-size: 12px; }
+
+      /* Subnav */
+      .about-subnav-inner .about-subnav-links { display: none; }
+      .about-subnav-title { padding: 10px 16px; }
+
+      /* Banner */
+      .page-banner { height: 200px; }
+
+      /* bg1-wrap 間距 */
+      .bg1-wrap .section { padding: 40px 20px; }
+
+      /* Timeline 手機版 accordion */
+      .timeline-tabs  { display: none !important; }
+      .timeline-panels { display: none !important; }
+      .tl-mobile-accordion { display: flex !important; }
+      .tl-progress-bar { display: none; }
+      .timeline-container { border-radius: 0; padding: 24px 20px 32px; width: 100%; }
+
+      /* Feature cards 1 欄 */
+      .cards-grid { grid-template-columns: 1fr; gap: 16px; }
+
+      /* Stats */
+      .stats-row { flex-direction: column; align-items: center; gap: 12px; }
+      .stat-card { width: 100%; max-width: 300px; padding: 16px 20px; }
+      .stat-number { font-size: 28px; }
+
+      /* Map 極小螢幕 */
+      .map-section { height: 200px; min-height: 180px; }
+
+      /* Recognition bullets */
+      .bullet-item { padding: 12px; }
+      .bullet-text { font-size: 16px; }
+
+      /* Coverage */
+      .coverage-item { padding: 16px 12px; gap: 14px; }
+      .pie-wrap { width: 76px; height: 76px; }
+      .pie-pct { font-size: 16px; }
+      .cov-title { font-size: 16px; }
+      .cov-cat { font-size: 16px; letter-spacing: .5px; }
+
+      /* Blue band */
+      .blue-band { height: 200px; }
+
+      /* Promise */
+      .promise-block { font-size: 16px; }
+
+      /* Timeline accordion */
+      .tl-acc-year { font-size: 36px; }
+      .tl-acc-body ul li { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<style>:root{--c-primary:#004b97;--c-text:#333;--c-text-light:#666;--c-bg:#fff;--c-bg-subtle:#f8f9fa;--c-border:#eee;--transition-base:all 0.3s ease;}#header{color:var(--c-text);position:sticky;top:0;background-color:var(--c-bg);border-bottom:1px solid var(--c-border);z-index:1000;transition:transform 0.3s ease;&.is-hidden{transform:translateY(-100%);}.layout-container{max-width:1320px;margin:0 auto;padding:0 10px;}> .layout-container{display:flex;justify-content:space-between;align-items:center;height:80px;}.brand-logo img{vertical-align:middle;}.header-actions{display:flex;align-items:center;height:100%;}.icon-btn{line-height:1;font-size:24px;cursor:pointer;user-select:none;background-color:transparent;border:none;color:var(--c-text);padding:5px 10px;margin-left:10px;transition:var(--transition-base);&:hover{color:var(--c-primary);}}.nav-trigger{display:none;}.primary-nav{display:flex;height:100%;margin:0;padding:0;list-style:none;.nav-node{height:100%;display:flex;align-items:center;> a{display:flex;align-items:center;height:100%;padding:0 15px;text-decoration:none;color:var(--c-text);font-weight:500;transition:var(--transition-base);&:hover{color:var(--c-primary);}}}.nav-node-relative{position:relative;}}.dropdown-mega{position:absolute;top:100%;left:0;width:100%;background-color:var(--c-bg);box-shadow:0 10px 20px rgba(0,0,0,0.05);border-top:1px solid var(--c-border);opacity:0;visibility:hidden;transform:translateY(10px);transition:var(--transition-base);.mega-content{position:relative;display:flex;min-height:400px;}}.mega-sidebar{list-style:none;margin:0;padding:20px 0;width:250px;border-right:1px solid var(--c-border);flex-shrink:0;.sidebar-item{> a{display:block;padding:12px 20px;text-decoration:none;color:var(--c-text);font-weight:500;transition:var(--transition-base);cursor:pointer;&:hover{background-color:var(--c-bg-subtle);color:var(--c-primary);}}&.is-active > a{background-color:var(--c-bg-subtle);color:var(--c-primary);font-weight:700;}}}.mega-panels{flex:1;padding:30px 40px;.mega-panel{display:none;height:100%;}& .is-active{display:block;}}.panel-grid{display:grid;grid-template-columns:1fr 350px;gap:40px;height:100%;.panel-links{display:grid;grid-template-columns:repeat(2,1fr);gap:30px;align-content:start;.link-col{.nav-group-title{font-size:clamp(1rem,1.5vw,1.125rem);color:var(--c-primary);margin:0 0 15px 0;padding-bottom:10px;border-bottom:1px solid var(--c-border);font-weight:700;}a{display:block;color:var(--c-text-light);text-decoration:none;padding:6px 0;font-size:0.95rem;transition:var(--transition-base);&:hover{color:var(--c-primary);transform:translateX(5px);}}}}.panel-feature{border-left:1px solid var(--c-border);padding-left:40px;img{width:100%;height:auto;border-radius:4px;margin-bottom:15px;}p{font-size:0.95rem;color:var(--c-text-light);line-height:1.6;margin:0;}}}.dropdown-small{position:absolute;top:100%;left:0;min-width:200px;background-color:var(--c-bg);box-shadow:0 10px 20px rgba(0,0,0,0.05);border-top:2px solid var(--c-primary);opacity:0;visibility:hidden;transform:translateY(10px);transition:var(--transition-base);padding:10px 0;z-index:100;a{display:block;padding:10px 20px;color:var(--c-text);text-decoration:none;transition:var(--transition-base);&:hover{color:var(--c-primary);background-color:var(--c-bg-subtle);}}}@media (min-width:992px){.primary-nav .nav-node:hover .dropdown-mega,.primary-nav .nav-node:hover .dropdown-small{opacity:1;visibility:visible;transform:translateY(0);}.dropdown-mega{max-height:calc(100vh - 80px);overflow-y:auto;}}@media (max-width:991px){.nav-trigger{display:block;}.primary-nav{display:flex;position:absolute;top:100%;left:0;width:100%;height:calc(100vh - 80px);overflow-y:auto;background-color:var(--c-bg);flex-direction:column;border-top:1px solid var(--c-border);box-shadow:0 10px 20px rgba(0,0,0,0.1);opacity:0;visibility:hidden;transform:translateY(10px);transition:var(--transition-base);&.is-open{opacity:1;visibility:visible;transform:translateY(0);}.nav-node{height:auto;flex-direction:column;align-items:flex-start;> a{width:100%;padding:15px 20px;border-bottom:1px solid var(--c-border);}}}.dropdown-mega,.dropdown-small{position:static;display:grid;grid-template-rows:0fr;transition:grid-template-rows 0.3s ease;box-shadow:none;border-top:none;width:100%;background-color:var(--c-bg-subtle);opacity:1;visibility:visible;transform:none;}.nav-node.is-expanded .dropdown-mega,.nav-node.is-expanded .dropdown-small{grid-template-rows:1fr;}.mega-accordion-wrapper,.small-accordion-wrapper{min-height:0;overflow:hidden;}.dropdown-small{padding:0;border-bottom:1px solid var(--c-border);a{padding:12px 20px 12px 40px;border-bottom:1px solid var(--c-border);&:last-child{border-bottom:none;}}}.mega-content{flex-direction:column;min-height:auto;}.mega-sidebar{display:none;}.mega-panels{padding:0;display:flex;flex-direction:column;.mega-panel{display:block !important;height:auto;}}.panel-grid{grid-template-columns:1fr;gap:0;padding:0;.panel-links{display:flex;flex-direction:column;gap:0;padding:0;.link-col{display:flex;flex-direction:column;.nav-group-title{padding:12px 20px 12px 30px;margin:0;border-bottom:1px solid var(--c-border);font-size:1rem;color:var(--c-primary);}a{display:block;padding:12px 20px 12px 40px;border-bottom:1px solid var(--c-border);color:var(--c-text-light);font-size:0.95rem;}}}.panel-feature{display:none;}}}}#search-overlay{position:fixed;inset:0;background-color:rgba(255,255,255,0.98);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:var(--transition-base);&.is-active{opacity:1;visibility:visible;}.search-close{position:absolute;top:30px;right:30px;font-size:40px;background-color:transparent;border:none;cursor:pointer;color:var(--c-text-light);transition:var(--transition-base);&:hover{color:var(--c-primary);transform:rotate(90deg);}}form{width:100%;max-width:800px;padding:0 20px;.ty{display:flex;align-items:center;border-bottom:2px solid var(--c-primary);padding-bottom:10px;.inputfrom{flex:1;border:none;background-color:transparent;font-size:clamp(1.5rem,3vw,2.5rem);outline:none;color:var(--c-text);min-width:0;}.button-1{background-color:var(--c-primary);color:var(--c-bg);border:none;padding:12px 30px;font-size:1.1rem;cursor:pointer;border-radius:4px;margin-left:20px;font-weight:500;transition:var(--transition-base);&:hover{opacity:0.9;}}}}}</style>
+  <header id="header">
+    <div class="layout-container" id="navigationBar">
+      <a href="/" class="brand-logo">
+        <img src="/images/logo.svg" width="186" height="51" alt="">
+      </a>
+      <div class="header-actions">
+        <nav class="primary-nav">
+          <li class="nav-node">
+            <a href="#" class="node-link">方案 ▾</a>
+            <div class="dropdown-mega">
+              <div class="mega-accordion-wrapper">
+                <div class="layout-container">
+                  <div class="mega-content">
+                    <ul class="mega-sidebar">
+                      <li class="sidebar-item is-active" data-tab-target="sol-ai"><a>AI 解決方案</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-product"><a>產品與軟體</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-smart"><a>智能+應用</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-ot"><a>OT應用</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-retail"><a>新零售</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-domain"><a>應用領域</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-cloud"><a>雲平台/雲應用</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-overview"><a>了解智能+全方案</a></li>
+                      <li class="sidebar-item" data-tab-target="sol-ecosystem"><a>5GAIoT</a></li>
+                    </ul>
+                    <div class="mega-panels">
+                      <div class="mega-panel is-active" id="sol-ai">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">企業 AI</div>
+                                <a href="/dsc/METIS/AIassist/index.html">企業AI助理</a>
+                                <a href="/dsc/project/ai-solution/private-ai">AI私有部署</a>
+                                <a href="/dsc/METIS/ChatFile/index">AI知識庫 ChatFile</a>
+                                <a href="/dsc/project/athena/index">METIS 平台</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20250206/a93676880cb0fe599ac7bc542f0254fb.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>METIS是智慧女神之母，負責封裝企業的寶貴知識，採用新一代技術，是企業數智化發展的平台底座。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-product">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">ERP滿足企業各成長階段</div>
+                                <a href="/software/T100/">集團大型企業：T100 ERP</a>
+                                <a href="/software/WF/WF">中大型製造業：Workflow ERP GP</a>
+                                <a href="/software/CM/CM">中大型流通業：Cosmos ERP</a>
+                                <a href="/dsc/solution/WB002839/AISM">中小企業：SmartERP</a>
+                                <a href="https://a1..com/">小微型企業：A1商務應用雲</a>
+                                <a href="/dsc/solution/WB002521/WB00252103">新創新設公司</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">ERPⅡ 管理需求延展應用</div>
+                                <a href="/software/BPM/BPM">BPM 企業流程管理</a>
+                                <a href="/software/717.html">BI 商業智慧</a>
+                                <a href="/software/708.html">CRM 客戶關係管理</a>
+                                <a href="/dsc/solution/WB002741/index">HR 人力資源管理</a>
+                                <a href="/software/710.html">POS 銷售點管理</a>
+                                <a href="/software/731.html">EAI 整合應用解決方案</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/37b987bff1522ec6ec4af4623bf6bb3b.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>針對企業各成長階段的管理需求延展應用，提供一體化解決方案。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-smart">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">數位化轉型</div>
+                                <a href="/dsc/project/WB002940/index">企業數位化轉型</a>
+                                <a href="/dsc/project/ESG/index">ESG企業永續價值</a>
+                                <a href="https://techops..com/solution-risk-assessment/">企業資安風險評量</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">智能+應用方案</div>
+                                <a href="/dsc/marketing/WB002838/WB00283808.htm">數智工廠全流程</a>
+                                <a href="/dsc/industry4/smartFactory">廠內智能物流</a>
+                                <a href="https://www..com.tw/software/PLM/index">PLM產品生命週期管理</a>
+                                <a href="/software/aps/aps">APS智能排程管理</a>
+                                <a href="/software/mes/mes">MES智能現場執行系統</a>
+                                <a href="/dsc/project/sFWR/sFWR">sFWR數智工廠戰情室</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/79fb222ca3a024206eda3ebe749ac068.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>讓數據自動化貫穿生產製造全流程，達到降本增效提質減存效益，激發新營運模式轉型創新，軟硬融合共贏智慧未來。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-ot">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">OT應用</div>
+                                <a href="https://www..com.tw/dsc/OT-IaaS/01_3/index.html">機聯網-設備聯網APP</a>
+                                <a href="https://www..com.tw/dsc/OT-EEC/01/index.html">能源管理APP</a>
+                                <a href="https://www..com.tw/dsc/OT-ROBOT/01/index.html">機械手臂</a>
+                                <a href="https://www..com.tw/dsc/OT-OMS/01/index.html">碳盤查</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20191211/750bf226aee551f6e16e709195ffa9c0.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>工業互聯網數據平台將加速數字化轉型，從設備單點工藝優化、產線效能強化、到全面提升工廠整體效益。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-retail">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">新零售</div>
+                                <a href="/dsc/solution/WB002972/index">新零售</a>
+                                <a href="/dsc/solution/WB002675/WB00267501">通路經營</a>
+                                <a href="https://www..com.tw/dsc/solution/WB002972/cloud">會員營銷</a>
+                                <a href="/dsc/solution/WB002595/WB00259501">網購管理</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20200416/8a998d2e2b0ca91c42211a29a1ed97e4.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>在新零售佈局下，通過全渠道管理高效運作，充分發揮新零售營運能力，實現線上線下整合精準行銷。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-domain">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">企業營運管理</div>
+                                <a href="/dsc/solution/WB002917/WB00291701">IT 編列預算</a>
+                                <a href="/ERP/financial">財務會計管理</a>
+                                <a href="/ERP/inventory.html">進銷存管理</a>
+                                <a href="/dsc/industry4/smartFactory">倉儲物流管理</a>
+                                <a href="/dsc/solution/WB002783/WB00278301">生產製造管理</a>
+                                <a href="/dsc/solution/WB002675/WB00267501_3">門店管理</a>
+                                <a href="/dsc/solution/WB003249/WB00324901.html">BCP企業營運持續計畫</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">時勢法規議題</div>
+                                <a href="https://www..com.tw/dsc/marketing/WB003008/web/02/index.html">企業新南向</a>
+                                <a href="/dsc/solution/WB003058/index">企業防疫全攻略</a>
+                                <a href="/dsc/solution/WB002742/WB00274201">電子發票</a>
+                                <a href="/dsc/solution/WB002741/law">人資勞動法規</a>
+                                <a href="/dsc/solution/WB002639/WB00263901">EAS企業會計準則</a>
+                                <a href="/dsc/solution/WB003031/index">行動應用</a>
+                                <a href="/dsc/solution/WB003413/index">AI銷售預測</a>
+                                <a href="/dsc/solution/WB003570/index">高效儲運</a>
+                                <a href="/dsc/solution/WB003583/index">RFID應用</a>
+                                <a href="/dsc/solution/WB003932/index">智能揀選</a>
+                                <a href="/dsc/solution/WB003954/index">美國關稅匯率</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/12ac7c0b08ef146400b108f7d380db64.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>以效益為導向的關鍵職能作業流程規劃，彈性因應市場不確定性與法令政策改變，提供對應的管理系統與諮詢服務。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-cloud">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">雲平台/雲應用</div>
+                                <a href="/software/DOP/DOP">營運監控雲平台</a>
+                                <a href="/dsc/project/ServiceCloud/ServiceCloud#steward2">敏捷BI-Tip Biu BI</a>
+                                <a href="https://a1..com/">A1商務應用雲</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20200416/9555d8d1087fdb92cda30e1fc7c5e0c2.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>定義服務新模式，啟動管理無限可能！重構服務新模式，搭建企業管理雲平台，賦能企業管理升級！</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-overview">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">了解智能+全方案</div>
+                                <a href="https://www..com.tw/ERP/erp-all.html">智能+全方案</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/0dcbbad4f7896e9315c3a7fe0220f6e4.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>累積將近40年產業輔導經驗，提供您最佳服務與支援。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="sol-ecosystem">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">智働家族</div>
+                                <a href="https://www..com.tw/5GAIOT/">5GAIoT體驗基地</a>
+                                <a href="https://www..com.tw/5GAIOT/#/page">夥伴聯盟方案總覽</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20211118/da7f47ce7395b6ca2eff20587c1665f9.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>發揮聯盟效應建構生態體系，提供生產製造端系統整合服務，助企業實現智造轉型。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- 行業選單 -->
+          <li class="nav-node">
+            <a href="#" class="node-link">行業 ▾</a>
+            <div class="dropdown-mega">
+              <div class="mega-accordion-wrapper">
+                <div class="layout-container">
+                  <div class="mega-content">
+                    <ul class="mega-sidebar">
+                      <li class="sidebar-item is-active" data-tab-target="ind-mfg"><a>製造業</a></li>
+                      <li class="sidebar-item" data-tab-target="ind-retail"><a>流通業</a></li>
+                      <li class="sidebar-item" data-tab-target="ind-other"><a>其他行業</a></li>
+                    </ul>
+                    <div class="mega-panels">
+                      <div class="mega-panel is-active" id="ind-mfg">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">製造業</div>
+                                <a href="/dsc/solution/WB002783/WB00278301">製造業</a>
+                                <a href="/dsc/solution/WB002513/WB00251301">電子業</a>
+                                <a href="https://www..com.tw/dsc/solution/WB003302/v2/index">工業電腦/網通</a>
+                                <a href="/dsc/solution/WB002476/WB00247601">機械設備業</a>
+                                <a href="/dsc/solution/WB003295/WB00329502">機械零組件</a>
+                                <a href="/dsc/solution/WB002811/WB00281101">交通零件</a>
+                                <a href="/dsc/solution/WB002554/WB00255401">塑膠業</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">&nbsp;</div>
+                                <a href="/dsc/solution/WB002785/WB00278501">醫材業</a>
+                                <a href="/dsc/solution/WB002543/WB00254301">生技製藥業</a>
+                                <a href="/solution/ListDetail5945">化工業</a>
+                                <a href="/dsc/solution/WB002553/WB00255301">食品業</a>
+                                <a href="/dsc/solution/WB002953/WB00295301">金屬業</a>
+                                <a href="/dsc/solution/semiconductor/index">半導體行業</a>
+                                <a href="/solution/ListDetail5983">紡織成衣</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/76f1e22c725aa28e950b3d812f3b2cc8.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>客製化時代的機會與挑戰，以軟硬融合打通資訊價值鏈，擁抱智造未來。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="ind-retail">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">流通業</div>
+                                <a href="/dsc/solution/WB002675/WB00267501">流通業</a>
+                                <a href="/dsc/solution/WB002972/index">新零售</a>
+                                <a href="/dsc/solution/WB002553/WB00255301">食品業</a>
+                                <a href="/dsc/solution/WB002972/cloud">會員營銷</a>
+                                <a href="/dsc/solution/WB002801/WB00280101">設備業</a>
+                                <a href="/dsc/solution/WB002595/WB00259501">網購電商</a>
+                                <a href="/dsc/solution/WB002711/WB00271101">美妝業</a>
+                                <a href="/dsc/solution/WB002675/WB00267501_3">門市專櫃</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">&nbsp;</div>
+                                <a href="/dsc/solution/WB003399/index">服飾業</a>
+                                <a href="/dsc/solution/WB002675/WB00267501_1">經銷批發</a>
+                                <a href="/dsc/solution/WB003006/index">餐飲業</a>
+                                <a href="/dsc/solution/WB002675/WB00267501_2">連鎖通路</a>
+                                <a href="/dsc/solution/WB002675/WB00267501_4">觀光工廠</a>
+                                <a href="/solution/ListDetail5967">休憩業</a>
+                                <a href="/dsc/solution/WB002752/WB00275201">接案管理</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180612/117f252fd9019a8a21007e3a61c5c667.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>在新零售佈局下，提供完善的資訊化解決方案，提升全通路營運能力。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="ind-other">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">其他行業</div>
+                                <a href="/dsc/solution/WB002899/WB00289901">工程業</a>
+                                <a href="/dsc/solution/WB003288/WB00328801">太陽能光電業</a>
+                                <a href="/solution/ListDetail5982">金融保險</a>
+                                <a href="/solution/ListDetail5947">印刷產業</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20211022/12158423bf2f7146f85fabfd896a54e5.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>以實現行業關鍵效益為核心，在市場高度變動和競爭下，以數位轉型立於不敗之地。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- 服務選單 -->
+          <li class="nav-node">
+            <a href="#" class="node-link">服務 ▾</a>
+            <div class="dropdown-mega">
+              <div class="mega-accordion-wrapper">
+                <div class="layout-container">
+                  <div class="mega-content">
+                    <ul class="mega-sidebar">
+                      <li class="sidebar-item is-active" data-tab-target="srv-val"><a>服務與支援</a></li>
+                      <li class="sidebar-item" data-tab-target="evaluate"><a>行業自我評估</a></li>
+                    </ul>
+                    <div class="mega-panels">
+                      <div class="mega-panel is-active" id="srv-val">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">客戶支援</div>
+                                <a href="/service">客服中心</a>
+                                <a href="https://service..com/login">e-service</a>
+                                <a href="/userservice">服務合約</a>
+                              </div>
+                              <div class="link-col">
+                                <div class="nav-group-title">服務產品</div>
+                                <a href="https://market.cloud.com/">雲市場</a>
+                                <a href="/dsc/project/ServiceCloud/ServiceCloud">服務雲</a>
+                                <a href="/dsc/service/WB002736/WB00273601">資訊委外</a>
+                                <a href="/dsc/service/WB003566/index">企業醫生</a>
+                                <a href="/digiknow/service/">全通路品牌行銷方案</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>全程價值服務，以效益導向的諮詢診斷，助力企業全面提升營運效能。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="evaluate">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">痛點診斷與評量</div>
+                                <a href="/dsc/diagnosis/01/">行業痛點診斷</a>
+                                <a href="https://techops..com/solution-risk-assessment/">企業資安風險評估</a>
+                                <a href="/dsc/diagnosis/04/">ESG碳排執行力評量</a>
+                                <a href="/dsc/diagnosis/05/">ESG社會責任評量</a>
+                                <a href="/dsc/diagnosis/07/">關稅匯率衝擊評量</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>透過問卷檢視企業面臨的管理問題，從中找出背後關鍵原因，取得應改善的管理建議。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- 案例 -->
+          <li class="nav-node"><a href="/case">案例</a></li>
+
+          <!-- 活動與學習選單 -->
+          <li class="nav-node">
+            <a href="#" class="node-link">活動與學習 ▾</a>
+            <div class="dropdown-mega">
+              <div class="mega-accordion-wrapper">
+                <div class="layout-container">
+                  <div class="mega-content">
+                    <ul class="mega-sidebar">
+                      <li class="sidebar-item is-active" data-tab-target="learn-event"><a>最新活動</a></li>
+                      <li class="sidebar-item" data-tab-target="learn-course"><a>課程與培訓</a></li>
+                      <li class="sidebar-item" data-tab-target="learn-knowledge"><a>知識專區</a></li>
+                      <li class="sidebar-item" data-tab-target="learn-download"><a>資源下載</a></li>
+                    </ul>
+                    <div class="mega-panels">
+                      <div class="mega-panel is-active" id="learn-event">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">最新活動</div>
+                                <a href="https://www.digiknow.com.tw/activity">近期活動</a>
+                                <a href="/activity_report">活動報導</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>掌握最新活動資訊與產業動態。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="learn-course">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">課程與培訓</div>
+                                <a href="http://dsa.dsc.com.tw/">精選課程</a>
+                                <a href="http://dsa.dsc.com.tw/Cert/Default.aspx">認證培訓</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>系統化課程與認證培訓，助力企業人才發展。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="learn-knowledge">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">知識專區</div>
+                                <a href="https://www.digiknow.com.tw/">就享知↗</a>
+                                <a href="/blog/index">經典專欄文章</a>
+                                <a href="/enewspaper">電子報</a>
+                                <a href="/mag">期刊雜誌</a>
+                                <a href="/video">影音中心</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>豐富的知識資源與學習內容，提升企業競爭力。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mega-panel" id="learn-download">
+                        <div class="panel-accordion-wrapper">
+                          <div class="panel-grid">
+                            <div class="panel-links">
+                              <div class="link-col">
+                                <div class="nav-group-title">資源下載</div>
+                                <a href="https://download..com/">資料下載中心</a>
+                              </div>
+                            </div>
+                            <div class="panel-feature">
+                              <img src="https://static..com.tw/upload/admin/20180919/192b2fb0d647fbfa93d9073149afa52d.jpg" width="310" height="174" loading="lazy" alt="*">
+                              <p>實用的參考資料與下載資源。</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- 關於 (小型下拉) -->
+          <li class="nav-node nav-node-relative">
+            <a href="/aboutdsc.html" class="node-link">關於 ▾</a>
+            <div class="dropdown-small">
+              <div class="small-accordion-wrapper">
+                <a href="/aboutdsc">公司簡介</a>
+                <a href="/news">新聞中心</a>
+                <a href="/about/prizes">企業榮譽</a>
+                <a href="/hr/school/">人才招募</a>
+                <a href="/dsc/solution/article/informationsecurity">資訊安全政策</a>
+                <a href="/grievance">申訴信箱</a>
+              </div>
+            </div>
+          </li>
+
+          <!-- 聯絡我們 (小型下拉) -->
+          <li class="nav-node nav-node-relative">
+            <a href="/contact/eform" class="node-link">聯絡我們 ▾</a>
+            <div class="dropdown-small">
+              <div class="small-accordion-wrapper">
+                <a href="/contact/eform">需求諮詢</a>
+                <a href="/servicepoint">服務據點</a>
+              </div>
+            </div>
+          </li>
+        </nav>
+
+        <!-- 搜尋按鈕 -->
+        <button class="icon-btn search-trigger" aria-label="開啟搜尋">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+        <!-- 手機版漢堡選單切換按鈕 -->
+        <button class="icon-btn nav-trigger" aria-label="切換導覽列">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 滿版搜尋畫面 -->
+  <div id="search-overlay" class="search-overlay">
+    <button class="search-close" aria-label="關閉搜尋">✕</button>
+    <div class="search-container">
+      <form action="/search">
+        <div class="top">
+          <div class="classify">
+            <div class="ty">
+              <input type="text" name="keyword" id="search_input" class="inputfrom" value="" autocomplete="off" placeholder="站內搜尋">
+              <span class="button-box">
+                <input type="submit" value="搜尋" class="button-1">
+              </span>
+              <div class="search-jl"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 處理手機版漢堡選單切換
+      const navTrigger = document.querySelector('.nav-trigger');
+      const primaryNav = document.querySelector('.primary-nav');
+
+      navTrigger.addEventListener('click', () => {
+        primaryNav.classList.toggle('is-open');
+      });
+
+      // 處理手機版主選單風琴式展開
+      const navNodes = document.querySelectorAll('.nav-node');
+      navNodes.forEach(node => {
+        const link = node.querySelector('.node-link');
+        if (link) {
+          link.addEventListener('click', (e) => {
+            // 判斷是否有下拉清單需要展開
+            if (node.querySelector('.dropdown-mega, .dropdown-small')) {
+              e.preventDefault();
+              if (window.innerWidth < 992) {
+                const isExpanded = node.classList.contains('is-expanded');
+                // 關閉其他節點
+                navNodes.forEach(n => n.classList.remove('is-expanded'));
+                // 切換當前狀態
+                if (!isExpanded) node.classList.add('is-expanded');
+              }
+            }
+          });
+        }
+      });
+
+      // 處理滿版下拉選單內的側邊大分類切換 (重構後純 JS 操控平行節點)
+      const sidebars = document.querySelectorAll('.mega-sidebar');
+      sidebars.forEach(sidebar => {
+        const items = sidebar.querySelectorAll('.sidebar-item');
+        const panelsContainer = sidebar.nextElementSibling; 
+        const panels = panelsContainer.querySelectorAll('.mega-panel');
+        
+        items.forEach(item => {
+          item.addEventListener('mouseenter', () => {
+            if (window.innerWidth >= 992) {
+              // 重置所有 Active 狀態
+              items.forEach(i => i.classList.remove('is-active'));
+              panels.forEach(p => p.classList.remove('is-active'));
+              
+              // 依據 data-tab-target 啟用對應面板
+              item.classList.add('is-active');
+              const targetId = item.getAttribute('data-tab-target');
+              const targetPanel = panelsContainer.querySelector(`#${targetId}`);
+              if (targetPanel) targetPanel.classList.add('is-active');
+            }
+          });
+        });
+      });
+
+      // 處理搜尋覆蓋層切換
+      const searchTrigger = document.querySelector('.search-trigger');
+      const searchOverlay = document.getElementById('search-overlay');
+      const searchClose = document.querySelector('.search-close');
+      const searchInput = document.getElementById('search_input');
+
+      searchTrigger.addEventListener('click', () => {
+        searchOverlay.classList.add('is-active');
+        // 等待過場動畫完成後聚焦輸入框
+        setTimeout(() => searchInput.focus(), 300);
+      });
+
+      searchClose.addEventListener('click', () => {
+        searchOverlay.classList.remove('is-active');
+      });
+
+      // 點擊覆蓋層空白處可關閉搜尋
+      searchOverlay.addEventListener('click', (e) => {
+        if (e.target === searchOverlay) {
+          searchOverlay.classList.remove('is-active');
+        }
+      });
+
+      // 透過 JS 判斷 scroll state 處理 Header 向上顯示/向下隱藏
+      let lastScrollY = window.scrollY;
+      const header = document.getElementById('header');
+
+      const subNav = document.querySelector('.about-subnav');
+
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+
+        // 若向下滾動且超過 header 高度，則隱藏；否則顯示
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+          header.classList.add('is-hidden');
+          if (subNav) subNav.classList.add('header-hidden');
+        } else {
+          header.classList.remove('is-hidden');
+          if (subNav) subNav.classList.remove('header-hidden');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+    });
+  </script>
+  <!-- ══ ABOUT SUB-NAV ══ -->
+  <div class="about-subnav">
+    <div class="about-subnav-inner">
+      <div class="about-subnav-title">關於</div>
+      <div class="about-subnav-links">
+        <a href="#vision">願景與信念</a>
+        <a href="#mission">使命與能力</a>
+        <a href="#strength">實力與歷程</a>
+        <a href="#future">擁抱過去展望未來</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ══ TOP BANNER ══ -->
+    <div class="page-banner">
+      <img src="images/banner-1.webp" alt="關於">
+    </div>
+
+    <!-- ══ VISION ══ -->
+    <section id="vision" class="vision-wrap">
+      <div class="section section-center" style="position:relative;z-index:1">
+        <div class="section-label" style="color:#6c757d">Vision &amp; Future</div>
+        <h1 class="display" style="margin-bottom:8px">我們的願景</h1>
+        <p class="display" style="margin-bottom:36px">讓更多人 <span class="gradient-text">智慧工作 樂享生活</span></p>
+        <div style="display:flex;flex-direction:column;gap:14px;text-align:left;max-width:900px;margin:0 auto">
+          <p class="body-text">我們相信，科技最終價值在於釋放人的潛能，突破人力與能力的限制，創新於無解之題、創值於無能之處。</p>
+          <p class="body-text">在 AI 重新定義產業運作的時代，已從軟體服務商，往AI 原生企業基礎設施提供者轉型進化，並將持續以此角色，攜手產業夥伴與客戶，成為AI轉型路上的引路人，陪伴企業穩健邁向智慧運營的新階段。</p>
+          <p class="body-text">一起用數智實現創想 實現「讓更多人智慧工作，樂享生活」的美好願景。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ MISSION + STRENGTH（bg-1 背景區）══ -->
+    <div class="bg1-wrap">
+
+    <!-- ══ MISSION ══ -->
+    <section id="mission" style="background:transparent">
+      <div class="section section-center">
+        <div class="section-label" style="color:#212529">MISSION &amp; CAPABILITY</div>
+        <h2 class="display" style="margin-bottom:8px">我們的使命</h2>
+        <p class="display" style="margin-bottom:36px">用數據和智能技術 <span class="gradient-text">創新生產力</span></p>
+        <div style="display:flex;flex-direction:column;gap:14px;text-align:left;max-width:900px;margin:0 auto 48px">
+          <p class="body-text">企業的茁壯，總是在一步一腳印中留下時代的印記；而一路走來的成功軌跡，則奠基於始終秉持的「創新、尊重、專業」企業經營理念。</p>
+          <p class="body-text">的誕生源於對產業浪潮下的創新轉型的回應。1980 年代的企業數位化剛萌芽，導入成本高、開發週期長、失敗率極高，使資訊化成為少數企業才能負擔的工程。創辦人孫藹彬先生懷抱讓更多企業得以實現資訊化管理的遠見，創立「電腦」，以ERP套裝軟體的創新模式，讓數位化成為普及、可推廣、可長期維運的企業基礎建設。這也是我們一路走來最重要的起點——以洞察時代挑戰、打造可實際落地的技術來回應企業需求。此後，每一段產業歷史的轉折，都成為我們與企業共同前行的軌跡。從 IFRS、個資法、工業 4.0 到 新冠疫情衝擊、ESG 合規壓力、台商出海布局、乃至近年的 關稅與匯率變動、AI轉型，我們總是在風口來臨的第一時間，集結合作夥伴，快速推出對應解方，協助企業在變局中維持營運穩定、保持成長動能。</p>
+          <p class="body-text">逾四十五年來，已獲超過 50,000 家客戶的肯定與實證，現在的「」，則是用全新的視角看待數據和智能技術，以數智平台乘載豐富的數智化應用場景，匯聚我們的客戶、合作夥伴以數智實現創想。</p>
+        </div>
+
+        <!-- Timeline Card -->
+        <div class="timeline-wrap" style="margin-bottom:48px">
+          <div class="timeline-container">
+            <p class="timeline-heading" id="tlHeading">創新・尊重・專業 <span id="tlYears">44</span>年專注深耕</p>
+
+            <!-- 進度條 -->
+            <div class="tl-progress-bar">
+              <div class="tl-progress-fill" id="tlProgress" style="width:11.1%"></div>
+            </div>
+
+            <!-- 年份標籤列 -->
+            <div class="timeline-tabs" id="timelineTabs">
+              <button class="timeline-tab is-active" data-tab="0" aria-expanded="true" aria-controls="tl-panel-0">1982 啟航</button>
+              <button class="timeline-tab" data-tab="1" aria-expanded="false" aria-controls="tl-panel-1">2008 深耕拓展</button>
+              <button class="timeline-tab" data-tab="2" aria-expanded="false" aria-controls="tl-panel-2">2012 價值服務</button>
+              <button class="timeline-tab" data-tab="3" aria-expanded="false" aria-controls="tl-panel-3">2015 跨越</button>
+              <button class="timeline-tab" data-tab="4" aria-expanded="false" aria-controls="tl-panel-4">2018 聚智</button>
+              <button class="timeline-tab" data-tab="5" aria-expanded="false" aria-controls="tl-panel-5">2021 共創</button>
+              <button class="timeline-tab" data-tab="6" aria-expanded="false" aria-controls="tl-panel-6">2022 技術革新</button>
+              <button class="timeline-tab" data-tab="7" aria-expanded="false" aria-controls="tl-panel-7">2024 蛻變</button>
+              <button class="timeline-tab" data-tab="8" aria-expanded="false" aria-controls="tl-panel-8">2025 </button>
+            </div>
+
+            <!-- 內容面板 -->
+            <div class="timeline-panels" id="timelinePanels">
+              <!-- 0: 1982 -->
+              <div class="timeline-panel is-active" data-panel="0">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">1982</div>
+                    <div class="tl-year-tag">啟航</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>成立</li>
+                      <li>致力於為製造與流通企業提供資訊化服務。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 1: 2008 -->
+              <div class="timeline-panel" id="tl-panel-1" role="tabpanel" data-panel="1">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2008</div>
+                    <div class="tl-year-tag">深耕拓展</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>榮獲經濟部第三屆工業永續精銳獎—技術服務類。</li>
+                      <li>以鼎捷集團，完整整合兩岸資源。</li>
+                      <li>成立鼎捷軟件（越南）。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 2: 2012 -->
+              <div class="timeline-panel" id="tl-panel-2" role="tabpanel" data-panel="2">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2012</div>
+                    <div class="tl-year-tag">價值服務</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>企業數位化轉型全程價值服務，通過提供培訓分享、指標佈建、管理改善以及轉型支撐等程式與手段，創造數位應用價值，實現經營管理效益。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 3: 2015 -->
+              <div class="timeline-panel" id="tl-panel-3" role="tabpanel" data-panel="3">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2015</div>
+                    <div class="tl-year-tag">跨越</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>發佈「智能+」戰略以及「一線三環互聯」的戰略路徑。</li>
+                      <li>（2014年）馬來西亞分公司成立，擴大海外業務版圖。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 4: 2018 -->
+              <div class="timeline-panel" id="tl-panel-4" role="tabpanel" data-panel="4">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2018</div>
+                    <div class="tl-year-tag">聚智</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>進駐台中中軟園區，建造數位人才培訓與合作夥伴創新匯集團地。</li>
+                      <li>鼎華系統成立，聚焦智能製造領域方案服務。</li>
+                      <li>（2019年）泰國分公司成立。持續推進企業出海服務。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 5: 2021 -->
+              <div class="timeline-panel" id="tl-panel-5" role="tabpanel" data-panel="5">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2021</div>
+                    <div class="tl-year-tag">共創</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>「5GAIoT體驗園區」正式啟用。</li>
+                      <li>成立知識型創新互動個人化「就享知」網站。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 6: 2022 -->
+              <div class="timeline-panel" id="tl-panel-6" role="tabpanel" data-panel="6">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2022</div>
+                    <div class="tl-year-tag">技術革新</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>成立40周年。</li>
+                      <li>發佈以數智驅動為核心的新型 PaaS 平台「METIS」，打造未來企業與未來員工的智慧應用場景。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 7: 2024 -->
+              <div class="timeline-panel" id="tl-panel-7" role="tabpanel" data-panel="7">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2024</div>
+                    <div class="tl-year-tag">蛻變</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>電腦，更名為「」面向數智未來煥新起航。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- 8: 2025 -->
+              <div class="timeline-panel" id="tl-panel-8" role="tabpanel" data-panel="8">
+                <div class="tl-panel-inner">
+                  <div class="tl-year-badge">
+                    <div class="tl-year-num">2025</div>
+                    <div class="tl-year-tag">智能躍升</div>
+                  </div>
+                  <div class="tl-divider"></div>
+                  <div class="tl-body">
+                    <ul>
+                      <li>打造企業級Agent運行生態平台。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /timeline-panels -->
+          </div>
+        </div>
+
+        <script>
+        (function(){
+          // 動態年數：以當前年份計算（1982年創立）
+          const founded = 1982;
+          const yearsEl = document.getElementById('tlYears');
+          if (yearsEl) yearsEl.textContent = new Date().getFullYear() - founded;
+
+          const tabs     = document.querySelectorAll('#timelineTabs .timeline-tab');
+          const panels   = document.querySelectorAll('#timelinePanels .timeline-panel');
+          const progress = document.getElementById('tlProgress');
+          const total    = tabs.length;
+
+          function activate(idx) {
+            tabs.forEach((t, i) => {
+              t.classList.toggle('is-active', i === idx);
+              t.setAttribute('aria-expanded', i === idx ? 'true' : 'false');
+            });
+            panels.forEach((p, i) => p.classList.toggle('is-active', i === idx));
+            if (progress) progress.style.width = ((idx + 1) / total * 100) + '%';
+          }
+
+          tabs.forEach((tab, idx) => {
+            tab.addEventListener('click', () => activate(idx));
+          });
+        })();
+        </script>
+
+      <div class="tl-mobile-accordion" id="tlAccordion">
+        <div class="tl-acc-item is-open" data-acc="0">
+          <button class="tl-acc-btn" aria-expanded="true" aria-controls="acc-body-0">1982 啟航</button>
+          <div class="tl-acc-body" id="acc-body-0">
+            <div class="tl-acc-year">1982</div>
+            <span class="tl-acc-tag">啟航</span>
+            <ul>
+              <li>成立</li>
+              <li>致力於為製造與流通企業提供資訊化服務。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="1">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-1">2008 深耕拓展</button>
+          <div class="tl-acc-body" id="acc-body-1">
+            <div class="tl-acc-year">2008</div>
+            <span class="tl-acc-tag">深耕拓展</span>
+            <ul>
+              <li>榮獲經濟部第三屆工業永續精銳獎—技術服務類。</li>
+              <li>以鼎捷集團，完整整合兩岸資源。</li>
+              <li>成立鼎捷軟件（越南）。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="2">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-2">2012 價值服務</button>
+          <div class="tl-acc-body" id="acc-body-2">
+            <div class="tl-acc-year">2012</div>
+            <span class="tl-acc-tag">價值服務</span>
+            <ul>
+              <li>企業數位化轉型全程價值服務，通過提供培訓分享、指標佈建、管理改善以及轉型支撐等程式與手段，創造數位應用價值，實現經營管理效益。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="3">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-3">2015 跨越</button>
+          <div class="tl-acc-body" id="acc-body-3">
+            <div class="tl-acc-year">2015</div>
+            <span class="tl-acc-tag">跨越</span>
+            <ul>
+              <li>發佈「智能+」戰略以及「一線三環互聯」的戰略路徑。</li>
+              <li>（2014年）馬來西亞分公司成立，擴大海外業務版圖。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="4">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-4">2018 聚智</button>
+          <div class="tl-acc-body" id="acc-body-4">
+            <div class="tl-acc-year">2018</div>
+            <span class="tl-acc-tag">聚智</span>
+            <ul>
+              <li>進駐台中中軟園區，建造數位人才培訓與合作夥伴創新匯集團地。</li>
+              <li>鼎華系統成立，聚焦智能製造領域方案服務。</li>
+              <li>（2019年）泰國分公司成立。持續推進企業出海服務。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="5">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-5">2021 共創</button>
+          <div class="tl-acc-body" id="acc-body-5">
+            <div class="tl-acc-year">2021</div>
+            <span class="tl-acc-tag">共創</span>
+            <ul>
+              <li>「5GAIoT體驗園區」正式啟用。</li>
+              <li>成立知識型創新互動個人化「就享知」網站。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="6">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-6">2022 技術革新</button>
+          <div class="tl-acc-body" id="acc-body-6">
+            <div class="tl-acc-year">2022</div>
+            <span class="tl-acc-tag">技術革新</span>
+            <ul>
+              <li>成立40周年。</li>
+              <li>發佈以數智驅動為核心的新型 PaaS 平台「METIS」，打造未來企業與未來員工的智慧應用場景。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="7">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-7">2024 蛻變</button>
+          <div class="tl-acc-body" id="acc-body-7">
+            <div class="tl-acc-year">2024</div>
+            <span class="tl-acc-tag">蛻變</span>
+            <ul>
+              <li>電腦，更名為「」面向數智未來煥新起航。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-acc-item" data-acc="8">
+          <button class="tl-acc-btn" aria-expanded="false" aria-controls="acc-body-8">2025 智能躍升</button>
+          <div class="tl-acc-body" id="acc-body-8">
+            <div class="tl-acc-year">2025</div>
+            <span class="tl-acc-tag">智能躍升</span>
+            <ul>
+              <li>打造企業級Agent運行生態平台。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      (function(){
+        const accItems = document.querySelectorAll('#tlAccordion .tl-acc-item');
+        accItems.forEach(item => {
+          const btn = item.querySelector('.tl-acc-btn');
+          btn.addEventListener('click', () => {
+            const isOpen = item.classList.contains('is-open');
+            accItems.forEach(i => {
+              i.classList.remove('is-open');
+              i.querySelector('.tl-acc-btn').setAttribute('aria-expanded', 'false');
+            });
+            if (!isOpen) {
+              item.classList.add('is-open');
+              btn.setAttribute('aria-expanded', 'true');
+            }
+          });
+        });
+      })();
+      </script>
+
+        <!-- Further body copy -->
+        <div style="display:flex;flex-direction:column;gap:14px;text-align:left;max-width:900px;margin:0 auto 48px">
+          <p class="body-text">承載一路走來的發展軌跡與時代印記，長期深耕企業現場所累積的產業經驗、流程知識與企業數據，皆讓在迎向 AI 時代之際，已具備讓智能技術真正發揮價值的關鍵基底，亦是最核心的差異化優勢。隨著時代浪潮推進，持續探索並發展Agentic AI 等新興技術，建構「企業級Agent運行生態平台」，將 AI 深度融入企業真實的營運流程，使其不僅能被使用，更能被運作、被交付，並隨企業成長持續放大，成為可規模化的數位勞動力。</p>
+          <p class="body-text">AI 不再只是「回答問題」的工具，而是能承接任務、進行判斷並主動行動，並即時回寫系統，形成可持續優化的運行閉環，使企業得以建立可理解營運脈絡、參與決策並實際執行任務的多個數位員工，進而從過往被動回應事件，邁向可預判、可調度的智慧運行模式。進一步透過串聯開發設計、應用運行與 ISV 協作機制，加速 AI 商用化落地進程，打造一個能讓夥伴共同生產、共享價值、持續成長的 AI 生態系。</p>
+          <p class="body-text">「使命」代表著如何實現願景的方法。透過不斷演進的創新精神，我們將致力於為企業創造與時俱進的數智價值，並以數據與智能技術，打破既有的工作框架與運作模式，釋放人的能力邊界，推動生產力的持續創新，陪伴企業在不同發展階段穩健前行。</p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="cards-grid">
+          <div class="feature-card">
+            <div class="card-header" style="background:#0ea5e9"><div class="card-header-text">技術自主、轉型落地</div></div>
+            <div class="card-img-placeholder"><img src="images/154-1.webp" alt="技術自主、轉型落地" width="244" height="160" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+            <div class="card-body">結合長期累積的 ERP 與產業營運知識，以自研技術建構可落地的「企業級Agent運行生態平台」，讓 AI 真正進入企業日常營運流程，推動營運流程的變革，邁向數智轉型。</div>
+          </div>
+          <div class="feature-card">
+            <div class="card-header" style="background:#0ea5e9"><div class="card-header-text">價值交付為方法論</div></div>
+            <div class="card-img-placeholder"><img src="images/154-2.webp" alt="價值交付為方法論" width="244" height="160" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+            <div class="card-body">始終以客戶真實需求為出發點，並以創造可驗證的企業營運效益為最終導向，發展出獨有的「價值交付」方法論，讓 AI 轉型能真正承接企業管理與營運需求，支持企業穩定成長。</div>
+          </div>
+          <div class="feature-card">
+            <div class="card-header" style="background:#0ea5e9"><div class="card-header-text">驅動新的商業模式</div></div>
+            <div class="card-img-placeholder"><img src="images/154-3.webp" alt="驅動新的商業模式" width="244" height="160" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+            <div class="card-body">基於對「數智原生企業」的願景與「智能＋」戰略目標，以「用數據和智能技術創新生產力」為核心使命，將 AI 深度融入企業營運流程，重塑營運與商業模式，協助企業持續累積數智價值，增價競爭優勢。</div>
+          </div>
+          <div class="feature-card">
+            <div class="card-header" style="background:#0ea5e9"><div class="card-header-text">建構AI生態系</div></div>
+            <div class="card-img-placeholder"><img src="images/154-4.webp" alt="建構AI生態系" width="244" height="160" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+            <div class="card-body">以平台為核心，串聯客戶、ISV夥伴與開發者，共同打造可共創、可擴充的 AI 應用生態系，讓場景持續累積、價值不斷放大，共利共榮，加速創新應用落地，推動數智價值在產業中持續擴散，引領產業變革。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ STRENGTH ══ -->
+    <section id="strength" style="background:white">
+      <div class="section section-center">
+        <div class="section-label" style="color:#1a4fe8">Strength &amp; History</div>
+        <h2 class="display" style="margin-bottom:8px">逾四十載的產業深耕</h2>
+        <p class="display" style="margin-bottom:40px"><span class="gradient-text">數據的積累</span>和<span class="gradient-text">客戶的信任見證實力</span></p>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-number gradient-text-warm">1982</div><div class="stat-label">創立年分</div></div>
+          <div class="stat-card"><div class="stat-number gradient-text-warm">40+</div><div class="stat-label">深耕年數</div></div>
+          <div class="stat-card"><div class="stat-number gradient-text-warm">亞太</div><div class="stat-label">布局版圖</div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;text-align:left;max-width:900px;margin:0 auto 60px">
+          <p class="body-text">立足台灣、布局亞太 跨域打造數智生態系。</p>
+          <p class="body-text">自 1982 年成立以來，始終走在產業發展的前沿。憑藉在台灣奠定的深厚產業基礎及長期洞察，我們精準捕捉企業營運流程的核心，並隨著客戶佈局的腳步，逐步將累積的經驗與服務，由台灣拓展至中國大陸，也涵蓋越南、馬來西亞、泰國等東南亞市場。</p>
+          <p class="body-text">在全球市場瞬息萬變的浪潮中，台商憑藉著敏銳的市場嗅覺「逐水草而居」，而則堅信「客戶在哪，服務就到哪」。這三十多年來，我們共同見證了產業鏈從台灣發跡、西進大陸到南向佈局的轉移歷程，在面對經營環境的更迭與挑戰升級，始終信守承諾，透過數位化到數智化，協助企業克服跨境經營的重重門檻。</p>
+          <p class="body-text">我們深知不同市場的獨特性，因此以因地制宜的策略，協助企業在變局中建立極具彈性與韌性的營運能力。透過資源整合與跨區協作，我們成功串聯起具規模綜效的亞太數智化經營網絡，致力於打造一個共生共榮的「數智化生態系」。不論產業版圖如何移動，永遠是企業開拓亞太市場時，最堅實、最可靠的後盾。</p>
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /bg1-wrap -->
+
+    <!-- ══ LEAFLET MAP ══ -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <div class="map-section">
+      <div id="leaflet-map"></div>
+      <!-- 右側浮動資訊面板 -->
+      <div class="map-info-panel" id="mapInfoPanel">
+        <div class="map-info-header">
+          <div class="map-info-name" id="mapInfoName"></div>
+          <button class="map-info-close" id="mapInfoClose" aria-label="關閉">✕</button>
+        </div>
+        <div class="map-info-body" id="mapInfoBody"></div>
+      </div>
+    </div>
+
+    <!-- 手機版地圖 UI（≤760px）-->
+    <div class="map-mobile-ui" id="mapMobileUi">
+      <div class="map-mobile-info">
+        <div class="map-mobile-tabs" id="mapMobileTabs">
+          <button class="map-mobile-tab is-active" data-midx="0">台灣</button>
+          <button class="map-mobile-tab" data-midx="1">中國</button>
+          <button class="map-mobile-tab" data-midx="2">泰國</button>
+          <button class="map-mobile-tab" data-midx="3">越南</button>
+          <button class="map-mobile-tab" data-midx="4">馬來西亞</button>
+          <button class="map-mobile-tab" data-midx="5">印尼</button>
+        </div>
+        <div class="map-mobile-country" id="mapMobileCountry">台灣｜Taiwan</div>
+        <div class="map-mobile-cities" id="mapMobileCities"></div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    (function(){
+
+      /* ════════════════════════════════════════════════════════════
+         地點資料
+         cities 結構：純文字 or 分區（region）形式
+      ════════════════════════════════════════════════════════════ */
+      const LOCS = [
+        {
+          id:   'tw',
+          name: '台灣｜Taiwan',
+          lat:  25.0,
+          lng:  121.3,
+          calloutDir: 'right',   // callout 往右
+          cities: [
+            { text: '台北｜桃園｜新竹｜台中｜台南｜高雄' }
+          ]
+        },
+        {
+          id:   'cn',
+          name: '中國｜China',
+          lat:  31.2,
+          lng:  112.0,
+          calloutDir: 'right',
+          cities: [
+            { region: '華東地區', text: '上海、杭州、寧波、溫州、紹興、嘉興、湖州、金華、台州' },
+            { region: '',         text: '南京、蘇州、無錫、常州、南通、泰州' },
+            { region: '',         text: '合肥、蕪湖、濟南、青島、福州、廈門、泉州' },
+            { region: '華北地區', text: '北京、天津' },
+            { region: '華中及中部地區', text: '武漢、長沙、南昌、鄭州' },
+            { region: '華南地區', text: '廣州、深圳、佛山、東莞、中山、惠州' },
+            { region: '西南地區', text: '成都、重慶' }
+          ]
+        },
+        {
+          id:   'th',
+          name: '泰國｜Thailand',
+          lat:  13.7,
+          lng:  100.5,
+          calloutDir: 'right',
+          cities: [{ text: '曼谷' }]
+        },
+        {
+          id:   'vn',
+          name: '越南｜Vietnam',
+          lat:  10.8,
+          lng:  106.7,
+          calloutDir: 'right',
+          cities: [{ text: '胡志明市' }]
+        },
+        {
+          id:   'my',
+          name: '馬來西亞｜Malaysia',
+          lat:  3.1,
+          lng:  101.7,
+          calloutDir: 'right',
+          cities: [{ text: '吉隆坡' }]
+        },
+        {
+          id:   'id',
+          name: '印尼｜Indonesia',
+          lat:  -6.2,
+          lng:  106.8,
+          calloutDir: 'right',
+          cities: [{ text: '雅加達' }]
+        }
+      ];
+
+      /* ── 手機版 HTML ── */
+      function mobileCitiesHTML(loc) {
+        let html = '';
+        loc.cities.forEach(c => {
+          if (c.region) html += `<p><strong>${c.region}</strong></p>`;
+          html += `<p>${c.text}</p>`;
+        });
+        return html;
+      }
+
+      /* ── marker icon 產生（灰/藍）── */
+      function makeIcon(loc, active) {
+        const pinColor = active ? '#1a4fe8' : '#8a9ab0';
+        const nameColor = active ? '#1a4fe8' : '#5a6a7a';
+        const fw = active ? '700' : '500';
+        return L.divIcon({
+          className: 'lf-marker',
+          html: `<div class="lf-marker-inner${active ? ' is-active' : ''}">
+                   <span class="lf-pin" style="--pin-bg:${pinColor}"></span>
+                   <span class="lf-name" style="color:${nameColor};font-weight:${fw}">${loc.name}</span>
+                 </div>`,
+          iconAnchor:  [12, 32],
+          tooltipAnchor: [12, -32]
+        });
+      }
+
+      /* ── 面板 DOM refs ── */
+      const infoPanel = document.getElementById('mapInfoPanel');
+      const infoName  = document.getElementById('mapInfoName');
+      const infoBody  = document.getElementById('mapInfoBody');
+      const infoClose = document.getElementById('mapInfoClose');
+
+      /* ── 右側面板內容產生 ── */
+      function panelBodyHTML(loc) {
+        let html = '';
+        loc.cities.forEach(c => {
+          if (c.region) {
+            html += `<div class="map-info-region">${c.region}</div>`;
+          }
+          html += `<div class="map-info-cities">${c.text}</div>`;
+        });
+        return html;
+      }
+
+      function showPanel(loc) {
+        infoName.textContent = loc.name;
+        infoBody.innerHTML   = panelBodyHTML(loc);
+        infoPanel.classList.add('is-visible');
+      }
+      function hidePanel() {
+        infoPanel.classList.remove('is-visible');
+      }
+
+      /* 關閉按鈕 */
+      if (infoClose) {
+        infoClose.addEventListener('click', (e) => {
+          e.stopPropagation();
+          hidePanel();
+          markers.forEach((mm, j) => mm.setIcon(makeIcon(LOCS[j], false)));
+          activeIdx = -1;
+        });
+      }
+
+      /* ── Leaflet 初始化 ── */
+      const map = L.map('leaflet-map', {
+        zoomControl:     false,
+        scrollWheelZoom: false,
+        dragging:        true,
+        attributionControl: false
+      });
+
+      /* ── 底圖 tile ── */
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd', maxZoom: 10
+      }).addTo(map);
+
+      /* ── 建立 markers ── */
+      const markers = [];
+      let activeIdx  = -1;
+
+      LOCS.forEach((loc, i) => {
+        const m = L.marker([loc.lat, loc.lng], {
+          icon: makeIcon(loc, false),
+          zIndexOffset: 0
+        }).addTo(map);
+
+        m.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          if (activeIdx === i) {
+            /* 再點一次 → 關閉 */
+            m.setIcon(makeIcon(loc, false));
+            hidePanel();
+            activeIdx = -1;
+          } else {
+            /* 關閉所有，啟動這個 */
+            markers.forEach((mm, j) => mm.setIcon(makeIcon(LOCS[j], false)));
+            m.setIcon(makeIcon(loc, true));
+            showPanel(loc);
+            activeIdx = i;
+          }
+        });
+
+        markers.push(m);
+      });
+
+      /* ── 點地圖空白處關閉 ── */
+      map.on('click', () => {
+        markers.forEach((mm, j) => mm.setIcon(makeIcon(LOCS[j], false)));
+        hidePanel();
+        activeIdx = -1;
+      });
+
+      /* ── 初始視角：fitBounds 包含所有據點 ── */
+      const allLatLngs = LOCS.map(l => [l.lat, l.lng]);
+      map.fitBounds(allLatLngs, {
+        padding: [40, 40],   // 四邊留白
+        maxZoom: 6           // 最大只縮放到 zoom 6，不要太近
+      });
+
+      /* ── 手機版 Tab 切換 ── */
+      const mobileTabs = document.querySelectorAll('.map-mobile-tab');
+      const mobCountry = document.getElementById('mapMobileCountry');
+      const mobCities  = document.getElementById('mapMobileCities');
+
+      if (mobCities) mobCities.innerHTML = mobileCitiesHTML(LOCS[0]);
+
+      mobileTabs.forEach((tab, idx) => {
+        tab.addEventListener('click', () => {
+          mobileTabs.forEach(t => t.classList.remove('is-active'));
+          tab.classList.add('is-active');
+          mobCountry.textContent = LOCS[idx].name;
+          mobCities.innerHTML    = mobileCitiesHTML(LOCS[idx]);
+        });
+      });
+
+      /* ── resize ── */
+      window.addEventListener('resize', () => {
+        setTimeout(() => map.invalidateSize(), 100);
+      });
+
+    })();
+    </script>
+
+        <!-- ══ RECOGNITION ══ -->
+    <section style="background:#f7f8fc">
+      <div class="section">
+        <div style="max-width:960px;margin:0 auto">
+          <div class="bordered-heading">市場肯定與實力展現</div>
+          <div class="bullet-list" style="margin-bottom:16px">
+            <div class="bullet-item"><div class="bullet-dot"></div><div class="bullet-text">根據天下雜誌823期，《天下兩千大調查》，十一度蟬聯 天下服務業650強，2024年排名315名。</div></div>
+            <div class="bullet-item"><div class="bullet-dot"></div><div class="bullet-text">兩千大產業排行統計，客戶覆蓋率達73%。其中，2021年首次上榜的企業共104家，有63家是客戶，覆蓋率達 61%。</div></div>
+            <div class="bullet-item"><div class="bullet-dot"></div><div class="bullet-text">兩千大中的營運績效 50 強，是《天下》評估近三年營收成長率、稅後純益成長率、股東權益報酬率等綜合指數所評選的結果，客戶覆蓋率高達 76%。</div></div>
+          </div>
+          <p style="font-size:16px;color:#6b7280;line-height:1.5">*資料來源：天下雜誌 823 期《天下兩千大調查》及內部統計數據。數值代表客戶於各項指標中的覆蓋比例。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ COVERAGE ══ -->
+    <section style="background:white">
+      <div class="section section-center">
+        <div class="bordered-heading" style="text-align:left;max-width:960px;margin:0 auto 40px">2024年 客户覆蓋率</div>
+        <div class="coverage-grid">
+          <div class="coverage-item">
+            <div class="pie-wrap">
+              <img src="images/73percent.webp" alt="73% 覆蓋率" width="160" height="160" loading="lazy">
+              <div class="pie-center"><span class="pie-pct">73%</span></div>
+            </div>
+            <div>
+              <div class="cov-title">客户<br>覆蓋率達<span class="cov-accent">73%</span></div>
+              <div class="cov-cat">天下2000大企業調查</div>
+              <div class="cov-src">*資料來源：天下雜誌823期</div>
+            </div>
+          </div>
+          <div class="coverage-item">
+            <div class="pie-wrap">
+              <img src="images/76percent.webp" alt="76% 覆蓋率" width="160" height="160" loading="lazy">
+              <div class="pie-center"><span class="pie-pct">76%</span></div>
+            </div>
+            <div>
+              <div class="cov-title">客户<br>覆蓋率達<span class="cov-accent">76%</span></div>
+              <div class="cov-cat">天下營運績效50強</div>
+              <div class="cov-src">*資料來源：天下雜誌823期</div>
+            </div>
+          </div>
+          <div class="coverage-item">
+            <div class="pie-wrap">
+              <img src="images/61percent.webp" alt="61% 覆蓋率" width="160" height="160" loading="lazy">
+              <div class="pie-center"><span class="pie-pct">61%</span></div>
+            </div>
+            <div>
+              <div class="cov-title">客戶<br>覆蓋率達<span class="cov-accent">61%</span></div>
+              <div class="cov-cat">天下2000大首次上榜</div>
+              <div class="cov-src">*資料來源：天下雜誌823期</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ BLUE BAND ══ -->
+    <div class="blue-band">
+      <img src="images/155.webp" alt="50,000+ 客戶見證" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;">
+    </div>
+
+    <!-- ══ FUTURE ══ -->
+    <section id="future" style="background:white">
+      <div class="section">
+        <div style="max-width:960px;margin:0 auto">
+          <div style="text-align:center;margin-bottom:36px">
+            <div class="section-label" style="color:#1a4fe8">FUTURE OUTLOOK</div>
+            <h2 class="display" style="margin-bottom:8px">深植智創 DNA</h2>
+            <p class="display">你我一同迎接<span style="color:#0ea5e9">數智未來</span></p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:48px">
+            <p class="body-text">在產業結構與營運模式持續重組的過程中，企業所面對的不只是技術更迭，而是整體經營邏輯、組織運作與決策方式的根本轉變。正是在這樣一次次的變革與轉型歷程中，逐步調整角色定位，累積對企業營運本質的理解，並思考如何以數據與智能技術，回應企業長期發展所需的穩定性與成長性。</p>
+            <p class="body-text">從「電腦」到「」，以對數智未來的深刻洞察與長期願景，回應企業在智能化、自動化與數智驅動營運上的關鍵需求，並以此作為持續布局與發展的核心方向，已經從軟體應用服務商，轉型成一個平台生態的建設者，而作為一個平台，我們將不再是唯一的方案開發者，而是匯聚了更多的智客，包括客戶、ISV和合作夥伴，共同創造解決方案。</p>
+            <p class="body-text">未來，將持續以數據與智能技術為核心基底，融入「智創」理念，打造兼具創新性與擴展性的數智平台，並在此基礎上不斷深化自研能力，並攜手客戶與生態夥伴一起「用數智實現創想」，邁向讓更多人實現「智慧工作、樂享生活」的願景。</p>
+          </div>
+          <div class="promise-block">
+            <p style="margin-bottom:12px">我們承諾，在企業轉型升級路上，堅定成為您值得信賴且並肩同行的夥伴。</p>
+            <p>歡迎與我們一起踏上數智驅動的革新旅程。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ FOOTER HERO ══ -->
+
+  </main>
+
+<style>
+#footer{--footer-bg:#253b50;--footer-text:#fefefe;--footer-copy-bg:#132230;--container-max-width:1320px;background-color:var(--footer-bg);color:var(--footer-text);line-height:1.6}:where(#footer){a{color:var(--footer-text);text-decoration:none;transition:opacity .2s ease;&:hover{opacity:.7}}ul{list-style:none;padding:0;margin:0}}.footer-container{max-width:var(--container-max-width);margin:0 auto;padding:0 1rem}.footer-directory{padding:3rem 0;border-bottom:1px solid rgba(255,255,255,.1)}.directory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2.5rem}.column-title{display:flex;align-items:center;justify-content:center;gap:.25rem;margin:0 0 1.25rem 0;font-size:clamp(1.125rem,2vw,1.375rem);font-weight:500;img{object-fit:contain}}.column-links{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem 1.5rem;width:fit-content;margin:0 auto}.footer-utilities{padding:1rem 0}.utilities-flex{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem}.social-block{display:flex;align-items:center;gap:1rem}.social-icons{display:flex;gap:.75rem}.lang-block select{padding:.5rem;border-radius:4px;background-color:rgba(255,255,255,.1);color:var(--footer-text);border:1px solid rgba(255,255,255,.2);outline:none;font-family:inherit;option{color:#333}}.legal-block{display:flex;flex-wrap:wrap;gap:1.5rem}.footer-copyright{background-color:var(--footer-copy-bg);padding:1.25rem 0;text-align:center}.mobile-sticky-cta{display:none}@media(max-width:479px){#footer{padding-bottom:70px}.mobile-sticky-cta{display:flex;justify-content:space-around;align-items:center;position:fixed;bottom:0;left:0;width:100%;background-color:var(--footer-bg);box-shadow:0 -2px 10px rgba(0,0,0,.3);z-index:100;a{display:flex;justify-content:center;align-items:center;flex:1;padding:.5rem 0;transition:transform .2s ease;&:hover{transform:scale(1.02)}img{display:block;max-height:50px;width:auto;object-fit:contain}}}}
+</style>
+  <footer id="footer" class="footer-menu">
+    <div class="footer-directory">
+      <div class="footer-container">
+        <div class="directory-grid">
+          <div class="directory-column">
+            <div class="column-title">
+              <img src="https://static..com.tw/upload/admin/20180424/7a4013e0f70c3f4571292e109da9fc75.png" width="42" height="30" loading="lazy" alt="*">我想瞭解
+            </div>
+            <ul class="column-links">
+              <li><a href="/ERP/this-is-erp">什麼是ERP</a></li>
+              <li><a href="/ERP/erp-all.html">產品/解決方案</a></li>
+              <li><a href="/industries">行業解決方案</a></li>
+              <li><a href="/case">企業案例</a></li>
+              <li><a href="/blog/2/index/750.html">價值</a></li>
+              <li><a href="/about/prizes">產品服務認證</a></li>
+              <li><a href="/dsc/solution/article/informationsecurity">資訊安全政策</a></li>
+              <li><a href="/activity_report/1320.html">週邊停車</a></li>
+            </ul>
+          </div>
+          
+          <div class="directory-column">
+            <div class="column-title">
+              <img src="https://static..com.tw/upload/portal/20180424/048ab777ebe2613eaac38744cd2acc61.png" width="22" height="30" loading="lazy" alt="*">我是用戶
+            </div>
+            <ul class="column-links">
+              <li><a href="https://service..com/login" target="_blank">24h服務平台</a></li>
+              <li><a href="https://www.digiknow.com.tw/activity" target="_blank">活動報名</a></li>
+              <li><a href="/dsc/service/WB002736/WB00273601">資訊委外</a></li>
+              <li><a href="https://play.google.com/store/apps/developer?id=%E9%BC%8E%E6%96%B0%E6%95%B8%E6%99%BA&amp;hl=zh_TW" target="_blank">APP下載</a></li>
+            </ul>
+          </div>
+          
+          <div class="directory-column">
+            <div class="column-title">
+              <img src="https://static..com.tw/upload/portal/20180424/ed495d3effbb49628bd82e5f820513d8.png" width="23" height="29" loading="lazy" alt="*">我是夥伴
+            </div>
+            <ul class="column-links">
+              <li><a href="/PR">公關媒體合作</a></li>
+              <li><a href="/5GAIOT/">數智夥伴大聯盟</a></li>
+              <li><a href="http://dsa.dsc.com.tw/Cert/Default.aspx" target="_blank">證照考試</a></li>
+              <li><a href="/social/" target="_blank">社群</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-utilities">
+      <div class="footer-container utilities-flex">
+        <div class="social-block">
+          <span class="social-label">關注我們</span>
+          <ul class="social-icons">
+            <li><a aria-label="就享知" href="https://www.digiknow.com.tw/" target="_blank"><img width="20" height="20" loading="lazy" src="https://static..com.tw/upload/admin/20260327/9105045be3aef9beae9226763872602e.png" alt="*"></a></li>
+            <li><a aria-label="FACEBOOK" href="https://www.facebook.com/DATASYStw" target="_blank"><img width="20" height="20" loading="lazy" src="https://static..com.tw/upload/admin/20181101/2a02551ec9ab1db6252c76062850ef4e.png" alt="*"></a></li>
+            <li><a aria-label="LINE@" href="https://lhco.li/48z2aOv" target="_blank"><img width="20" height="20" loading="lazy" src="https://static..com.tw/upload/admin/20201008/bfef19583af9f39bc61ec53ca31a1f4b.png" alt="*"></a></li>
+            <li><a aria-label="Youtube" href="https://www.youtube.com/@DATASYStw" target="_blank"><img width="20" height="20" loading="lazy" src="https://static..com.tw/upload/admin/20180810/9441fe324b2d13b62f60c294e89797cc.png" alt="*"></a></li>
+          </ul>
+        </div>
+        
+        <ul class="legal-block">
+          <li><a href="/aboutdsc">關於</a></li>
+          <li><a href="/contact/eform">聯絡我們</a></li>
+          <li><a href="/legal">隱私權聲明</a></li>
+          <li><a href="/sitemap/">網站地圖</a></li>
+        </ul>
+        
+        <div class="lang-block">
+          <select aria-label="選擇語言" onchange="javascript:window.open(this.options[this.selectedIndex].value)">
+            <option value="https://www..com.tw/">台灣-繁體中文</option>
+            <option value="https://www..com">中国-简体中文</option>
+            <option value="https://www..com.vn/">Vietnam-Tiếng Việt</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-copyright">
+      <div class="footer-container">
+        <small>Copyright © 2025 股份有限公司 DATA SYSTEMS CO., LTD. All rights reserved.</small>
+      </div>
+    </div>
+    <div class="mobile-sticky-cta">
+      <a href="tel:0800-009-890" aria-label="聯絡我們">
+        <img width="50" height="50" loading="lazy" src="https://static..com.tw/static/images/xztel.png" alt="電話">
+      </a>
+      <a href="https://www..com.tw/contact/eform" aria-label="留言諮詢">
+        <img width="67" height="64" loading="lazy" src="https://static..com.tw/static/images/t4.png" alt="留言諮詢">
+      </a>
+      <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" aria-label="回到頁面最上面">
+        <img width="28" height="23" loading="lazy" src="https://static..com.tw/static/images/top-icon.png" alt="回到最上面">
+      </a>
+    </div>
+  </footer>
+  <div style="text-align:center;padding:20px;font-size:13px;color:#888;border-top:1px solid #e4e8f0"><a href="../index.html" style="color:#0d6efd;text-decoration:none">← 返回專案清單</a></div>
+</body>
+</html>
