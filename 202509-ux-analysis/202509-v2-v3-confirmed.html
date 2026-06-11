@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digiwin AI Agent — UX Report v2 + v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111;--ink2:#444;--ink3:#888;
+  --bg:#F5F3EE;--bg2:#ECEAE4;--bg3:#E3E0D8;
+  --surface:#FDFCFA;
+  --accent:#1B2B5E;--accent2:#2D4DB8;
+  --red:#B93030;--amber:#A05C10;--green:#0D6B50;--blue:#185FA5;--purple:#4B42A8;
+  --border:rgba(17,17,17,.1);--border2:rgba(17,17,17,.06);
+  --r:4px;--r2:8px;--r3:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.7}
+
+/* VERSION SWITCHER */
+.ver-bar{background:var(--accent);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:200}
+.ver-logo{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.45);padding:14px 0;white-space:nowrap}
+.ver-logo b{color:#fff}
+.ver-tabs{display:flex;gap:0}
+.ver-tab{padding:14px 20px;font-family:'Syne',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.ver-tab:hover{color:rgba(255,255,255,.8)}
+.ver-tab.on{color:#fff;border-bottom-color:#fff}
+
+/* VERSION PANELS */
+.ver-panel{display:none}
+.ver-panel.on{display:block}
+
+/* ── SHARED COMPONENTS ─────────────── */
+.wrap{max-width:920px;margin:0 auto;padding:0 28px}
+
+/* Hero */
+.hero{background:var(--accent);padding:56px 0 44px;overflow:hidden;position:relative}
+.hero::after{content:'';position:absolute;right:-80px;top:-80px;width:400px;height:400px;border:1px solid rgba(255,255,255,.05);border-radius:50%}
+.hero::before{content:'';position:absolute;right:60px;top:20px;width:240px;height:240px;border:1px solid rgba(255,255,255,.04);border-radius:50%}
+.hero-inner{position:relative;max-width:920px;margin:0 auto;padding:0 28px}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.hero-eyebrow::before{content:'';display:inline-block;width:20px;height:1px;background:rgba(255,255,255,.3)}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4.5vw,46px);font-weight:700;color:#fff;line-height:1.15;margin-bottom:16px}
+.hero-title em{font-style:normal;color:rgba(255,255,255,.55)}
+.hero-desc{font-size:13px;color:rgba(255,255,255,.6);max-width:580px;line-height:1.8;margin-bottom:28px}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-family:'DM Mono',monospace;font-size:10px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
+.chip.on{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25)}
+
+/* Section */
+.section{padding:44px 0;border-top:1px solid var(--border)}
+.section-hd{margin-bottom:24px}
+.section-eye{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--ink3);margin-bottom:6px}
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1.2}
+.section-sub{font-size:13px;color:var(--ink2);margin-top:6px}
+
+/* Cards */
+.cards{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:15px 17px}
+.card.g{border-left:3px solid var(--green);border-radius:0 var(--r3) var(--r3) 0}
+.card.r{border-left:3px solid var(--red);border-radius:0 var(--r3) var(--r3) 0}
+.card.y{border-left:3px solid var(--amber);border-radius:0 var(--r3) var(--r3) 0}
+.card.b{border-left:3px solid var(--blue);border-radius:0 var(--r3) var(--r3) 0}
+.card.p{border-left:3px solid var(--purple);border-radius:0 var(--r3) var(--r3) 0}
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;margin-bottom:7px;letter-spacing:.03em}
+.bg-g{background:#E1F5EE;color:#0B5E43}
+.bg-r{background:#FCEBEB;color:#8B2020}
+.bg-y{background:#FDF0DC;color:#7A4509}
+.bg-b{background:#E6F1FB;color:#0F4A87}
+.bg-p{background:#EEEDFE;color:#332E90}
+.card-h{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:5px}
+.card-p{font-size:13px;color:var(--ink2);line-height:1.65}
+.fix{background:var(--bg2);border-radius:var(--r2);padding:11px 13px;margin-top:10px}
+.fix-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);letter-spacing:.05em;margin-bottom:4px}
+.fix-p{font-size:12px;color:var(--ink2);line-height:1.65}
+.fix-p code{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface);padding:1px 5px;border-radius:3px;border:1px solid var(--border)}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.g2{grid-template-columns:1fr}}
+
+/* Stats */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:15px}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--ink3);margin-bottom:4px}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--ink);line-height:1}
+.stat-sub{font-size:11px;color:var(--ink2);margin-top:3px}
+.stat.alert .stat-val{color:var(--red)}
+.stat.good .stat-val{color:var(--green)}
+
+/* Funnel */
+.funnel{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:20px;margin-bottom:16px}
+.funnel-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.07em;color:var(--ink3);margin-bottom:14px}
+.frow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.frow:last-child{margin-bottom:0}
+.f-label{font-size:12px;color:var(--ink2);width:130px;flex-shrink:0}
+.f-bar-wrap{flex:1;background:var(--bg3);border-radius:3px;height:22px;overflow:hidden;position:relative}
+.f-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px}
+.f-bar span{font-size:11px;font-weight:500;color:#fff;white-space:nowrap}
+.f-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);width:36px;text-align:right;flex-shrink:0}
+.f-drop{font-size:11px;color:var(--red);width:50px;text-align:right;flex-shrink:0}
+
+/* Quote */
+.quote{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:16px 20px;margin-bottom:16px;position:relative}
+.quote-text{font-size:13px;color:var(--ink2);font-style:italic;line-height:1.7;padding-left:16px;border-left:2px solid var(--bg3)}
+.quote-from{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-top:8px}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 12px;text-align:left;font-weight:500;color:var(--ink2);border-bottom:1px solid var(--border);background:var(--bg2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--border2);vertical-align:top}
+.tbl tr:hover td{background:var(--bg2)}
+.p0{color:var(--red);font-weight:600;font-size:11px}
+.p1{color:var(--amber);font-weight:600;font-size:11px}
+.p2{color:var(--blue);font-size:11px}
+
+/* Compare */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+@media(max-width:560px){.cmp{grid-template-columns:1fr}}
+.cbox{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 14px}
+.cbox-lbl{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;margin-bottom:7px;display:block}
+.cbox-lbl.old{color:var(--red)}
+.cbox-lbl.new{color:var(--green)}
+.cbox-text{font-size:13px;color:var(--ink);line-height:1.65}
+.cbox-text em{font-style:normal;color:var(--ink2);font-size:12px}
+.cbox.highlight{border-color:var(--green)}
+
+/* Divider */
+.div{height:1px;background:var(--border);margin:24px 0}
+
+/* North Star */
+.ns{background:var(--accent);border-radius:var(--r3);padding:32px 28px;text-align:center;margin-top:20px}
+.ns-lbl{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.1em;margin-bottom:12px}
+.ns-copy{font-family:'Syne',sans-serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#fff;line-height:1.3;margin-bottom:10px}
+.ns-sub{font-size:13px;color:rgba(255,255,255,.6);line-height:1.75;max-width:500px;margin:0 auto}
+
+/* Verdict */
+.vrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.v{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.vg{background:#E1F5EE;color:#0B5E43}
+.vy{background:#FDF0DC;color:#7A4509}
+.vr{background:#FCEBEB;color:#8B2020}
+.vb{background:#E6F1FB;color:#0F4A87}
+
+/* Q box */
+.qbox{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:14px 16px;margin-bottom:10px}
+.qbox-q{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--blue);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.qbox-q::before{content:'Q';width:16px;height:16px;background:var(--blue);color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qbox-a{font-size:13px;color:var(--ink2);line-height:1.65}
+.qbox-a strong{color:var(--ink);font-weight:500}
+
+/* Announcement box */
+.ann{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--amber);border-radius:0 var(--r3) var(--r3) 0;padding:14px 16px;margin-bottom:20px}
+.ann-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:.06em;margin-bottom:5px}
+.ann-h{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.ann-p{font-size:13px;color:var(--ink2);line-height:1.65}
+
+/* Highlight box */
+.hl{background:var(--accent);border-radius:var(--r2);padding:14px 16px;margin:16px 0}
+.hl p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.7}
+.hl strong{color:#fff}
+
+/* ── V3 SPECIFIC ──────────────────── */
+/* Flow diagram */
+.flow-wrap{overflow-x:auto;padding:4px 0 12px;margin-bottom:20px}
+.flow{display:flex;align-items:flex-start;gap:0;min-width:700px}
+.fnode{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0}
+.fbox{padding:8px 14px;border-radius:var(--r2);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;cursor:default}
+.farrow{color:var(--ink3);font-size:14px;padding:0 3px;margin-top:9px;flex-shrink:0}
+.fstep{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+.femo{font-size:16px}
+.ffeel{font-size:10px;color:var(--ink2);max-width:72px;text-align:center;line-height:1.4}
+.fbad{color:var(--red);font-size:10px;font-weight:500;max-width:72px;text-align:center}
+
+/* Scene card mockup */
+.scene-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+.scene-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);overflow:hidden}
+.scene-card-top{padding:16px;border-bottom:1px solid var(--border2)}
+.scene-cat{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:.05em;margin-bottom:6px}
+.scene-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--accent);margin-bottom:8px}
+.scene-tags{display:flex;gap:5px;flex-wrap:wrap}
+.scene-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--bg2);color:var(--ink2)}
+.scene-body{padding:16px}
+.scene-step{margin-bottom:10px}
+.scene-step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-bottom:3px}
+.scene-step-text{font-size:12px;color:var(--ink2);line-height:1.6}
+.scene-step-text.pain{color:var(--red);font-weight:500}
+.scene-step-text.guide{color:var(--blue)}
+.scene-step-text.value{color:var(--green)}
+.scene-footer{padding:12px 16px;border-top:1px solid var(--border2);display:flex;gap:8px}
+.btn-main{flex:1;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-size:12px;font-weight:500;cursor:default;text-align:center;font-family:'Noto Sans TC',sans-serif}
+.btn-sub{padding:8px 12px;background:transparent;color:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);font-size:12px;cursor:default;text-align:center;font-family:'Noto Sans TC',sans-serif}
+
+/* HUD mockup */
+.hud-demo{background:var(--accent);border-radius:var(--r3);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.hud-steps{display:flex;gap:0;align-items:center}
+.hud-step{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.4);padding:4px 10px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.hud-step.done{color:rgba(255,255,255,.7)}
+.hud-step.cur{color:#fff;background:rgba(255,255,255,.12);border-radius:3px}
+.hud-step-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.hud-sep{color:rgba(255,255,255,.2);font-size:12px;padding:0 2px}
+.hud-right{display:flex;align-items:center;gap:12px}
+.hud-role{font-family:'DM Mono',monospace;font-size:11px;color:#fff;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:3px}
+.hud-back{font-size:11px;color:rgba(255,255,255,.5);cursor:default}
+
+/* Role card */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.role-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:15px;cursor:default;transition:border-color .15s}
+.role-card:hover{border-color:var(--accent2)}
+.role-card.sel{border-color:var(--accent2);background:#EEF2FF}
+.role-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:10px}
+.role-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.role-desc{font-size:11px;color:var(--ink3);margin-bottom:8px}
+.role-pain{font-size:12px;color:var(--ink2);font-style:italic;line-height:1.55;border-left:2px solid var(--bg3);padding-left:8px}
+
+/* End page mockup */
+.endpage{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:24px;margin-bottom:16px}
+.ep-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.ep-sub{font-size:12px;color:var(--ink2);margin-bottom:16px}
+.ep-kpi{background:var(--accent);border-radius:var(--r2);padding:14px 18px;display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.ep-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#fff}
+.ep-vs{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);margin:0 4px}
+.ep-desc{font-size:12px;color:rgba(255,255,255,.7);flex:1}
+.ep-ctas{display:flex;gap:10px;flex-wrap:wrap}
+.ep-cta-main{flex:1;min-width:160px;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r2);font-size:13px;font-weight:500;text-align:center;cursor:default;font-family:'Noto Sans TC',sans-serif}
+.ep-cta-sub{flex:1;min-width:160px;padding:12px;background:var(--surface);color:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);font-size:13px;text-align:center;cursor:default;font-family:'Noto Sans TC',sans-serif}
+.ep-note{font-size:11px;color:var(--ink3);margin-top:8px;text-align:center}
+
+/* Bug tag */
+.bug-tag{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;background:#EEEDFE;color:#332E90;padding:2px 8px;border-radius:3px;margin-bottom:7px}
+
+/* Annotation row */
+.ann-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.ann-n{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+.ann-n.r{background:#FCEBEB;color:#8B2020}
+.ann-n.g{background:#E1F5EE;color:#0B5E43}
+.ann-n.y{background:#FDF0DC;color:#7A4509}
+.ann-txt{font-size:13px;color:var(--ink2);line-height:1.55;padding-top:2px}
+
+/* Page tabs (for page-by-page) */
+.ptabs{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:20px;position:sticky;top:48px;background:var(--bg);z-index:50}
+.ptab{padding:9px 13px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;flex-shrink:0;background:none;border-top:none;border-left:none;border-right:none}
+.ptab:hover{color:var(--ink)}
+.ptab.on{color:var(--accent2);border-bottom-color:var(--accent2)}
+.ppane{display:none}
+.ppane.on{display:block}
+
+/* step header */
+.step-hd{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.step-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--bg3);line-height:1;flex-shrink:0}
+.step-info .step-t{font-size:16px;font-weight:500;color:var(--ink);margin-bottom:1px}
+.step-info .step-s{font-size:11px;color:var(--ink3)}
+.step-emo{font-size:20px;margin-left:auto;flex-shrink:0}
+
+@media print{.ver-bar{display:none}.section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<!-- VERSION BAR -->
+<nav class="ver-bar">
+  <div class="ver-logo"><b>Digiwin AI Agent</b> — UX Report</div>
+  <div class="ver-tabs">
+    <div class="ver-tab on" onclick="switchVer('v2')">v2.0 會議後確認</div>
+    <div class="ver-tab" onclick="switchVer('v3')">v3.0 改版設計方向</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     V2.0 — 會議後確認版
+═══════════════════════════════════════════ -->
+<div class="ver-panel on" id="v2">
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">V2.0 — 2026.06.09 會議後確認版</div>
+    <h1 class="hero-title">假設確認 <em>+</em> 數據解讀<br><em>+ 工作範圍釐清</em></h1>
+    <p class="hero-desc">結合 GA 數據、主管會議紀錄、PPT（Slide 17–23）與場景文案 Excel，將 v1.0 的所有推測逐一確認或修正。</p>
+    <div class="hero-chips">
+      <span class="chip on">GA 數據補充</span>
+      <span class="chip on">主管會議確認</span>
+      <span class="chip on">PPT 動線規劃</span>
+      <span class="chip on">文案 Excel 讀取</span>
+      <span class="chip">v1.0 推測已確認</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 版本紀錄 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">VERSION LOG</div>
+    <h2 class="section-title">版本紀錄</h2>
+  </div>
+  <div class="cards">
+    <div class="card g">
+      <div class="badge bg-g">v1.0 ✅ 完成</div>
+      <div class="card-h">會議前檢測 — 基於 11 張截圖的推測分析</div>
+      <div class="card-p">受眾假設、流程問題、文案方向均為推測。所有假設待確認。檔案：digiwin-ux-analysis.html</div>
+    </div>
+    <div class="card b">
+      <div class="badge bg-b">v2.0 🔄 本版</div>
+      <div class="card-h">會議後確認版 — GA 數據 + 主管確認 + PPT + Excel</div>
+      <div class="card-p">2026/06/09 會議。假設全數確認，數據補充，工作範圍釐清，文案方向定調。</div>
+    </div>
+    <div class="card y">
+      <div class="badge bg-y">v3.0 📐 下一步</div>
+      <div class="card-h">改版設計方向 — 新動線框架 + 場景文案套版</div>
+      <div class="card-p">依主管 PPT Slide 20–22 新動線規劃製作改版 HTML 外框，套入 Excel 三段式文案。週五前交付打包資料夾。</div>
+    </div>
+  </div>
+</section>
+
+<!-- GA 數據 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">GA DATA — 2026/5/27–6/9</div>
+    <h2 class="section-title">數據解讀</h2>
+    <p class="section-sub">這張圖直接驗證了 v1.0 所有的流失點推測，而且比預期更嚴重。</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-lbl">體驗人次</div><div class="stat-val">1,796</div><div class="stat-sub">有打廣告的情況下</div></div>
+    <div class="stat alert"><div class="stat-lbl">體驗完成率</div><div class="stat-val">12%</div><div class="stat-sub">100人進來只有12人走完</div></div>
+    <div class="stat alert"><div class="stat-lbl">留資率</div><div class="stat-val">1%</div><div class="stat-sub">送出留資僅 23 人</div></div>
+    <div class="stat"><div class="stat-lbl">平均停留</div><div class="stat-val">6.5分</div><div class="stat-sub">時間不算短，但沒有轉換</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="funnel">
+      <div class="funnel-title">場景漏斗</div>
+      <div class="frow"><div class="f-label">1. 進入體驗</div><div class="f-bar-wrap"><div class="f-bar" style="width:100%;background:#2D4DB8"><span>1,796</span></div></div><div class="f-pct">100%</div><div class="f-drop"></div></div>
+      <div class="frow"><div class="f-label">2. 選擇角色</div><div class="f-bar-wrap"><div class="f-bar" style="width:28%;background:#E07B2A"><span>497</span></div></div><div class="f-pct">28%</div><div class="f-drop" style="color:var(--red)">-72%</div></div>
+      <div class="frow"><div class="f-label">3. 完成體驗</div><div class="f-bar-wrap"><div class="f-bar" style="width:12%;background:#C0392B"><span>218</span></div></div><div class="f-pct">12%</div><div class="f-drop" style="color:var(--red)">-16%</div></div>
+      <div class="frow"><div class="f-label">4. 進入留資</div><div class="f-bar-wrap"><div class="f-bar" style="width:3%;background:#888"></div></div><div class="f-pct">3%</div><div class="f-drop"></div></div>
+      <div class="frow"><div class="f-label">5. 送出留資</div><div class="f-bar-wrap"><div class="f-bar" style="width:1%;background:#555"></div></div><div class="f-pct">1%</div><div class="f-drop"></div></div>
+    </div>
+    <div class="funnel">
+      <div class="funnel-title">體驗首頁漏斗</div>
+      <div class="frow"><div class="f-label">1. 進入首頁</div><div class="f-bar-wrap"><div class="f-bar" style="width:100%;background:#2D4DB8"><span>429</span></div></div><div class="f-pct">100%</div><div class="f-drop"></div></div>
+      <div class="frow"><div class="f-label">2. 展開體驗旅程</div><div class="f-bar-wrap"><div class="f-bar" style="width:66%;background:#2D4DB8"><span>282</span></div></div><div class="f-pct">66%</div><div class="f-drop" style="color:var(--amber)">-34%</div></div>
+      <div class="frow"><div class="f-label">3. 進入場景頁</div><div class="f-bar-wrap"><div class="f-bar" style="width:62%;background:#E07B2A"><span>267</span></div></div><div class="f-pct">62%</div><div class="f-drop"></div></div>
+      <div class="frow"><div class="f-label">4. 選擇場景</div><div class="f-bar-wrap"><div class="f-bar" style="width:48%;background:#C0392B"><span>207</span></div></div><div class="f-pct">48%</div><div class="f-drop" style="color:var(--red)">-52%</div></div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card r">
+      <div class="badge bg-r">最關鍵數字</div>
+      <div class="card-h">進入體驗 → 選擇角色，流失了 72%</div>
+      <div class="card-p">1,796 人進入後，只有 497 人走到選擇角色這一步。這和 v1.0 推測的「Step 2–3 是最高流失點」完全吻合，而且比預期更嚴重。主管 PPT Slide 17 也直接確認：「在『選擇角色』就遇到了最主要的流失。」</div>
+    </div>
+    <div class="card y">
+      <div class="badge bg-y">值得注意</div>
+      <div class="card-h">平均停留 6.5 分鐘，但完成率只有 12%</div>
+      <div class="card-p">停留時間不算短，代表使用者願意看，但流程的認知門檻讓他們在中途放棄。問題不在內容吸引力，在引導與操作清晰度。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 假設確認 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">ASSUMPTION VERIFIED</div>
+    <h2 class="section-title">v1.0 假設確認結果</h2>
+  </div>
+
+  <div class="cards">
+    <div class="qbox">
+      <div class="qbox-q">受眾是誰？</div>
+      <div class="qbox-a"><strong>確認：新舊客戶都有，核心聚焦「企業使用者（經理人或員工）」</strong>，在工作上有實際工作流程與痛點的人。這個體驗中心不是第一個接觸點，正常邏輯是先經過 Landing Page 了解「數字分身」世界觀，再來這裡試玩。目前直接打廣告導流是「本末倒置」，是已知問題。</div>
+      <div class="vrow"><span class="v vg">✓ 確認：潛在客戶為主</span><span class="v vb">補充：企業使用者（有工作痛點）</span></div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">體驗後的 CTA 是什麼？</div>
+      <div class="qbox-a"><strong>確認：「索取方案」＋「訂閱最新消息」</strong>兩個。下半年 KPI 定在「讓使用者完成體驗」，留資率不是主要目標。原本的「前往訂閱」定義不清，確認改掉。</div>
+      <div class="vrow"><span class="v vg">✓ 確認：轉換節點設計方向正確</span></div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">自助體驗還是業務陪同？</div>
+      <div class="qbox-a"><strong>確認：自助體驗為主</strong>，但平台同時也用於業務展示場合。這確認了「每個元件都必須能自我解釋」的設計標準，所有說明文字都不能依賴業務在旁解釋。</div>
+      <div class="vrow"><span class="v vg">✓ 確認：自助體驗</span><span class="v vy">影響：互動說明標準必須更高</span></div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">連續兩次選角色的問題怎麼解？</div>
+      <div class="qbox-a"><strong>確認修改方向：中間四個次角色選項全部拿掉</strong>，選完職能直接進場景。主管原話：「本來想說讓他們有多點路徑選擇，現在改版就是要把它踩平。」</div>
+      <div class="vrow"><span class="v vg">✓ 確認：簡化流程，移除重複選擇</span></div>
+    </div>
+    <div class="qbox">
+      <div class="qbox-q">產品內嵌畫面要不要動？</div>
+      <div class="qbox-a"><strong>確認：完全不動。</strong>產品後台介面是線上系統，我們只負責「外框/外包容器」的 UI/UX。雙重捲動 BUG 屬於產品端問題，反應過但目前不在我們範圍內。</div>
+      <div class="vrow"><span class="v vg">✓ 確認：範圍外</span><span class="v vy">BUG 已知，產品端負責</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PPT 重點 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">PPT KEY INSIGHTS — SLIDE 17–23</div>
+    <h2 class="section-title">主管 PPT 的關鍵指示</h2>
+    <p class="section-sub">Slide 17–23 是直接影響改版方向的核心內容。</p>
+  </div>
+
+  <div class="ann" style="margin-bottom:16px">
+    <div class="ann-lbl">SLIDE 17 — 數據確認</div>
+    <div class="ann-h">「以數據現狀來看，在『選擇角色』就遇到了最主要的流失」</div>
+    <div class="ann-p">PPT 與 GA 數據完全吻合，也和 v1.0 的分析結論一致。這是啟動改版的直接依據。</div>
+  </div>
+
+  <div class="ann" style="border-left-color:var(--blue)">
+    <div class="ann-lbl" style="color:var(--blue)">SLIDE 18 — HUD 設計需求</div>
+    <div class="ann-h">全程 HUD：「我是誰？我在哪裡？不要讓使用者迷路」</div>
+    <div class="ann-p">要求在 PC 和 Mobile 全程顯示浮動提示條，包含步驟進度（1–5）、「回到分身大廳」、「返回上一步」、「你的職能：OO」。讓使用者隨時定位自己在體驗的哪個環節。</div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="section-eye" style="margin-bottom:12px">SLIDE 20–22 — 新動線規劃（核心）</div>
+  <div class="flow-wrap">
+    <div class="flow">
+      <div class="fnode"><div class="fbox" style="background:#1B2B5E">歡迎大廳</div><div class="fstep">Step 1</div></div>
+      <div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#2D4DB8">選定職能</div><div class="fstep">Step 2</div><div class="ffeel" style="color:var(--green)">同時看見職能痛點</div></div>
+      <div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#2D4DB8">選擇場景</div><div class="fstep">Step 3</div><div class="ffeel">推薦場景＋其他場景</div></div>
+      <div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#0E7490">場景開場</div><div class="fstep">Step 4</div><div class="ffeel">小秘書三段式引導</div></div>
+      <div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#534AB7">圓桌會議</div><div class="fstep">Step 5</div></div>
+      <div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#059669">分身總結</div><div class="fstep">結束</div><div class="ffeel" style="color:var(--green)">雷達圖＋索取方案＋訂閱</div></div>
+    </div>
+  </div>
+
+  <div class="hl"><p><strong>最關鍵的改動：</strong>移除了原本第 3–6 步之間的重複選擇（選模式→選職能→選場景→選角色），合併為「選定職能→選擇場景」兩步，並在職能選擇頁直接顯示職能痛點，讓使用者一次完成「我是誰」的定義。</p></div>
+
+  <div class="div"></div>
+
+  <div class="section-eye" style="margin-bottom:12px">SLIDE 19 — 身分定位邏輯</div>
+  <div class="g2">
+    <div class="card b">
+      <div class="badge bg-b">第一層：確認身份</div>
+      <div class="card-h">「我的工作角色是 OO 職能」</div>
+      <div class="card-p">使用者只需要確認自己是誰，不做多餘選擇。</div>
+    </div>
+    <div class="card b">
+      <div class="badge bg-b">第二層：說明分身</div>
+      <div class="card-h">「你是 OO，那麼在這個情境，XX 分身將能協助你…」</div>
+      <div class="card-p">說明清楚使用者的角色，有哪些數智分身可以提供幫助。全程用第二人稱「你」。</div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="section-eye" style="margin-bottom:12px">SLIDE 23–24 — 結束頁簡化</div>
+  <div class="cards">
+    <div class="card g">
+      <div class="badge bg-g">確認保留</div>
+      <div class="card-h">「傳統企業做完這場決策，平均需要 3 天。分身用了 3 分鐘。」</div>
+      <div class="card-p">這句話在 PPT 結束頁被特別標示出來，確認是核心說服點，要保留並強化顯示。</div>
+    </div>
+    <div class="card g">
+      <div class="badge bg-g">確認 CTA</div>
+      <div class="card-h">索取方案（主）＋ 訂閱最新消息（次）</div>
+      <div class="card-p">PPT Slide 23 已畫出兩個按鈕的排版位置，確認取代原本的「前往訂閱」。</div>
+    </div>
+    <div class="card y">
+      <div class="badge bg-y">注意</div>
+      <div class="card-h">分身總結內容要簡化，雷達圖聚焦「現況突破」與「分身能力」兩個維度</div>
+      <div class="card-p">PPT Slide 24 說明企業不須從零訓練或建構平台，這是結束頁的核心價值主張，要和雷達圖結合呈現。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Excel 文案 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">EXCEL — 場景文案（8個場景）</div>
+    <h2 class="section-title">文案 Excel 讀取結果</h2>
+    <p class="section-sub">三段式架構已具備，但部分場景有文案 bug 需要注意。</p>
+  </div>
+
+  <div class="ann" style="border-left-color:var(--red);margin-bottom:16px">
+    <div class="ann-lbl" style="color:var(--red)">⚠️ 發現 BUG</div>
+    <div class="ann-h">「缺料斷鏈救援」的第二段文案與「高效入庫檢驗」重複</div>
+    <div class="ann-p">Excel 第 7 個場景（缺料斷鏈救援）的開場描述第二段，複製貼上了第 6 個場景（高效入庫檢驗）的文案。需要主管或 PO 補正確文案後再套入。</div>
+  </div>
+
+  <div class="scene-grid">
+    <div class="scene-card">
+      <div class="scene-card-top">
+        <div class="scene-cat">生產管理 › 生產排程與插單管理</div>
+        <div class="scene-name">急單插單應變</div>
+        <div class="scene-tags"><span class="scene-tag">專案經理</span><span class="scene-tag">採購</span><span class="scene-tag">業務</span><span class="scene-tag">廠長</span></div>
+      </div>
+      <div class="scene-body">
+        <div class="scene-step"><div class="scene-step-num">情境痛點</div><div class="scene-step-text pain">客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。</div></div>
+        <div class="scene-step"><div class="scene-step-num">秘書引導</div><div class="scene-step-text guide">鼎新 AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。</div></div>
+        <div class="scene-step"><div class="scene-step-num">分身價值</div><div class="scene-step-text value">下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。</div></div>
+      </div>
+      <div class="scene-footer"><div class="btn-main">模擬這個場景 →</div><div class="btn-sub">了解方案</div></div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-card-top">
+        <div class="scene-cat">合規與風險 › 資安風險管理</div>
+        <div class="scene-name">資安漏洞速補</div>
+        <div class="scene-tags"><span class="scene-tag">IT 資訊人員</span></div>
+      </div>
+      <div class="scene-body">
+        <div class="scene-step"><div class="scene-step-num">情境痛點</div><div class="scene-step-text pain">老闆今天早上傳來一則訊息：「最近資安事件頻傳，我們的 ERP 系統確定沒問題嗎？你這週給我一個確認。」</div></div>
+        <div class="scene-step"><div class="scene-step-num">秘書引導</div><div class="scene-step-text guide">你的團隊只有 3 個人。資安專家在休假。你手上有一個工具——法規遵循顧問 Agent。</div></div>
+        <div class="scene-step"><div class="scene-step-num">分身價值</div><div class="scene-step-text value">你不需要懂 SBOM，不需要會 Linux。你只需要說一句話。</div></div>
+      </div>
+      <div class="scene-footer"><div class="btn-main">模擬這個場景 →</div><div class="btn-sub">了解方案</div></div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-card-top">
+        <div class="scene-cat">行銷與銷售 › 潛客開發與名單管理</div>
+        <div class="scene-name">名片商機獵取</div>
+        <div class="scene-tags"><span class="scene-tag">業務</span></div>
+      </div>
+      <div class="scene-body">
+        <div class="scene-step"><div class="scene-step-num">情境痛點</div><div class="scene-step-text pain">每次拜訪或參展後，大量名片堆積造成資訊落差，手動整理耗時，無法第一時間進行名單貼標與有效性檢測。</div></div>
+        <div class="scene-step"><div class="scene-step-num">秘書引導</div><div class="scene-step-text guide">鼎新 AI 職能分身——名單收集已預置光學掃描與網路爬蟲能力，精準解析各式名片格式，自動查補缺漏。</div></div>
+        <div class="scene-step"><div class="scene-step-num">分身價值</div><div class="scene-step-text value">下載名單收集能力，開箱即用，越用越懂你的目標產業，能力持續增強！</div></div>
+      </div>
+      <div class="scene-footer"><div class="btn-main">模擬這個場景 →</div><div class="btn-sub">了解方案</div></div>
+    </div>
+    <div class="scene-card">
+      <div class="scene-card-top">
+        <div class="scene-cat">採購與供應鏈 › 倉儲與庫存管理</div>
+        <div class="scene-name">高效入庫檢驗</div>
+        <div class="scene-tags"><span class="scene-tag">倉管</span></div>
+      </div>
+      <div class="scene-body">
+        <div class="scene-step"><div class="scene-step-num">情境痛點</div><div class="scene-step-text pain">月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫記錄驗收數，效率太慢導致現場大塞車。</div></div>
+        <div class="scene-step"><div class="scene-step-num">秘書引導</div><div class="scene-step-text guide">讓「採購進貨」與「進貨驗收批退」Agent 聯手——自動辨識廠商單據生成進貨單，你只要輸入實際驗收數，Agent 自動判定並產出驗收與批退資料。</div></div>
+        <div class="scene-step"><div class="scene-step-num">分身價值</div><div class="scene-step-text value">擁有這組職能分身，讓「進貨、驗收、過帳」一氣呵成，收貨區不再大排長龍。</div></div>
+      </div>
+      <div class="scene-footer"><div class="btn-main">模擬這個場景 →</div><div class="btn-sub">了解方案</div></div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--ink3);text-align:center">另有：物料運補監管、即問即買導購、缺料斷鏈救援（待文案修正）、圖紙智能報價，共 8 個場景</p>
+</section>
+
+<!-- 工作範圍 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">SCOPE — 交付物確認</div>
+    <h2 class="section-title">工作範圍釐清</h2>
+  </div>
+  <div class="g2">
+    <div class="card g">
+      <div class="badge bg-g">範圍內 — 我們負責</div>
+      <div class="card-h">外框 UI/UX 改版</div>
+      <div class="card-p">首頁文案承接優化、流程簡化（移除重複角色選擇）、全程 HUD、三段式文案套版、結束頁 CTA 改版（索取方案＋訂閱）、場景卡片重新設計。</div>
+    </div>
+    <div class="card r">
+      <div class="badge bg-r">範圍外 — 不動</div>
+      <div class="card-h">產品內嵌後台 UI</div>
+      <div class="card-p">產品後台介面維持原狀。雙重捲動 BUG 屬於產品端。右下角進度條待產品端決定。對話框內的文字內容不做修改。</div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="card b" style="margin-top:0">
+    <div class="badge bg-b">交付格式</div>
+    <div class="card-h">打包成含 index.html 的資料夾，週五前交付</div>
+    <div class="card-p">不需要上傳到網址。直接打包 HTML＋路徑＋圖片連結的資料夾給主管，能直接讀取畫面模擬即可。等主管給會議 PPT 與各角色文案 Excel（已收到）後開始製作。</div>
+  </div>
+</section>
+
+<!-- 文案策略 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">COPY STRATEGY</div>
+    <h2 class="section-title">文案改寫策略確認</h2>
+  </div>
+  <div class="cards">
+    <div class="card b"><div class="badge bg-b">策略 1</div><div class="card-h">三段式架構：情境痛點 → 秘書引導 → 分身價值</div><div class="card-p">每個場景的開場描述統一用三段呈現。第一段用使用者痛點切入，第二段讓小秘書出面引導，第三段說明分身帶來的具體價值。</div></div>
+    <div class="card b"><div class="badge bg-b">策略 2</div><div class="card-h">全程第二人稱「你」</div><div class="card-p">所有的引導文字都用第二人稱，讓使用者感覺自己是主角而非旁觀者。如 Slide 22 所示：「客戶突然要追加，身為採購，你將與數智分身一同擬定策略。」</div></div>
+    <div class="card b"><div class="badge bg-b">策略 3</div><div class="card-h">AI 統一改寫調性</div><div class="card-p">目前各 PO 的文案語氣不統一，主管確認：把所有場景文案打包丟給 AI 依設定好的調性統一改寫，避免與各 PO 來回溝通耗時。</div></div>
+  </div>
+  <div class="ns">
+    <div class="ns-lbl">體驗核心文案主軸</div>
+    <div class="ns-copy">「當你的工作卡住，<br>其他職務的 AI 不等人。」</div>
+    <div class="ns-sub">首頁說問題 → 選職能說自己是誰 → 場景說情境 → 圓桌體驗解法 → 結束頁說價值 → 索取方案 / 訂閱</div>
+  </div>
+</section>
+
+</div><!-- end wrap v2 -->
+</div><!-- end v2 panel -->
+
+<!-- ═══════════════════════════════════════════
+     V3.0 — 改版設計方向
+═══════════════════════════════════════════ -->
+<div class="ver-panel" id="v3">
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">V3.0 — 改版設計方向</div>
+    <h1 class="hero-title">新動線框架 <em>+</em> 場景文案套版<br><em>+ HUD 設計規格</em></h1>
+    <p class="hero-desc">依據主管 PPT Slide 20–22 的新動線規劃，重新設計體驗流程外框。所有改動均在「外框 UI/UX」範圍內，產品內嵌畫面不動。</p>
+    <div class="hero-chips">
+      <span class="chip on">流程精簡</span>
+      <span class="chip on">HUD 全程跟隨</span>
+      <span class="chip on">三段式文案</span>
+      <span class="chip on">CTA 重新定義</span>
+      <span class="chip">週五前交付</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 新舊流程對比 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">FLOW COMPARISON</div>
+    <h2 class="section-title">新舊動線對比</h2>
+    <p class="section-sub">從 8 步精簡到 6 步，移除重複選擇，加入 HUD。</p>
+  </div>
+
+  <div class="section-eye" style="margin-bottom:10px">原本流程（v1.0）— 高流失</div>
+  <div class="flow-wrap" style="margin-bottom:20px">
+    <div class="flow">
+      <div class="fnode"><div class="fbox" style="background:#555">首頁</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#B93030">選模式</div><div class="fbad">❌ 抽象術語</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#B93030">選職能</div><div class="fbad">❌ 無說明</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#555">場景卡</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#555">Bridge</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#B93030">選角色</div><div class="fbad">❌ 重複選擇</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#534AB7">圓桌</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#059669">結束頁</div></div>
+    </div>
+  </div>
+
+  <div class="section-eye" style="margin-bottom:10px">新流程（v3.0）— 主管 Slide 20–22</div>
+  <div class="flow-wrap" style="margin-bottom:20px">
+    <div class="flow">
+      <div class="fnode"><div class="fbox" style="background:#1B2B5E">歡迎大廳</div><div class="fstep">Step 1</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#2D4DB8">選定職能</div><div class="fstep">Step 2</div><div class="ffeel" style="color:var(--green)">✓ 顯示痛點</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#2D4DB8">選擇場景</div><div class="fstep">Step 3</div><div class="ffeel" style="color:var(--green)">✓ 推薦＋其他</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#0E7490">場景開場</div><div class="fstep">Step 4</div><div class="ffeel" style="color:var(--green)">✓ 三段式</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#534AB7">圓桌會議</div><div class="fstep">Step 5</div></div><div class="farrow">→</div>
+      <div class="fnode"><div class="fbox" style="background:#059669">分身總結</div><div class="fstep">結束</div><div class="ffeel" style="color:var(--green)">✓ 新 CTA</div></div>
+    </div>
+  </div>
+
+  <div class="hl"><p><strong>關鍵改動摘要：</strong>移除「選模式」（職能/場景的抽象分岔）；合併「選職能」＋「選角色」為「選定職能」單一步驟並加入痛點展示；加入全程 HUD；場景開場統一三段式文案；結束頁 CTA 改為「索取方案」＋「訂閱最新消息」。</p></div>
+</section>
+
+<!-- HUD 設計規格 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">HUD SPEC — SLIDE 18</div>
+    <h2 class="section-title">全程 HUD 設計規格</h2>
+    <p class="section-sub">讓使用者隨時知道「我是誰、我在哪裡」，PC 和 Mobile 都要有。</p>
+  </div>
+
+  <div class="section-eye" style="margin-bottom:8px">HUD 示意（PC 版）</div>
+  <div class="hud-demo">
+    <div class="hud-steps">
+      <div class="hud-step done"><div class="hud-step-dot"></div>1 歡迎大廳</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step done"><div class="hud-step-dot"></div>2 選定職能</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step done"><div class="hud-step-dot"></div>3 選擇場景</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step cur"><div class="hud-step-dot"></div>4 場景體驗</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step"><div class="hud-step-dot"></div>5 分身總結</div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-back">← 返回上一步</div>
+      <div class="hud-role">你的職能：採購</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card b">
+      <div class="badge bg-b">設計要求</div>
+      <div class="card-h">HUD 需全程固定在畫面頂部或底部</div>
+      <div class="card-p">PC 版：頂部固定條。Mobile 版：因行動裝置遮蔽區問題，需確認放在安全區域內（主管 Slide 18 有標示「行動裝置遮蔽區」）。無論哪個步驟都要顯示，讓使用者隨時可以確認自己的位置與職能。</div>
+    </div>
+    <div class="card b">
+      <div class="badge bg-b">顯示內容</div>
+      <div class="card-h">步驟進度 + 職能標籤 + 返回按鈕</div>
+      <div class="card-p">① 步驟進度：1–5 步驟，當前步驟高亮，已完成步驟顯示完成狀態。② 職能標籤：「你的職能：採購」，從 Step 2 選定後全程顯示。③ 返回按鈕：「← 返回上一步」，讓使用者不依賴瀏覽器返回鍵。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 職能選擇頁重設計 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">STEP 2 REDESIGN</div>
+    <h2 class="section-title">職能選擇頁重設計</h2>
+    <p class="section-sub">選定職能後立刻看到該職能的常見痛點，建立代入感後再進場景選擇。</p>
+  </div>
+
+  <div class="section-eye" style="margin-bottom:12px">職能卡片設計（含痛點展示）</div>
+  <div class="role-grid">
+    <div class="role-card sel">
+      <div class="role-icon" style="background:#EEF2FF;color:#2D4DB8">📋</div>
+      <div class="role-name">採購</div>
+      <div class="role-desc">管供應商、控成本、確認交期</div>
+      <div class="role-pain">「客戶急單，我該跟誰討論供應鏈的底線…」</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon" style="background:#E1F5EE;color:#0D6B50">🏭</div>
+      <div class="role-name">生管</div>
+      <div class="role-desc">排產能、調排程、盯進度</div>
+      <div class="role-pain">「生產時才發現料不夠，只能停線等料…」</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon" style="background:#FDF0DC;color:#A05C10">💼</div>
+      <div class="role-name">業務</div>
+      <div class="role-desc">開發客戶、維護關係、推進成交</div>
+      <div class="role-pain">「客戶跟了兩年，這次急單答不出交期…」</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon" style="background:#FCEBEB;color:#B93030">🖥️</div>
+      <div class="role-name">IT 資訊</div>
+      <div class="role-desc">系統維護、資安合規、技術支援</div>
+      <div class="role-pain">「老闆要我確認 ERP 資安，但團隊只有 3 人…」</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon" style="background:#EEEDFE;color:#4B42A8">📊</div>
+      <div class="role-name">廠長</div>
+      <div class="role-desc">生產排程、品質管控、效率提升</div>
+      <div class="role-pain">「總是在幫產線救火，根本沒時間看數據…」</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon" style="background:#E6F1FB;color:#185FA5">📦</div>
+      <div class="role-name">資材</div>
+      <div class="role-desc">庫存管理、物料調度、補給計劃</div>
+      <div class="role-pain">「手動翻查幾百項品號的庫存，一整天都在轉單…」</div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card g">
+      <div class="badge bg-g">改版重點</div>
+      <div class="card-h">角色痛點台詞取代單一職能名稱</div>
+      <div class="card-p">原本只有「採購」兩個字，現在每張卡加入：職責描述（說明這個職能做什麼）＋痛點台詞（用第一人稱描述真實工作困境）。讓使用者選角時能立刻確認「這就是我」，而不是猜測這個詞代表什麼。</div>
+    </div>
+    <div class="card b">
+      <div class="badge bg-b">互動邏輯</div>
+      <div class="card-h">選定職能後，場景頁自動篩選推薦場景</div>
+      <div class="card-p">點了「採購」後進入場景選擇頁，頂部推薦的場景會對應採購職能（如急單插單應變、缺料斷鏈救援），其他職能的場景列在下方「其他場景」區塊。讓場景選擇和職能選擇產生真正的關聯。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 場景開場重設計 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">STEP 4 REDESIGN</div>
+    <h2 class="section-title">場景開場重設計</h2>
+    <p class="section-sub">三段式文案架構套入場景頁，取代原本單一大段描述。</p>
+  </div>
+
+  <div class="section-eye" style="margin-bottom:12px">場景開場頁示意（以「急單插單應變」為例）</div>
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:24px;margin-bottom:20px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);margin-bottom:6px;letter-spacing:.06em">SCENE — 急單插單應變</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--accent);margin-bottom:20px">客戶突然要追加，<br>身為採購，你將與數智分身一同擬定策略</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex-shrink:0;width:24px;height:24px;background:#FCEBEB;color:#8B2020;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">1</div>
+        <div><div style="font-size:11px;color:var(--red);font-family:'DM Mono',monospace;letter-spacing:.05em;margin-bottom:4px">情境痛點</div><div style="font-size:13px;color:var(--ink);line-height:1.65">客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex-shrink:0;width:24px;height:24px;background:#E6F1FB;color:#0F4A87;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">2</div>
+        <div><div style="font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:.05em;margin-bottom:4px">小秘書引導</div><div style="font-size:13px;color:var(--ink);line-height:1.65">鼎新 AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex-shrink:0;width:24px;height:24px;background:#E1F5EE;color:#0B5E43;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">3</div>
+        <div><div style="font-size:11px;color:var(--green);font-family:'DM Mono',monospace;letter-spacing:.05em;margin-bottom:4px">分身價值</div><div style="font-size:13px;color:var(--ink);line-height:1.65">下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="btn-main" style="display:block;padding:12px;font-size:13px">啟動會議 →</div>
+      <div class="btn-sub" style="padding:12px;font-size:13px">← 換個場景</div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="cbox">
+      <span class="cbox-lbl old">原本 CTA</span>
+      <div class="cbox-text">「開始體驗」＋「前往訂閱」<br><em>使用者還沒體驗就看到訂閱，體感是被推銷</em></div>
+    </div>
+    <div class="cbox highlight">
+      <span class="cbox-lbl new">新 CTA</span>
+      <div class="cbox-text">「啟動會議 →」（主）＋「← 換個場景」（次）<br><em>明確的行動描述，移除時機錯誤的訂閱按鈕</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- 結束頁重設計 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">ENDPAGE REDESIGN</div>
+    <h2 class="section-title">結束頁重設計</h2>
+    <p class="section-sub">聚焦「3天 vs 3分鐘」量化說服，CTA 拆成主次兩個。</p>
+  </div>
+
+  <div class="endpage">
+    <div class="ep-title">分身能力總結 — 急單插單應變</div>
+    <div class="ep-sub">這場模擬突破了哪些限制？</div>
+    <div class="ep-kpi">
+      <div><div class="ep-num">3 天</div><div style="font-size:11px;color:rgba(255,255,255,.5)">傳統企業的決策時間</div></div>
+      <div class="ep-vs">→</div>
+      <div><div class="ep-num" style="color:#7EEFC8">3 分鐘</div><div style="font-size:11px;color:rgba(255,255,255,.5)">數智分身的協作速度</div></div>
+      <div class="ep-desc">企業不需要從零訓練或建構平台，開箱就是一整個主管級專家團隊。</div>
+    </div>
+    <div class="ep-ctas">
+      <div class="ep-cta-main">索取方案 →</div>
+      <div class="ep-cta-sub">訂閱最新消息</div>
+    </div>
+    <div class="ep-note">或 ← 換個角色再體驗一次</div>
+  </div>
+
+  <div class="g2">
+    <div class="card g">
+      <div class="badge bg-g">改版重點 1</div>
+      <div class="card-h">「3天 vs 3分鐘」更大、更突出</div>
+      <div class="card-p">原本這個數字被埋在其他文字中，改版後放大為頁面主視覺，讓使用者一眼看到這個量化對比。這是全站最有說服力的內容，應該是結束頁最顯眼的元素。</div>
+    </div>
+    <div class="card g">
+      <div class="badge bg-g">改版重點 2</div>
+      <div class="card-h">CTA 拆成主次，讓使用者按自己意願選</div>
+      <div class="card-p">主按鈕「索取方案 →」：明確的商業行動，深色強調。次按鈕「訂閱最新消息」：輕量承諾，讓還沒準備好的使用者也能留下聯繫方式。兩個行動不綁在一起，降低決策壓力。</div>
+    </div>
+    <div class="card y">
+      <div class="badge bg-y">待確認</div>
+      <div class="card-h">雷達圖「時空維度 25 初探」的文案語氣</div>
+      <div class="card-p">原本說明「尚未完整展現…」語氣負面。建議改為正向引導：「時空維度：還有更多可解鎖的能力 →」。PPT Slide 23 顯示雷達圖簡化為「現況突破」與「分身能力」兩個維度，可依此調整。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 修改清單 -->
+<section class="section">
+  <div class="section-hd">
+    <div class="section-eye">PRIORITY LIST</div>
+    <h2 class="section-title">完整修改清單（更新版）</h2>
+    <p class="section-sub">依主管會議確認後的範圍重新排序，灰色項目為範圍外。</p>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr><th style="width:75px">優先級</th><th style="width:180px">問題</th><th style="width:80px">位置</th><th>修改方向</th><th style="width:70px">狀態</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="p0">P0 確認</span></td><td>連續兩次選角色造成流失</td><td>全流程</td><td>依 Slide 20–22 新動線，移除次角色選擇步驟</td><td><span style="color:var(--green);font-size:11px">主管確認</span></td></tr>
+      <tr><td><span class="p0">P0 確認</span></td><td>全流程無進度指示</td><td>全流程</td><td>加入全程 HUD（步驟＋職能＋返回），依 Slide 18 規格</td><td><span style="color:var(--green);font-size:11px">主管確認</span></td></tr>
+      <tr><td><span class="p1">P1 高</span></td><td>首頁文案說產品不說痛點</td><td>首頁</td><td>主標改為使用者痛點切入，配合廣告投放的受眾設定</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p1">P1 高</span></td><td>職能選擇無職責說明與痛點</td><td>選職能</td><td>每個職能加職責描述＋第一人稱痛點台詞</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p1">P1 高</span></td><td>場景開場無三段式架構</td><td>場景開場</td><td>套入 Excel 三段式文案：情境痛點→秘書引導→分身價值</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p1">P1 高</span></td><td>「前往訂閱」時機錯誤</td><td>場景卡</td><td>移除場景卡訂閱按鈕，主CTA改「模擬這個場景 →」</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p1">P1 高</span></td><td>結束頁大CTA含兩個行動</td><td>結束頁</td><td>拆成「索取方案」主按鈕＋「訂閱最新消息」次按鈕</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p2">P2 中</span></td><td>場景卡不說明分身數與類型</td><td>場景卡</td><td>加小標籤：N個分身＋圓桌協作/專項對話</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p2">P2 中</span></td><td>採購角色透明度像disabled</td><td>選職能</td><td>改用scale縮小而非透明度表示「未聚焦」</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p2">P2 中</span></td><td>「返回」/「首頁」語意曖昧</td><td>圓桌</td><td>改為「← 換個場景」和「⌂ 重新開始」</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p2">P2 中</span></td><td>「時空25初探」語氣負面</td><td>結束頁</td><td>改為「還有更多可解鎖的能力 →」</td><td><span style="color:var(--amber);font-size:11px">待執行</span></td></tr>
+      <tr><td><span class="p2">P2 中</span></td><td>缺料斷鏈救援文案複製錯誤</td><td>Excel</td><td>第二段文案與高效入庫重複，需請主管/PO提供正確文案</td><td><span style="color:var(--red);font-size:11px">⚠ 待補正</span></td></tr>
+      <tr style="opacity:.45"><td><span style="font-size:11px">範圍外</span></td><td>對話區雙重捲動BUG</td><td>圓桌</td><td>產品端負責，已反應過</td><td><span style="font-size:11px">產品端</span></td></tr>
+      <tr style="opacity:.45"><td><span style="font-size:11px">範圍外</span></td><td>側邊欄數字無標籤</td><td>圓桌</td><td>產品後台UI，不在改版範圍</td><td><span style="font-size:11px">產品端</span></td></tr>
+      <tr style="opacity:.45"><td><span style="font-size:11px">範圍外</span></td><td>右下角進度條</td><td>圓桌</td><td>待產品端決定是否移除</td><td><span style="font-size:11px">待定</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="ns">
+    <div class="ns-lbl">北極星文案主軸（不變）</div>
+    <div class="ns-copy">「當你的工作卡住，<br>其他職務的 AI 不等人。」</div>
+    <div class="ns-sub">歡迎大廳說問題 → 選職能說「我是誰」 → 選場景說情境 → 開場三段引導 → 圓桌體驗 → 總結說價值 → 索取方案 / 訂閱</div>
+  </div>
+</section>
+
+</div><!-- end wrap v3 -->
+</div><!-- end v3 panel -->
+
+<script>
+function switchVer(v) {
+  document.querySelectorAll('.ver-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ver-tab').forEach(t => t.classList.remove('on'));
+  document.getElementById(v).classList.add('on');
+  var tabs = document.querySelectorAll('.ver-tab');
+  if (v === 'v2') tabs[0].classList.add('on');
+  else tabs[1].classList.add('on');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>

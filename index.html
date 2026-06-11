@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinwin_work | 工作紀錄與專案整合</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --accent-color: #0d6efd;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            color: #111;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* 專案卡片樣式 */
+        .project-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: var(--accent-color);
+        }
+
+        .project-title {
+            margin: 0 0 8px 0;
+            font-size: 1.25rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .project-desc {
+            margin: 0 0 12px 0;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        .project-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 15px;
+        }
+
+        .tag {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Dinwin_work</h1>
+            <p>工作紀錄、專案討論與 UX 分析整合平台</p>
+        </header>
+
+        <main>
+            <h2 class="section-title">目前專案與討論紀錄</h2>
+            
+            <div class="project-list">
+                
+                <a href="digiwin-ux-analysis.html" class="project-card">
+                    <h3 class="project-title">Digiwin UX Analysis</h3>
+                    <p class="project-desc">針對鼎新系統進行的 UX 使用者體驗分析與優化建議紀錄。</p>
+                    <div class="project-meta">
+                        <span class="tag">UX Analysis</span>
+                        <span>更新日期: 2026-06</span>
+                    </div>
+                </a>
+                </div>
+        </main>
+    </div>
+
+</body>
+</html>
