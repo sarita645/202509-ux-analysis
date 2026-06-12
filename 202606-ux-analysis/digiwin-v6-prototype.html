@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — 體驗中心 v6.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* brand standard colors */
+  --brand:#125BBC;--brand-dark:#0E4A9A;--brand2:#31A2EF;--brand-mid:#31A2EF;
+  --brand-pale:#AEDCFF;--brand-light:#E6F2FE;
+  --brand-rgb:18,91,188;            /* #125BBC channels for tinted shadows/rings */
+  --brand-grad:linear-gradient(135deg,#31A2EF,#125BBC);
+  --accent:#5B2D8E;--accent2:#7B3DB5;--accent-light:#EDE7F6;
+  /* semantic / status (from kit) */
+  --ok:#16A34A;--ok-light:#E6F6EC;--warn:#D97706;--warn-light:#FBF0E0;
+  --danger:#DC2626;--danger-light:#FCE9E9;--muted:#64748B;--muted-light:#EDF1F6;
+  --ink:#16243B;--ink2:#475569;--ink3:#8593A6;
+  --bg:#F4F8FE;--surface:#FFFFFF;--surface2:#EDF2FB;
+  --border:#E2E9F4;--border2:#EDF1F8;
+  --r:8px;--r2:12px;--r3:16px;
+  /* soft, blue-tinted elevation (kit feel) */
+  --sh-sm:0 1px 3px rgba(20,50,120,.06);
+  --sh:0 4px 16px rgba(20,50,120,.07);
+  --sh-card:0 6px 20px rgba(20,50,120,.06);
+  --sh-lg:0 14px 40px rgba(20,50,120,.12);
+  --hud-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;overflow-x:hidden}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ── Base form controls (design-kit style) ──── */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]),
+textarea,select{
+  font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 13px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input::placeholder,textarea::placeholder{color:var(--ink3)}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,
+textarea:focus,select:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+/* accent for native controls */
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--brand)}
+
+/* ── HUD ──────────────────────────── */
+.hud{
+  width:100%;background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:var(--hud-h);
+  position:sticky;top:0;z-index:100;
+  flex-shrink:0;
+}
+.hud-left{display:flex;align-items:center;gap:0;overflow-x:auto}
+.hud-logo{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,.5);padding-right:20px;border-right:1px solid rgba(255,255,255,.15);margin-right:16px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:10px}
+.hud-logo-img{height:20px;width:auto;filter:brightness(0) invert(1);flex-shrink:0}
+.hud-logo-sep{width:1px;height:14px;background:rgba(255,255,255,.25);flex-shrink:0}
+.hud-logo-title{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:.02em}
+.hud-steps{display:flex;align-items:center;gap:0}
+.hud-step{display:flex;align-items:center;gap:6px;font-size:16px;color:rgba(255,255,255,.4);padding:6px 10px;border-radius:4px;white-space:nowrap;transition:all .2s;cursor:default}
+.hud-step.done{color:rgba(255,255,255,.65)}
+.hud-step.done .hs-dot{background:rgba(255,255,255,.5)}
+.hud-step.active{color:#fff;background:rgba(255,255,255,.12)}
+.hud-step.active .hs-dot{background:#fff}
+.hs-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:background .2s}
+.hs-num{font-family:'DM Mono',monospace;font-size:14px}
+.hud-sep{color:rgba(255,255,255,.2);font-size:14px;padding:0 2px;flex-shrink:0}
+.hud-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:12px}
+.hud-role{font-family:'DM Mono',monospace;font-size:14px;color:#fff;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:4px;white-space:nowrap;display:none}
+.hud-role.show{display:block}
+.hud-back{font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;transition:all .15s;display:none}
+.hud-back.show{display:block}
+.hud-back:hover{background:rgba(255,255,255,.1);color:#fff}
+.hud-home{font-size:14px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 10px;border-radius:4px;white-space:nowrap;transition:color .15s}
+.hud-home:hover{color:rgba(255,255,255,.8)}
+
+/* ── PAGES ────────────────────────── */
+.page{display:none;min-height:calc(100vh - var(--hud-h));animation:fadeIn .25s ease}
+.page.active{display:flex;flex-direction:column}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE 1: 歡迎大廳 + 選定職能 ────────────── */
+#p1{
+  padding:0;align-items:stretch;justify-content:flex-start;
+  min-height:calc(100vh - var(--hud-h));
+  position:relative;overflow:hidden;background:#e9f0fa;
+}
+/* full-bleed atmosphere image + right-side legibility fade */
+.p1-bg{
+  position:absolute;inset:0;z-index:0;
+  background:#e9f0fa url('https://raw.githubusercontent.com/sarita645/202509-ux-analysis/refs/heads/main/202606-ux-analysis/images/202509-v5-prototype_bg-01.jpg') no-repeat;
+  background-size:cover;background-position:center left;
+}
+.p1-bg::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg,rgba(245,248,253,0) 26%,rgba(245,248,253,.55) 52%,rgba(245,248,253,.9) 78%);
+}
+
+.p1-layout{
+  position:relative;z-index:2;width:100%;max-width:1320px;margin:0 auto;
+  min-height:calc(100vh - var(--hud-h));
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:48px 60px;
+}
+
+/* ── floating pain bubbles：桌機 ≥1200px ── */
+.p1-pains{position:absolute;inset:0;z-index:1;pointer-events:none}
+.p1-pain{
+  position:absolute;white-space:nowrap;
+  background:rgba(255,255,255,.94);border:1px solid rgba(20,50,120,.08);
+  border-radius:22px;padding:11px 18px;
+  font-size:14px;color:#2c3e57;font-weight:500;
+  box-shadow:0 10px 30px rgba(15,40,100,.13);
+  display:flex;align-items:center;gap:9px;
+  animation:floaty 5.5s ease-in-out infinite;
+}
+.p1-pain-icon{flex-shrink:0;width:24px;height:24px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.p1-pain.highlight{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 12px 34px rgba(var(--brand-rgb),.35)}
+.p1-pain.highlight .p1-pain-icon{background:rgba(255,255,255,.22)}
+.pain-1{left:14%;top:64%;animation-delay:0s}
+.pain-2{left:27%;top:54%;animation-delay:1.2s}
+.pain-3{left:24%;top:74%;animation-delay:2.4s}
+.pain-4{left:10%;top:44%;animation-delay:0.6s}
+.pain-5{left:32%;top:44%;animation-delay:1.8s}
+.pain-6{left:8%;top:72%;animation-delay:3s}
+/* ── Layer 1 動態效果 ── */
+
+/* 1. 職能卡選取：彈跳 + 邊框發光 */
+@keyframes roleSelect{
+  0%  {transform:scale(1)}
+  40% {transform:scale(1.06)}
+  70% {transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+.p1-role-card.selected{animation:roleSelect .32s cubic-bezier(.22,1,.36,1)}
+.p1-role-card{transition:border-color .15s,box-shadow .15s,background .15s,transform .12s}
+.p1-role-card:hover{transform:translateY(-2px)}
+
+/* 2. 場景卡 hover：光暈從右上角擴散 */
+@keyframes glowSpread{
+  from{opacity:0;transform:scale(.7)}
+  to  {opacity:1;transform:scale(1)}
+}
+.sc-card:hover::after{animation:glowSpread .25s ease}
+
+/* 3. CTA 按鈕：呼吸脈動引導注意 */
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 8px 24px rgba(var(--brand-rgb),.32)}
+  50%    {box-shadow:0 8px 28px rgba(var(--brand-rgb),.55), 0 0 0 6px rgba(var(--brand-rgb),.1)}
+}
+.p1-cta:not(:disabled){animation:ctaPulse 2.4s ease-in-out infinite}
+.p1-cta:not(:disabled):hover{animation:none}
+
+/* 4. P3 啟動按鈕：同樣脈動 */
+@keyframes launchPulse{
+  0%,100%{box-shadow:0 8px 24px rgba(var(--brand-rgb),.32)}
+  50%    {box-shadow:0 8px 28px rgba(var(--brand-rgb),.55), 0 0 0 8px rgba(var(--brand-rgb),.1)}
+}
+.btn-launch{animation:launchPulse 2.4s ease-in-out infinite}
+.btn-launch:hover{animation:none}
+
+/* 5. 浮動痛點泡泡：stagger + 振幅各異，更自然 */
+@keyframes floaty-a{0%,100%{transform:translateY(0)   rotate(-.5deg)}50%{transform:translateY(-9px)  rotate(.5deg)}}
+@keyframes floaty-b{0%,100%{transform:translateY(0)   rotate(.4deg)} 50%{transform:translateY(-6px)  rotate(-.4deg)}}
+@keyframes floaty-c{0%,100%{transform:translateY(-2px)rotate(-.3deg)}50%{transform:translateY(-10px) rotate(.3deg)}}
+.pain-1{animation:floaty-a 5.8s ease-in-out infinite;animation-delay:0s}
+.pain-2{animation:floaty-b 6.4s ease-in-out infinite;animation-delay:.8s}
+.pain-3{animation:floaty-c 5.2s ease-in-out infinite;animation-delay:1.6s}
+.pain-4{animation:floaty-a 6.8s ease-in-out infinite;animation-delay:2.2s}
+.pain-5{animation:floaty-b 5.6s ease-in-out infinite;animation-delay:.4s}
+.pain-6{animation:floaty-c 6.2s ease-in-out infinite;animation-delay:1.2s}
+
+/* 6. 痛點泡泡 highlight：出現時有小彈跳 */
+@keyframes painPop{
+  0%  {transform:scale(1)}
+  50% {transform:scale(1.05)}
+  100%{transform:scale(1)}
+}
+.p1-pain.highlight{animation:floaty-a 5.8s ease-in-out infinite, painPop .3s ease}
+
+/* 7. P5 achievement 數字出現：從下淡入 */
+@keyframes numReveal{
+  from{opacity:0;transform:translateY(8px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.p5-ach-headline em{display:inline-block;animation:numReveal .4s ease both}
+.p5-ach-headline .em-win{animation-delay:.1s}
+.p5-ach-headline .em-old{animation-delay:.25s}
+
+/* 8. HUD 步驟 active：從下淡入 */
+@keyframes stepIn{
+  from{opacity:.4;transform:translateY(3px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.hud-step.active{animation:stepIn .2s ease}
+
+/* 9. 分身 avatar pill 依序進場 */
+@keyframes pillIn{
+  from{opacity:0;transform:translateY(10px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.avatar-pill:nth-child(1){animation:pillIn .3s ease .05s both}
+.avatar-pill:nth-child(2){animation:pillIn .3s ease .15s both}
+.avatar-pill:nth-child(3){animation:pillIn .3s ease .25s both}
+.avatar-pill:nth-child(4){animation:pillIn .3s ease .35s both}
+
+/* reduce-motion 全局覆寫 */
+@media(prefers-reduced-motion:reduce){
+  .p1-role-card,.sc-card,.p1-cta,.btn-launch,
+  .p1-pain,.p5-ach-headline em,.hud-step,.avatar-pill{
+    animation:none!important;transition:none!important;
+  }
+}
+
+/* ── Inline pain strip：<1200px 時取代懸浮泡泡 ── */
+.p1-pain-strip{
+  display:none; /* 桌機隱藏 */
+  flex-wrap:wrap;gap:8px;
+  padding:14px 24px 0;
+  position:relative;z-index:2;
+}
+.p1-pain-strip-item{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.9);border:1px solid rgba(20,50,120,.1);
+  border-radius:20px;padding:7px 14px;
+  font-size:14px;color:#2c3e57;font-weight:500;
+  box-shadow:0 2px 8px rgba(15,40,100,.08);
+  transition:background .15s,color .15s;
+}
+.p1-pain-strip-item.highlight{
+  background:var(--brand);color:#fff;border-color:transparent;
+}
+.p1-pain-strip-icon{
+  flex-shrink:0;width:20px;height:20px;
+  background:var(--brand-light);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+.p1-pain-strip-item.highlight .p1-pain-strip-icon{background:rgba(255,255,255,.22)}
+
+/* right-side content block */
+.p1-content{width:min(560px,54%);display:flex;flex-direction:column}
+.p1-eyebrow{font-family:'DM Mono',monospace;font-size:14px;color:var(--brand);letter-spacing:.16em;margin-bottom:10px;text-transform:uppercase;font-weight:500}
+.p1-source-hint{
+  font-size:15px;color:var(--ink2);line-height:1.5;
+  margin-bottom:14px;
+  padding:10px 14px;
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(8px);
+  border-left:3px solid var(--brand-mid);
+  border-radius:0 8px 8px 0;
+  display:inline-block;
+}
+.p1-title{font-size:clamp(30px,4.4vw,50px);font-weight:900;line-height:1.16;letter-spacing:-.01em;margin-bottom:16px;color:var(--brand);background:linear-gradient(120deg,#31A2EF,#125BBC);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.p1-sub{font-size:20px;color:var(--ink2);line-height:1.75;margin-bottom:34px;max-width:420px}
+.p1-roles-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.p1-roles-sub{font-size:14px;color:var(--ink3);margin-bottom:18px;line-height:1.6}
+.p1-role-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:26px}
+.p1-role-card{
+  background:rgba(255,255,255,.92);border:1px solid #d4e0f2;
+  border-radius:9px;padding:13px 6px;cursor:pointer;
+  transition:all .15s;text-align:center;
+  font-size:16px;font-weight:500;color:var(--ink2);
+  font-family:'Noto Sans TC',sans-serif;
+  box-shadow:0 1px 2px rgba(20,50,120,.04);
+}
+.p1-role-card:hover{border-color:var(--brand-mid);color:var(--brand);box-shadow:0 4px 12px rgba(var(--brand-rgb),.12)}
+.p1-role-card.selected{border-color:var(--brand);background:var(--brand-light);color:var(--brand);font-weight:700;box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+.p1-cta{
+  width:100%;padding:17px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;
+  border:none;border-radius:10px;font-size:16px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;box-shadow:0 8px 22px rgba(var(--brand-rgb),.30);
+}
+.p1-cta:hover:not(:disabled){background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 28px rgba(15,62,158,.38);transform:translateY(-1px)}
+.p1-cta:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* ── <1200px：收起懸浮泡泡，改為 inline strip ── */
+@media(max-width:1199px){
+  .p1-pains{display:none}
+  .p1-pain-strip{display:none}
+  .p1-layout{
+    justify-content:center;
+    padding:24px 32px 48px;
+    align-items:flex-start;
+    min-height:auto;
+  }
+  .p1-bg{opacity:.25}
+  .p1-bg::after{background:rgba(245,248,253,.7)}
+  .p1-content{width:100%;max-width:600px}
+  .p1-title{font-size:clamp(24px,5vw,36px)}
+  .p1-sub{font-size:16px}
+  .p1-roles-sub{font-size:14px}
+  .p1-role-grid{grid-template-columns:repeat(4,1fr)}
+  .p1-role-card{font-size:14px;padding:11px 4px}
+}
+
+/* ── <768px：職能格改 3 欄 ── */
+@media(max-width:768px){
+  .p1-layout{padding:20px 20px 40px}
+  .p1-pain-strip{padding:12px 20px 0}
+  .p1-pain-strip-item{font-size:13px;padding:6px 11px}
+  .p1-role-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .p1-role-card{font-size:14px}
+  .p1-roles-title{font-size:16px}
+}
+
+/* ── <480px：職能格 2 欄 ── */
+@media(max-width:480px){
+  .p1-role-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── PAGE 2 (選擇場景) ────────────── */
+#p2{
+  padding:0;
+  background:
+    linear-gradient(rgba(18,91,188,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,91,188,.035) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(49,162,239,.11) 0%, transparent 70%),
+    #F2F6FD;
+  background-size:40px 40px, 40px 40px, 100% 100%, 100% 100%;
+}
+
+/* sticky header — 磨砂玻璃 */
+.p2-header{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(18,91,188,.08);
+  padding:14px 32px 12px;
+  position:sticky;top:var(--hud-h);z-index:10;
+  box-shadow:0 2px 16px rgba(18,91,188,.06);
+}
+.p2-header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+/* 職能 badge — 發光邊框 */
+.p2-role-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(230,242,254,.9);
+  border:1px solid rgba(var(--brand-rgb),.3);
+  border-radius:20px;padding:4px 12px 4px 8px;
+  font-size:14px;color:var(--brand);font-weight:700;
+  white-space:nowrap;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(var(--brand-rgb),.07), 0 0 12px rgba(49,162,239,.12);
+}
+.p2-role-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--brand);
+  box-shadow:0 0 6px rgba(49,162,239,.7);
+}
+.p2-header-text{flex:1;min-width:0}
+.p2-title{font-size:16px;font-weight:700;color:var(--ink);line-height:1.3}
+.p2-sub{font-size:14px;color:var(--ink3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Body */
+.p2-body{max-width:960px;margin:0 auto;padding:28px 32px 48px}
+@media(max-width:600px){.p2-body{padding:18px 16px 36px}}
+
+.p2-section-label{
+  font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.12em;
+  color:var(--ink3);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.p2-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(18,91,188,.15),transparent)}
+
+/* ── 卡片佈局 ── */
+.p2-rec-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;align-items:start}
+@media(max-width:700px){.p2-rec-layout{grid-template-columns:1fr}}
+
+/* Glass 卡片 */
+.sc-card{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px;cursor:pointer;
+  transition:transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s, border-color .2s;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 24px rgba(18,91,188,.07), 0 1px 4px rgba(18,91,188,.05);
+}
+/* 卡片右上角微光暈 */
+.sc-card::after{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:120px;height:120px;
+  background:radial-gradient(circle, rgba(49,162,239,.07) 0%, transparent 70%);
+  pointer-events:none;transition:background .2s;
+}
+.sc-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(18,91,188,.13), 0 4px 12px rgba(18,91,188,.07);
+  border-color:rgba(49,162,239,.38);
+}
+.sc-card:hover::after{background:radial-gradient(circle, rgba(49,162,239,.15) 0%, transparent 70%)}
+
+/* accent 條 — 發光 */
+.sc-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:16px 0 0 16px;box-shadow:2px 0 8px rgba(49,162,239,.2)}
+
+.sc-cat{font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.06em;color:var(--ink3);margin-bottom:8px}
+.sc-name{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3}
+
+/* 情境引言 */
+.sc-situation{
+  background:rgba(18,91,188,.04);
+  border-left:3px solid rgba(49,162,239,.45);
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  font-size:14px;color:var(--ink2);line-height:1.65;
+  margin-bottom:14px;font-style:italic;flex:1;
+}
+
+.sc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
+.sc-agents{display:flex;align-items:center;gap:4px;flex-wrap:wrap;flex:1}
+
+.sc-agent-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:4px;
+  font-size:14px;font-weight:600;
+  border:1px solid currentColor;
+}
+.sc-agent-tag-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* 箭頭 — 品牌漸層 + 發光 */
+.sc-arrow{
+  width:30px;height:30px;background:var(--brand-grad);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;flex-shrink:0;
+  transition:transform .15s, box-shadow .15s;
+  box-shadow:0 2px 8px rgba(var(--brand-rgb),.28);
+}
+.sc-card:hover .sc-arrow{transform:translateX(3px);box-shadow:0 4px 14px rgba(var(--brand-rgb),.4)}
+
+/* Other roles filter row */
+.p2-others-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.p2-other-chip{
+  padding:7px 16px;border:1px solid rgba(18,91,188,.15);border-radius:20px;
+  font-size:14px;color:var(--ink2);cursor:pointer;
+  background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
+  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.p2-other-chip:hover{border-color:rgba(49,162,239,.45);color:var(--brand)}
+.p2-other-chip.active{
+  border-color:var(--brand);background:rgba(var(--brand-rgb),.07);
+  color:var(--brand);font-weight:600;
+  box-shadow:0 0 0 2px rgba(var(--brand-rgb),.1);
+}
+
+/* Other scenes list */
+.p2-other-scene{
+  background:rgba(255,255,255,.75);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.7);border-radius:12px;
+  padding:14px 18px;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;gap:14px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(18,91,188,.05);
+}
+.p2-other-scene:hover{
+  border-color:rgba(49,162,239,.32);
+  box-shadow:0 6px 20px rgba(18,91,188,.09);
+  transform:translateX(3px);
+}
+.pos-num{
+  flex-shrink:0;width:26px;height:26px;
+  background:rgba(18,91,188,.07);color:var(--brand);
+  border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;
+}
+.pos-body{flex:1}
+.pos-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.pos-pain{font-size:14px;color:var(--ink3);line-height:1.5}
+.pos-agents{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.pos-agent-tag{
+  font-size:14px;font-weight:600;padding:2px 8px;border-radius:4px;
+  border:1px solid currentColor;
+  display:inline-flex;align-items:center;gap:3px;
+}
+.pos-agent-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+/* ── PAGE 3: 場景開場 ────────────── */
+#p3{
+  padding:0;
+  background:
+    linear-gradient(rgba(18,91,188,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,91,188,.035) 1px, transparent 1px),
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(49,162,239,.1) 0%, transparent 65%),
+    #F2F6FD;
+  background-size:40px 40px, 40px 40px, 100% 100%, 100% 100%;
+  align-items:center;justify-content:center;
+}
+.p3-inner{
+  width:100%;max-width:680px;margin:0 auto;
+  padding:48px 28px 48px;
+  display:flex;flex-direction:column;gap:20px;
+}
+@media(max-width:600px){.p3-inner{padding:28px 20px 36px}}
+
+/* 場景標籤 */
+.p3-scene-tag{
+  display:inline-flex;align-items:center;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;
+  font-weight:700;text-transform:uppercase;
+  color:var(--brand);background:rgba(var(--brand-rgb),.08);
+  border:1px solid rgba(var(--brand-rgb),.18);
+  border-radius:6px;padding:4px 12px;
+  align-self:flex-start;
+}
+
+/* ① 痛點情境 */
+.p3-crisis{
+  background:linear-gradient(135deg,rgba(220,38,38,.06),rgba(220,38,38,.03));
+  border:1px solid rgba(220,38,38,.18);
+  border-left:4px solid #DC2626;
+  border-radius:0 12px 12px 0;
+  padding:20px 22px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.p3-crisis-icon{
+  font-size:22px;flex-shrink:0;margin-top:2px;
+  filter:drop-shadow(0 2px 4px rgba(220,38,38,.3));
+}
+.p3-crisis-text{
+  font-size:16px;font-weight:600;color:#7F1D1D;
+  line-height:1.65;
+  /* 關鍵數字自動加重 */
+}
+
+/* ② 分身區塊 */
+.p3-divider{height:1px;background:var(--border);margin:16px 0}
+.p3-agents-section{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px 22px 20px;
+  box-shadow:0 4px 20px rgba(18,91,188,.07);
+}
+.p3-agents-label{
+  font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);
+  margin-bottom:14px;
+}
+/* avatar pills 置中 */
+.dividers-section{
+  display:flex;gap:10px;margin-bottom:16px;
+  flex-wrap:wrap;
+  justify-content:center;  /* 置中 */
+}
+.avatar-pill{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(18,91,188,.06);
+  transition:box-shadow .15s,border-color .15s;
+}
+.avatar-pill:hover{border-color:rgba(49,162,239,.3);box-shadow:0 4px 16px rgba(18,91,188,.1)}
+.av-circle{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.15);
+}
+.av-name{font-size:16px;color:var(--ink);font-weight:600}
+.av-sub{font-size:14px;color:var(--ink3)}
+.p3-ability-text{
+  font-size:14px;color:var(--ink2);line-height:1.7;
+  padding-top:4px;border-top:1px solid var(--border2);
+}
+
+/* ③ 啟動區塊 */
+.p3-launch-section{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px 22px 20px;
+  box-shadow:0 4px 20px rgba(18,91,188,.07);
+  text-align:center;
+}
+.p3-launch-hint{
+  font-size:14px;color:var(--ink2);line-height:1.7;
+  margin-bottom:16px;
+}
+.p4-ready{
+  font-size:15px;font-weight:600;color:var(--brand);
+  margin-bottom:16px;
+  text-shadow:0 0 16px rgba(49,162,239,.25);
+}
+.btn-launch{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));
+  color:#fff;border:none;border-radius:12px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:all .2s;
+  box-shadow:0 8px 24px rgba(var(--brand-rgb),.32);
+}
+.btn-launch:hover{
+  background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+  box-shadow:0 12px 30px rgba(var(--brand-rgb),.42);
+  transform:translateY(-2px);
+}
+
+/* ── PAGE 4: 圓桌會議（框架）── */
+#p4{
+  padding:0;flex-direction:column;
+  background:
+    linear-gradient(rgba(18,91,188,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,91,188,.03) 1px, transparent 1px),
+    #F2F6FD;
+  background-size:40px 40px, 40px 40px, 100% 100%;
+}
+.btn-end{
+  padding:11px 30px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;
+  box-shadow:0 4px 14px rgba(91,45,142,.28);
+}
+.btn-end:hover{box-shadow:0 6px 20px rgba(91,45,142,.38);transform:translateY(-1px)}
+
+/* ── PAGE 5: 分身總結 ────────────── */
+#p5{
+  padding:0;align-items:stretch;
+  background:
+    linear-gradient(rgba(18,91,188,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18,91,188,.03) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 35% at 50% 0%, rgba(49,162,239,.09) 0%, transparent 65%),
+    #F2F6FD;
+  background-size:40px 40px, 40px 40px, 100% 100%, 100% 100%;
+}
+.p5-wrap{width:100%;max-width:820px;margin:0 auto;padding:32px 28px 52px}
+@media(max-width:600px){.p5-wrap{padding:20px 16px 40px}}
+
+/* ① 你做到了什麼 — 更豐富的深色橫幅 */
+.p5-achievement{
+  background:linear-gradient(135deg,#0E4A9A 0%,#1A5FD0 45%,#31A2EF 100%);
+  border-radius:16px;padding:32px 28px 28px;margin-bottom:32px;
+  text-align:center;
+  box-shadow:0 12px 40px rgba(18,91,188,.28), 0 0 0 1px rgba(49,162,239,.2);
+  position:relative;overflow:hidden;
+}
+/* 橫幅內光暈裝飾 */
+.p5-achievement::before{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:300px;height:200px;
+  background:radial-gradient(ellipse, rgba(255,255,255,.1) 0%, transparent 70%);
+  pointer-events:none;
+}
+.p5-ach-scene{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);
+  border-radius:6px;padding:4px 14px;
+  font-size:14px;font-weight:700;color:#D6EAFF;
+  font-family:'DM Mono',monospace;letter-spacing:.06em;
+  margin-bottom:18px;
+}
+.p5-ach-headline{
+  font-size:clamp(18px,3vw,26px);font-weight:900;color:#fff;
+  line-height:1.3;margin-bottom:12px;
+}
+.p5-ach-headline em{
+  color:#A8D8FF;font-style:normal;
+  text-shadow:0 0 20px rgba(168,216,255,.5);
+}
+.p5-ach-sub{font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:500px;margin:0 auto}
+
+/* ② section 標題 */
+.p5-section-title{
+  font-size:14px;font-weight:700;color:var(--ink3);
+  letter-spacing:.08em;text-transform:uppercase;
+  font-family:'DM Mono',monospace;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.p5-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(18,91,188,.15),transparent)}
+
+/* ② 突破 — glass card */
+.p5-breakthrough{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px;margin-bottom:28px;
+  box-shadow:0 4px 24px rgba(18,91,188,.07);
+  display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;
+}
+.p5-radar-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.p5-radar-caption{font-size:14px;color:var(--ink3);text-align:center;max-width:160px;line-height:1.5}
+.p5-dims-col{flex:1;min-width:240px;display:flex;flex-direction:column;gap:10px}
+.p5-dim-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 12px;border-radius:8px;
+  background:rgba(18,91,188,.03);
+  transition:background .15s;
+}
+.p5-dim-row:hover{background:rgba(18,91,188,.06)}
+.p5-dim-left{flex-shrink:0;width:56px;text-align:center}
+.p5-dim-axis{font-size:14px;font-weight:700;margin-bottom:2px}
+.p5-dim-num{
+  font-family:'DM Mono',monospace;font-size:22px;font-weight:800;line-height:1;
+}
+.p5-dim-badge{
+  font-size:9px;font-weight:700;padding:1px 5px;
+  border-radius:3px;margin-top:3px;display:inline-block;
+  font-family:'DM Mono',monospace;
+}
+.p5-dim-right{flex:1}
+.p5-dim-text{font-size:14px;color:var(--ink2);line-height:1.6}
+
+/* ③ 帶走什麼 — glass cards */
+.p5-takeaway-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));
+  gap:12px;margin-bottom:32px;
+}
+.p5-takeaway-card{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:12px;padding:18px 16px;
+  display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 3px 16px rgba(18,91,188,.06);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+  position:relative;overflow:hidden;
+}
+.p5-takeaway-card::after{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:70px;height:70px;
+  background:radial-gradient(circle, rgba(91,45,142,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.p5-takeaway-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(18,91,188,.11);
+  border-color:rgba(91,45,142,.25);
+}
+.p5-tk-name{font-size:16px;font-weight:700;color:var(--accent);line-height:1.3}
+.p5-tk-role{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.05em;color:var(--ink3)}
+.p5-tk-value{font-size:14px;color:var(--ink2);line-height:1.55;flex:1}
+
+/* ④ 轉換區 */
+.p5-convert{
+  background:linear-gradient(135deg,#0E4A9A 0%,#1A5FD0 50%,#31A2EF 100%);
+  border-radius:16px;padding:26px 28px;margin-bottom:20px;
+  box-shadow:0 12px 36px rgba(18,91,188,.26), 0 0 0 1px rgba(49,162,239,.15);
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  position:relative;overflow:hidden;
+}
+.p5-convert::before{
+  content:'';position:absolute;bottom:-40px;right:-40px;
+  width:180px;height:180px;
+  background:radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 65%);
+  pointer-events:none;
+}
+.p5-convert-text{flex:1;min-width:200px;position:relative}
+.p5-convert-headline{font-size:17px;font-weight:700;color:#fff;margin-bottom:8px}
+.p5-convert-sub{font-size:14px;color:rgba(255,255,255,.68);line-height:1.65}
+.p5-convert-sub strong{color:#A8D8FF}
+.p5-convert-cta{flex-shrink:0;position:relative}
+.p5-convert .p5-btn-primary{
+  background:#fff;color:var(--brand);
+  box-shadow:0 6px 18px rgba(8,28,80,.25);
+}
+.p5-convert .p5-btn-primary:hover{
+  background:#EDF5FF;color:var(--brand-dark);
+  box-shadow:0 8px 24px rgba(8,28,80,.32);
+}
+.p5-btn-primary{
+  padding:14px 28px;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;
+  border:none;border-radius:10px;font-size:16px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:all .18s;white-space:nowrap;
+  box-shadow:0 6px 16px rgba(var(--brand-rgb),.32);
+}
+.p5-btn-primary:hover{
+  background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+  box-shadow:0 8px 22px rgba(var(--brand-rgb),.42);
+  transform:translateY(-1px);
+}
+.p5-cta-secondary-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.p5-btn-secondary{
+  flex:1;min-width:140px;padding:12px;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(8px);
+  color:var(--ink2);border:1px solid rgba(18,91,188,.15);
+  border-radius:10px;font-size:14px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:all .15s;text-align:center;
+}
+.p5-btn-secondary:hover{border-color:rgba(49,162,239,.4);color:var(--brand)}
+.p5-reset{
+  display:block;width:100%;text-align:center;
+  font-size:14px;color:var(--ink3);cursor:pointer;padding:8px;
+}
+.p5-reset:hover{color:var(--ink)}
+/* ── P2–P5 共用背景圖（獨立 fixed 層，不隨頁面切換重建）── */
+#scene-bg{
+  display:none;
+  position:fixed;inset:0;z-index:0;
+  background:url('https://raw.githubusercontent.com/sarita645/202509-ux-analysis/refs/heads/main/202606-ux-analysis/images/202509-v5-prototype_bg-02.png') center/cover no-repeat;
+  pointer-events:none;
+}
+#scene-bg.show{display:block}
+/* body / inner content 在背景圖上方 */
+.p2-body,.p3-inner,.p4-demo-area,#p4-footer,.p5-wrap{position:relative;z-index:1}
+/* sticky header 維持在最上層 */
+.p2-header{position:sticky;top:var(--hud-h);z-index:50}
+
+
+/* ── P2 身份確認橋接 ── */
+.p2-identity-bridge{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 4px 14px;margin-bottom:6px;
+}
+.p2-bridge-role{
+  font-size:16px;font-weight:800;color:var(--brand);
+  white-space:nowrap;
+}
+.p2-bridge-arrow{
+  font-size:16px;color:var(--ink3);flex-shrink:0;
+}
+.p2-bridge-task{
+  font-size:16px;font-weight:800;color:var(--ink);line-height:1.5;
+}
+
+/* ── P5 before/after em 對比 ── */
+.p5-ach-headline .em-win{
+  color:#fff815;font-style:normal;
+  text-shadow:0 0 22px rgba(255,248,21,.5), 0 0 6px rgba(255,248,21,.3);
+}
+.p5-ach-headline .em-old{
+  color:#fff;font-style:normal;
+  text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.5);
+  text-underline-offset:3px;
+}
+
+/* ── P5 分身說明小字 ── */
+.p5-takeaway-note{
+  font-size:13px;color:var(--ink3);line-height:1.6;
+  margin-bottom:16px;margin-top:-8px;
+}
+
+/* ── sc-card 點擊提示 ── */
+.sc-click-hint{
+  font-size:12px;color:var(--brand);font-weight:600;
+  text-align:right;margin-top:6px;
+  opacity:0;transition:opacity .15s;
+  font-family:'DM Mono',monospace;letter-spacing:.04em;
+}
+.sc-card:hover .sc-click-hint{opacity:1}
+
+/* ── HUD compact progress (mobile) ──── */
+.hud-progress{display:none;align-items:center;gap:9px}
+.hud-dots{display:flex;align-items:center;gap:6px}
+.hd-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:all .2s;flex-shrink:0}
+.hd-dot.done{background:rgba(255,255,255,.55)}
+.hd-dot.active{background:#fff;width:18px;border-radius:4px}
+.hud-cur{font-size:14px;color:#fff;white-space:nowrap;font-weight:500}
+
+@media(max-width:1199px){
+  .hud{padding:0 14px}
+  .hud-left{overflow:visible;min-width:0}
+  .hud-logo{padding-right:12px;margin-right:12px}
+  .hud-logo-sub{display:none}
+  .hud-steps{display:none}        /* hide the scrolling breadcrumb */
+  .hud-progress{display:flex}     /* show compact dots + current step */
+  .hud-right{gap:6px;margin-left:8px}
+  .hud-role{display:none!important}
+  .hud-back{padding:5px 8px}
+  .hud-back .hb-text{display:none} /* arrow only on mobile */
+  .hud-home{padding:5px 6px;font-size:14px}
+}
+@media(max-width:560px){
+  .hud-cur{display:none}          /* very narrow: dots only, no overflow */
+}
+
+/* ── Floating AI assistant (bottom-right, presentational) ──── */
+.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:flex;align-items:center;gap:11px;animation:botIn .5s ease .3s both}
+@keyframes botIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ai-bubble{
+  position:relative;
+  background:linear-gradient(135deg,#ece8fb,#e3ecfe);
+  border:1px solid rgba(110,99,230,.18);
+  border-radius:16px;padding:11px 17px;
+  box-shadow:0 14px 36px rgba(45,35,120,.2);
+  display:flex;flex-direction:column;gap:2px;line-height:1.4;
+}
+.ai-bubble::after{
+  content:'';position:absolute;right:-7px;top:50%;transform:translateY(-50%);
+  border-left:8px solid #e3ecfe;border-top:7px solid transparent;border-bottom:7px solid transparent;
+}
+.ai-bubble-top{font-size:14px;color:#7c7a92}
+.ai-bubble-main{font-size:14.5px;font-weight:700;color:#3f3ca8;white-space:nowrap}
+.ai-avatar{
+  width:62px;height:62px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,#9a8ff5,#6c63e6 70%);
+  box-shadow:0 10px 28px rgba(108,99,230,.42);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  animation:botFloat 4s ease-in-out infinite;
+}
+.ai-avatar img{width:100%;height:100%;object-fit:cover}
+@keyframes botFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(max-width:560px){
+  .ai-bot{right:14px;bottom:14px;gap:8px}
+  .ai-bubble{display:none}        /* avatar only on small screens */
+  .ai-avatar{width:52px;height:52px}
+}
+@media(prefers-reduced-motion:reduce){.ai-bot,.ai-avatar{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- HUD -->
+<nav class="hud" role="navigation" aria-label="體驗進度導覽">
+  <div class="hud-left">
+    <div class="hud-logo">
+      <img src="https://www..com.tw/images/logo.svg?v=1" alt="" class="hud-logo-img">
+      <span class="hud-logo-sep"></span>
+      <span class="hud-logo-title"> Agent 體驗中心</span>
+    </div>
+    <div class="hud-steps" id="hudSteps">
+      <div class="hud-step active" data-step="1"><div class="hs-dot"></div><span class="hs-num">1</span>選定職能</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="2"><div class="hs-dot"></div><span class="hs-num">2</span>選擇場景</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="3"><div class="hs-dot"></div><span class="hs-num">3</span>啟動分身</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="4"><div class="hs-dot"></div><span class="hs-num">4</span>圓桌會議</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="5"><div class="hs-dot"></div><span class="hs-num">5</span>分身總結</div>
+    </div>
+    <!-- compact progress shown on narrow screens instead of the breadcrumb -->
+    <div class="hud-progress" id="hudProgress" aria-hidden="true">
+      <div class="hud-dots">
+        <span class="hd-dot active"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+      </div>
+      <span class="hud-cur" id="hudCur">選定職能</span>
+    </div>
+  </div>
+  <div class="hud-right">
+    <div class="hud-role" id="hudRole"></div>
+    <div class="hud-back" id="hudBack" onclick="goBack()"><span class="hb-arrow">←</span><span class="hb-text"> 返回上一步</span></div>
+    <div class="hud-home" onclick="gotoPage(1)" title="回到分身大廳">回到分身大廳</div>
+  </div>
+</nav>
+
+<!-- ── PAGE 1: 歡迎大廳 + 選定職能 ── -->
+<!-- 背景圖層：P2-P5 共用，固定存在不重建，避免切換閃爍 -->
+<div id="scene-bg" aria-hidden="true"></div>
+
+<main>
+<section class="page active" id="p1" aria-label="歡迎大廳">
+  <div class="p1-bg" aria-hidden="true"></div>
+
+  <!-- floating pain bubbles：桌機 ≥1200px 懸浮於圖上 -->
+  <div class="p1-pains" id="p1Pains" aria-hidden="true">
+    <div class="p1-pain pain-1" data-role="採購">
+      <div class="p1-pain-icon">📋</div>客戶急單，我該跟誰討論供應鏈底線
+    </div>
+    <div class="p1-pain pain-2" data-role="生管">
+      <div class="p1-pain-icon">🏭</div>生產時才發現料不夠，只能停線等
+    </div>
+    <div class="p1-pain pain-3" data-role="IT資訊人員">
+      <div class="p1-pain-icon">🔒</div>老闆要確認 ERP 資安，但我們只有 3 人
+    </div>
+    <div class="p1-pain pain-4" data-role="業務">
+      <div class="p1-pain-icon">💼</div>這個客戶跟了兩年，不能讓他跑掉
+    </div>
+    <div class="p1-pain pain-5" data-role="廠長">
+      <div class="p1-pain-icon">⚙️</div>總是在幫產線救火，沒時間看數據
+    </div>
+    <div class="p1-pain pain-6" data-role="資材">
+      <div class="p1-pain-icon">📦</div>手動翻查幾百項品號，一整天都在轉單
+    </div>
+  </div>
+
+  <!-- inline pain strip：<1200px 時顯示於內容上方 -->
+  <div class="p1-pain-strip" id="p1PainStrip" aria-label="常見工作挑戰">
+    <div class="p1-pain-strip-item" data-role="採購"><span class="p1-pain-strip-icon">📋</span>客戶急單，我該跟誰討論</div>
+    <div class="p1-pain-strip-item" data-role="生管"><span class="p1-pain-strip-icon">🏭</span>生產時才發現料不夠</div>
+    <div class="p1-pain-strip-item" data-role="廠長"><span class="p1-pain-strip-icon">⚙️</span>總是在幫產線救火</div>
+    <div class="p1-pain-strip-item" data-role="業務"><span class="p1-pain-strip-icon">💼</span>客戶跟了兩年不能跑</div>
+    <div class="p1-pain-strip-item" data-role="IT資訊人員"><span class="p1-pain-strip-icon">🔒</span>ERP 資安只有 3 人確認</div>
+    <div class="p1-pain-strip-item" data-role="資材"><span class="p1-pain-strip-icon">📦</span>翻查品號一整天在轉單</div>
+  </div>
+
+  <div class="p1-layout">
+    <div class="p1-content">
+      <div class="p1-eyebrow">AI — 數智分身體驗中心</div>
+      <div class="p1-source-hint" id="p1SourceHint">體驗 AI 分身如何在你的工作現場做決策</div>
+      <h1 class="p1-title">探索複雜多變的<br>企業工作現場</h1>
+      <p class="p1-sub">選擇你的職能，進入真實情境，體驗數智分身如何在關鍵時刻替你推進決策</p>
+
+      <h2 class="p1-roles-title">你平常主要負責什麼？</h2>
+      <p class="p1-roles-sub">選擇最接近你的職能，我們會為你推薦最相關的場景</p>
+
+      <div class="p1-role-grid" id="roleGrid">
+        <div class="p1-role-card" data-role="採購" data-color="#1B5E36" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：採購">採購</div>
+        <div class="p1-role-card" data-role="業務" data-color="#E65100" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：業務">業務</div>
+        <div class="p1-role-card" data-role="廠長" data-color="#4A148C" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：廠長">廠長</div>
+        <div class="p1-role-card" data-role="生管" data-color="#1565C0" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：生管">生管</div>
+        <div class="p1-role-card" data-role="倉管" data-color="#006064" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：倉管">倉管</div>
+        <div class="p1-role-card" data-role="物控" data-color="#00838F" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：物控">物控</div>
+        <div class="p1-role-card" data-role="產線班組長" data-color="#5D4037" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：產線班組長">產線班組長</div>
+        <div class="p1-role-card" data-role="IT資訊人員" data-color="#B71C1C" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：IT資訊人員">IT資訊人員</div>
+        <div class="p1-role-card" data-role="資材" data-color="#0277BD" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：資材">資材</div>
+        <div class="p1-role-card" data-role="專案經理" data-color="#283593" onclick="selectRole(this)" tabindex="0" role="button" aria-pressed="false" aria-label="選擇職能：專案經理">專案經理</div>
+      </div>
+
+      <button class="p1-cta" id="p1Cta" onclick="gotoPage(2)" disabled aria-label="查看推薦場景">查看推薦場景 &nbsp;›</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── PAGE 2: 選擇場景 ── -->
+<section class="page" id="p2" aria-label="選擇場景">
+  <div class="p2-header">
+    <div class="p2-header-inner">
+      <div class="p2-role-badge" id="p2RoleBadge">
+        <span class="p2-role-dot" id="p2RoleDot"></span>
+        <span id="p2RoleName">採購</span>的推薦場景
+      </div>
+      <div class="p2-header-text">
+        <div class="p2-title" id="p2Title">選擇你想體驗的場景</div>
+        <div class="p2-sub">每個場景模擬一個真實挑戰，數智分身會在你身旁協同決策</div>
+      </div>
+    </div>
+  </div>
+  <div class="p2-body">
+    <!-- 身份確認橋接 — 進來第一眼看到，確認「我是誰、我要做什麼」 -->
+    <div class="p2-identity-bridge" id="p2Bridge">
+      <div class="p2-bridge-role" id="p2BridgeRole">你是採購</div>
+      <div class="p2-bridge-arrow">→</div>
+      <div class="p2-bridge-task">選一個你想體驗的場景，點擊卡片進入</div>
+    </div>
+
+    <div class="p2-section-label">為你推薦的場景</div>
+    <div class="p2-rec-layout" id="p2RecGrid"></div>
+
+    <div class="p2-section-label">其他職能的場景</div>
+    <div class="p2-others-row" id="p2OthersRow"></div>
+    <div id="p2OthersList"></div>
+  </div>
+</section>
+
+<!-- ── PAGE 3: 場景開場 ── -->
+<section class="page" id="p3" aria-label="場景開場">
+  <div class="p3-inner">
+
+    <!-- 場景標籤 -->
+    <div class="p3-scene-tag" id="p3SceneTag">急單插單應變</div>
+
+    <!-- ① 痛點情境（描述1）-->
+    <div class="p3-crisis">
+      <div class="p3-crisis-icon" aria-hidden="true">⚠️</div>
+      <div class="p3-crisis-text" id="p3Crisis">
+        客戶突然追加7倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。
+      </div>
+    </div>
+
+    <!-- ② + ③ 分身陣容 + 引導（整合，去除重複語彙）-->
+    <div class="p3-agents-section">
+      <div class="p3-agents-label">參與此場景的數智分身</div>
+      <div class="dividers-section" id="p4Avatars"></div>
+      <div class="p3-ability-text" id="p3Ability">
+         AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。
+      </div>
+      <div class="p3-divider"></div>
+      <p class="p4-ready" id="p4ReadyText">數智分身已經準備就緒，等你拍板</p>
+      <button class="btn-launch" onclick="gotoPage(4)" aria-label="進入圓桌會議體驗">
+        進入體驗 &nbsp;›
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── PAGE 4: 圓桌會議 ── -->
+<!--
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  PAGE 4 — 圓桌會議（工程師演示區）                               │
+  │                                                                 │
+  │  此頁面框架由 UX 保留，內部演示內容請工程師自行填入。            │
+  │                                                                 │
+  │  框架結構：                                                      │
+  │  ├── #p4-demo-area   ← 演示主體區（全高彈性區塊）               │
+  │  │    工程師在此放入實際的 AI 會議演示內容                       │
+  │  │    建議尺寸：100% 寬，flex:1（撐滿剩餘高度）                  │
+  │  │                                                              │
+  │  └── #p4-footer      ← 固定底部操作列                           │
+  │       保留「查看分身能力總結」按鈕，連接下一頁                   │
+  │                                                                 │
+  │  頁面進入時機：從 PAGE 3（場景開場）點擊「啟動會議」後觸發       │
+  │  離開時機：點擊底部「查看分身能力總結」→ gotoPage(5)            │
+  │                                                                 │
+  │  可取用的 state 變數（JS）：                                     │
+  │    state.role       → 使用者職能（字串，例如 "採購"）           │
+  │    state.roleColor  → 職能代表色（hex，例如 "#1B5E36"）         │
+  │    state.scene      → 當前場景物件，包含：                      │
+  │      .name          → 場景名稱（例如 "急單插單應變"）           │
+  │      .lead          → 場景引言（使用者身份代入句）               │
+  │      .agents[]      → 參與分身陣列 [{name, color}, ...]         │
+  │      .steps[]       → 三段劇本文字                              │
+  └─────────────────────────────────────────────────────────────────┘
+-->
+<section class="page" id="p4" aria-label="圓桌會議">
+
+  <!-- ════════════════════════════════════════════════
+       演示主體區
+       工程師請在此 div 內放入 AI 圓桌會議的演示內容
+       ════════════════════════════════════════════════ -->
+  <div id="p4-demo-area" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;min-height:0">
+
+    <!-- [ 工程師填入區 — 開始 ] -->
+    <!-- 演示內容放這裡 -->
+    <!-- [ 工程師填入區 — 結束 ] -->
+
+  </div>
+  <!-- ════════════════════════════════════════════════ -->
+
+  <!-- 底部固定操作列：保留，請勿移除 -->
+  <div id="p4-footer" style="padding:14px 24px;border-top:1px solid var(--border2);background:var(--surface);text-align:center;flex-shrink:0">
+    <button class="btn-end" onclick="gotoPage(5)" aria-label="查看分身能力總結">查看分身能力總結 &nbsp;›</button>
+  </div>
+
+</section>
+
+<!-- ── PAGE 5: 分身總結 ── -->
+<section class="page" id="p5" aria-label="分身能力總結">
+  <div class="p5-wrap">
+
+    <!-- ① 你做到了什麼 -->
+    <div class="p5-achievement">
+      <div class="p5-ach-scene" id="p5SceneTag">急單插單應變</div>
+      <div class="p5-ach-headline" id="p5Headline">
+        你剛才用 <em class="em-win">3 分鐘</em>，完成了一個通常要 <em class="em-old">3 天</em> 的決策
+      </div>
+      <div class="p5-ach-sub" id="p5AchSub">身為採購，你與數智分身協同處理了急單缺料、產線排程與交期承諾，做出了一個跨部門都能接受的判斷。</div>
+    </div>
+
+    <!-- ② 突破了什麼 -->
+    <div class="p5-section-title">這次體驗，突破了哪些限制</div>
+    <div class="p5-breakthrough">
+      <div class="p5-radar-col">
+        <svg width="150" height="150" viewBox="0 0 160 160" aria-label="能力突破雷達圖" role="img">
+          <title>分身能力雷達圖</title>
+          <polygon points="80,20 140,80 80,140 20,80" fill="none" stroke="#E8ECF0" stroke-width="1.5"/>
+          <polygon points="80,35 125,80 80,125 35,80" fill="none" stroke="#E8ECF0" stroke-width="1"/>
+          <polygon points="80,50 110,80 80,110 50,80" fill="none" stroke="#E8ECF0" stroke-width="1"/>
+          <polygon id="p5RadarShape" points="80,28 132,80 80,132 28,80" fill="rgba(var(--brand-rgb),.12)" stroke="#125BBC" stroke-width="2"/>
+          <text x="80" y="13" text-anchor="middle" font-size="11" fill="#94A3B8">人力</text>
+          <text x="150" y="84" text-anchor="start" font-size="11" fill="#94A3B8">能力</text>
+          <text x="80" y="153" text-anchor="middle" font-size="11" fill="#94A3B8">思維</text>
+          <text x="10" y="84" text-anchor="end" font-size="11" fill="#94A3B8">時空</text>
+        </svg>
+        <div class="p5-radar-caption" id="p5RadarCaption">突破四個維度的限制</div>
+      </div>
+      <div class="p5-dims-col" id="p5DimsCol"></div>
+    </div>
+
+    <!-- ③ 體驗中出現的分身 -->
+    <div class="p5-section-title">這場體驗用到的分身陣容</div>
+    <div class="p5-takeaway-note" id="p5TakeawayNote">以下分身在你剛才的體驗中協同運作，每一個都可以單獨部署到你的企業。</div>
+    <div class="p5-takeaway-grid" id="p5TakeawayGrid"></div>
+
+    <!-- 轉換區：CTA 在情緒最高點 -->
+    <div class="p5-convert">
+      <div class="p5-convert-text">
+        <div class="p5-convert-headline">開箱即用，不需要從零訓練 AI</div>
+        <div class="p5-convert-sub">下載分身，預置能力立即可用——並且會隨著使用習慣持續強化，<strong>越用越懂你的企業</strong>。</div>
+      </div>
+      <div class="p5-convert-cta">
+        <button class="p5-btn-primary" aria-label="索取方案">索取方案 &nbsp;›</button>
+      </div>
+    </div>
+    <div class="p5-cta-secondary-row">
+      <button class="p5-btn-secondary" aria-label="訂閱最新消息">訂閱最新消息</button>
+      <button class="p5-btn-secondary" aria-label="換個場景再體驗" onclick="gotoPage(2)">換個場景再體驗</button>
+    </div>
+    <div class="p5-reset" onclick="resetExperience()" role="button" tabindex="0">← 換個角色重新開始</div>
+
+  </div>
+</section>
+</main>
+
+
+
+<!-- Floating AI assistant (presentational only) -->
+<div class="ai-bot" role="img" aria-label="AI 數智助理">
+  <div class="ai-bubble">
+    <span class="ai-bubble-top">在開始體驗前…</span>
+    <span class="ai-bubble-main">先了解未來工作新樣貌 ▼</span>
+  </div>
+  <div class="ai-avatar">
+    <img src="https://agent-exp.apps.cloud.com/assets/images/onboarding/icon-assistant.png" alt="AI 助理" onerror="this.style.display='none'">
+  </div>
+</div>
+
+<script>
+var state = { page: 1, role: '', roleColor: '', scene: null, history: [1] };
+
+var SCENES = {
+  採購: [
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['專案經理','採購','業務','廠長'], lead:'客戶突然要追加，身為採購，你將與數智分身一同擬定策略', steps:['客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。',' AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。'], agents:[{name:'PM',color:'#1B5E36'},{name:'業務',color:'#E65100'},{name:'廠長',color:'#4A148C'}] },
+    { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['資材'], lead:'身為採購，你將協同 AI 分身快速掌握缺料風險', steps:['生產線急等用料，但採購人員還在忙著翻查數百項品號的可用庫存，光是轉單就耗掉一整天。','讓採購分身自動盤點缺口、比對替代料源，你只需要拍板關鍵決策。','擁有這組職能分身，你不用再當「打單機器人」，確保料件準時到位。'], agents:[{name:'採購',color:'#1B5E36'},{name:'倉管',color:'#006064'}] }
+  ],
+  生管: [
+    { id:'s3', name:'物料運補監管', cat:'生產管理 › 生產排程與插單管理', tags:['生管','倉管','物控'], lead:'身為生管，你將與分身一同確認開工前的料況安全', steps:['客戶臨時插單時、工單上線生產前，你真的知道料夠不夠嗎？多數情況，是開始生產了才發現缺料。','職能分身在工單開工前自動解析用料需求、即時比對庫存，並預測料況風險。','下載職能分身，協助預測缺料風險，準確驅動開工決策，提升生產效率。'], agents:[{name:'生管',color:'#1565C0'},{name:'物控',color:'#006064'},{name:'倉管',color:'#006064'}] },
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['專案經理','採購','業務','廠長'], lead:'你的產線剛接到急單，數智分身協助你快速重排', steps:['客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。',' AI 職能分身各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。'], agents:[{name:'PM',color:'#1B5E36'},{name:'業務',color:'#E65100'},{name:'廠長',color:'#4A148C'}] }
+  ],
+  業務: [
+    { id:'s4', name:'名片商機獵取', cat:'行銷與銷售 › 潛客開發與名單管理', tags:['業務'], lead:'身為業務，你將讓 AI 分身幫你把展覽名片變成有效商機', steps:['每次參展後，大量名片堆積造成資訊落差，手動整理耗時，無法第一時間進行名單貼標。',' AI 職能分身已預置光學掃描與爬蟲能力，精準解析各式名片格式，自動查補缺漏。','下載名單收集能力，開箱即用，越用越懂你的目標產業，能力持續增強！'], agents:[{name:'業務',color:'#E65100'},{name:'商機',color:'#1B5E36'}] },
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['業務','採購','廠長'], lead:'這次急單，你身為業務要在有限時間給客戶一個確定的答案', steps:['客戶突然追加 7 倍急單——備料不足、產線排滿。你需要馬上協調內部給出交期承諾。',' AI 職能分身——業務、廠長、採購，各自預置專業思維，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力，開箱就是一整個主管級專家團隊。'], agents:[{name:'廠長',color:'#4A148C'},{name:'採購',color:'#1B5E36'},{name:'PM',color:'#006064'}] }
+  ],
+  廠長: [
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['廠長','採購','業務'], lead:'身為廠長，你需要在產線已滿的情況下決定是否接這張急單', steps:['客戶突然追加 7 倍急單——備料不足、產線排滿。你若判斷錯誤，不是丟單就是虧損。',' AI 職能分身各自預置專業思維，把跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力，開箱就是一整個主管級專家團隊。'], agents:[{name:'採購',color:'#1B5E36'},{name:'業務',color:'#E65100'},{name:'PM',color:'#006064'}] },
+    { id:'s3', name:'物料運補監管', cat:'生產管理 › 生產排程與插單管理', tags:['生管','倉管','物控'], lead:'身為廠長，你要確保產線開工前料況無虞', steps:['工單上線生產前，你真的知道料夠不夠嗎？多數情況，是開始生產了才發現缺料，造成停線。','職能分身在工單開工前自動解析用料需求、即時比對庫存，並預測料況風險。','下載職能分身，協助預測缺料風險，準確驅動開工決策，提升生產效率。'], agents:[{name:'生管',color:'#1565C0'},{name:'物控',color:'#006064'}] }
+  ],
+  IT資訊: [
+    { id:'s5', name:'資安漏洞速補', cat:'合規與風險 › 資安風險管理', tags:['IT資訊'], lead:'老闆要你本週確認 ERP 系統資安，但你的團隊只有 3 個人', steps:['老闆今天早上傳來訊息：「最近資安事件頻傳，我們的 ERP 系統確定沒問題嗎？你這週給我確認。」','你的團隊只有 3 個人，資安專家在休假。你手上有一個工具——法規遵循顧問 Agent。','你不需要懂 SBOM，不需要會 Linux。你只需要說一句話。'], agents:[{name:'法規',color:'#B71C1C'},{name:'IT',color:'#1565C0'}] }
+  ],
+  資材: [
+    { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓「採購進貨」與「進貨驗收批退」Agent 聯手——自動辨識廠商單據生成進貨單。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#1B5E36'},{name:'驗收',color:'#006064'}] },
+    { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['資材'], lead:'身為資材，你要在最短時間解決緊急缺料危機', steps:['生產線急等用料，採購還在翻查數百項品號的庫存，光是轉單就耗掉一整天。','讓採購進貨分身自動辨識廠商單據、生成進貨單，你只需要輸入驗收數即可。','擁有這組職能分身，從需求偵測到正式下單一氣呵成，確保料件準時到位。'], agents:[{name:'採購',color:'#1B5E36'},{name:'倉管',color:'#006064'}] }
+  ]
+};
+
+// New roles from the landing grid that don't have their own scene sets
+// are routed to the closest existing scene set, keeping their own display name.
+var ROLE_ALIAS = {
+  'IT資訊人員':'IT資訊',
+  '倉管':'資材',
+  '物控':'生管',
+  '產線班組長':'廠長',
+  '專案經理':'採購'
+};
+function scenesFor(role){ return SCENES[ROLE_ALIAS[role]||role] || []; }
+
+var ABILITIES = {
+  s1:[{n:'GM決策協調分身',r:'急單決策',d:'跨部門協調，快速評估急單可行性與風險'},{n:'業務談判分身',r:'客戶溝通',d:'即時提供交期承諾與談判話術支援'},{n:'生產排程分身',r:'產能評估',d:'自動重排產線，計算最優插單位置'},{n:'供應鏈風控分身',r:'備料風控',d:'即時比對庫存，預測備料缺口與交期風險'}],
+  s3:[{n:'生管主管分身',r:'工單管理',d:'自動解析工單用料需求並觸發預警'},{n:'物控專員分身',r:'庫存比對',d:'即時比對庫存與在途料，預測料況風險'},{n:'倉庫管理員分身',r:'倉儲調度',d:'協調倉儲調度，確保開工前料件到位'}],
+  s4:[{n:'名單收集分身',r:'OCR 辨識',d:'光學掃描與爬蟲能力，精準解析各式名片'},{n:'商機評估分身',r:'客戶分級',d:'依職稱、產業、規模自動評分並分配業務'}],
+  s5:[{n:'法規遵循顧問Agent',r:'資安掃描',d:'依 NIST CSF 框架評估風險，產出修復清單'},{n:'IT資訊分身',r:'系統稽核',d:'檢查存取控制、MFA 與稽核日誌完整性'}],
+  s6:[{n:'採購進貨Agent',r:'單據辨識',d:'自動辨識廠商送貨單，產生進貨草稿'},{n:'進貨驗收批退Agent',r:'驗收流程',d:'自動判定驗收結果，產出批退資料'}],
+  s2:[{n:'採購分身',r:'缺料盤點',d:'掃描品號庫存，排序急迫性等候拍板'},{n:'倉管分身',r:'替代料源',d:'即時查找替代料與替代供應商備選方案'}]
+};
+
+function gotoPage(n){
+  var prev=state.page;
+  document.getElementById('p'+prev).classList.remove('active');
+  document.getElementById('p'+n).classList.add('active');
+  // 只在跳到不同頁時才記錄 history，避免重複堆疊
+  if(n !== prev) state.history.push(n);
+  state.page=n;
+  updateHUD(n);
+  // 背景圖：P2-P5 顯示，P1 隱藏
+  document.getElementById('scene-bg').classList.toggle('show', n >= 2);
+  window.scrollTo(0,0);
+  if(n===2)buildScenePage();
+  if(n===4)initRoundtable();
+  if(n===5)buildSummary();
+}
+
+function goBack(){
+  if(state.history.length>1){
+    state.history.pop();
+    // 找到上一個不同於當前頁的頁碼
+    var prev=state.history[state.history.length-1];
+    // 直接操作 DOM，不再 push，避免 history 再次增長
+    document.getElementById('p'+state.page).classList.remove('active');
+    document.getElementById('p'+prev).classList.add('active');
+    state.page=prev;
+    updateHUD(prev);
+    document.getElementById('scene-bg').classList.toggle('show', prev >= 2);
+    window.scrollTo(0,0);
+    if(prev===2)buildScenePage();
+  }
+}
+
+function updateHUD(n){
+  var steps=document.querySelectorAll('.hud-step');
+  steps.forEach(function(s,i){
+    s.classList.remove('active','done');
+    if(i+1===n)s.classList.add('active');
+    else if(i+1<n)s.classList.add('done');
+  });
+  // compact (mobile) progress
+  var names=['選定職能','選擇場景','啟動分身','圓桌會議','分身總結'];
+  var cur=document.getElementById('hudCur');
+  if(cur)cur.textContent=names[n-1]||'';
+  document.querySelectorAll('.hd-dot').forEach(function(d,i){
+    d.classList.remove('active','done');
+    if(i+1===n)d.classList.add('active');
+    else if(i+1<n)d.classList.add('done');
+  });
+  var role=document.getElementById('hudRole');
+  var back=document.getElementById('hudBack');
+  if(state.role&&n>1){role.textContent='你的職能：'+state.role;role.classList.add('show');}
+  else{role.classList.remove('show');}
+  if(n>1){back.classList.add('show');}
+  else{back.classList.remove('show');}
+}
+
+function selectRole(card){
+  document.querySelectorAll('.p1-role-card').forEach(function(c){
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed','false');
+  });
+  card.classList.add('selected');
+  card.setAttribute('aria-pressed','true');
+  state.role=card.dataset.role;
+  state.roleColor=card.dataset.color;
+
+  // Enable the CTA and personalise its label
+  var btn=document.getElementById('p1Cta');
+  btn.disabled=false;
+  btn.textContent='查看'+state.role+'的推薦場景 \u00A0›';
+
+  // Map aliased roles to a pain bubble data-role for highlight
+  var PAIN_MAP={
+    '採購':'採購','生管':'生管','業務':'業務','廠長':'廠長',
+    'IT資訊人員':'IT資訊人員','資材':'資材',
+    '倉管':'資材','物控':'生管','產線班組長':'廠長','專案經理':'採購'
+  };
+  var painTarget=PAIN_MAP[state.role]||state.role;
+  // 懸浮泡泡 highlight（桌機）
+  document.querySelectorAll('.p1-pain').forEach(function(p){
+    p.classList.toggle('highlight', p.dataset.role===painTarget);
+  });
+  // inline strip highlight（窄螢幕）
+  document.querySelectorAll('.p1-pain-strip-item').forEach(function(p){
+    p.classList.toggle('highlight', p.dataset.role===painTarget);
+  });
+}
+
+function buildScenePage(){
+  var role=state.role;
+  var scenes=scenesFor(role);
+  var color=state.roleColor||'var(--brand)';
+
+  // Update identity bridge
+  document.getElementById('p2BridgeRole').textContent='你是'+role;
+  // Update header
+  document.getElementById('p2RoleName').textContent=role;
+  document.getElementById('p2RoleDot').style.background=color;
+  document.getElementById('p2Title').textContent='選擇你想體驗的場景';
+
+  // Build recommended cards — first is primary, rest are secondary
+  var recGrid=document.getElementById('p2RecGrid');
+  recGrid.innerHTML='';
+  scenes.slice(0,2).forEach(function(s, i){
+    recGrid.appendChild(buildSceneCard(s, i===0, color));
+  });
+
+  // Build other roles filter chips
+  var othersRow=document.getElementById('p2OthersRow');
+  othersRow.innerHTML='';
+  var aliasKey=ROLE_ALIAS[role]||role;
+  var otherKeys=Object.keys(SCENES).filter(function(k){return k!==aliasKey});
+  // State: which other role is selected
+  var selectedOther=otherKeys[0];
+  function renderOtherScenes(){
+    var listEl=document.getElementById('p2OthersList');
+    listEl.innerHTML='';
+    var otherScenes=SCENES[selectedOther]||[];
+    otherScenes.forEach(function(s,i){
+      listEl.appendChild(buildOtherSceneRow(s, i+1));
+    });
+    // Update chip active state
+    othersRow.querySelectorAll('.p2-other-chip').forEach(function(chip){
+      chip.classList.toggle('active', chip.dataset.role===selectedOther);
+    });
+  }
+  otherKeys.forEach(function(k){
+    var chip=document.createElement('button');
+    chip.className='p2-other-chip'+(k===selectedOther?' active':'');
+    chip.dataset.role=k;
+    chip.textContent=k;
+    chip.onclick=function(){selectedOther=k;renderOtherScenes();};
+    othersRow.appendChild(chip);
+  });
+  renderOtherScenes();
+}
+
+function buildSceneCard(s, isPrimary, accentColor){
+  var el=document.createElement('div');
+  el.className='sc-card '+(isPrimary?'primary':'secondary');
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label','進入場景：'+s.name);
+  el.onclick=function(){selectScene(s);};
+  el.onkeydown=function(e){if(e.key==='Enter'||e.key===' ')selectScene(s);};
+
+  // Colored agent tags using each agent's own color
+  var agentTagsHtml=s.agents.map(function(a){
+    var bg=a.color+'18'; // 10% opacity background
+    return '<span class="sc-agent-tag" style="color:'+a.color+';background:'+bg+';border-color:'+a.color+'40">'+
+      '<span class="sc-agent-tag-dot"></span>'+a.name+
+    '</span>';
+  }).join('');
+
+  el.innerHTML=
+    '<div class="sc-accent" style="background:'+accentColor+'"></div>'+
+    '<div class="sc-cat">'+s.cat+'</div>'+
+    '<div class="sc-name">'+s.name+'</div>'+
+    '<div class="sc-situation">'+s.steps[0]+'</div>'+
+    '<div class="sc-footer">'+
+      '<div class="sc-agents">'+agentTagsHtml+'</div>'+
+      '<div class="sc-arrow">›</div>'+
+    '</div>'+
+    '<div class="sc-click-hint">點擊進入體驗 →</div>';
+  return el;
+}
+
+function buildOtherSceneRow(s, num){
+  var el=document.createElement('div');
+  el.className='p2-other-scene';
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label','進入場景：'+s.name);
+  el.onclick=function(){selectScene(s);};
+  el.onkeydown=function(e){if(e.key==='Enter'||e.key===' ')selectScene(s);};
+  var agentTagsHtml=s.agents.map(function(a){
+    var bg=a.color+'18';
+    return '<span class="pos-agent-tag" style="color:'+a.color+';background:'+bg+';border-color:'+a.color+'40">'+
+      '<span class="pos-agent-dot"></span>'+a.name+
+    '</span>';
+  }).join('');
+  el.innerHTML=
+    '<div class="pos-num">'+num+'</div>'+
+    '<div class="pos-body">'+
+      '<div class="pos-name">'+s.name+'</div>'+
+      '<div class="pos-pain">'+s.steps[0].slice(0,55)+'…</div>'+
+      '<div class="pos-agents">'+agentTagsHtml+'</div>'+
+    '</div>'+
+    '<div style="color:var(--ink3);font-size:18px;flex-shrink:0">›</div>';
+  return el;
+}
+
+function selectScene(s){
+  state.scene=s;
+
+  // P3: 場景標籤
+  document.getElementById('p3SceneTag').textContent=s.name;
+
+  // P3 ①：痛點情境（steps[0]）
+  document.getElementById('p3Crisis').textContent=s.steps[0];
+
+  // P3 ②：分身能力說明（steps[1]）
+  document.getElementById('p3Ability').textContent=s.steps[1];
+
+  // P3 ②：avatar pills 置中
+  var avEl=document.getElementById('p4Avatars');
+  avEl.innerHTML='';
+  s.agents.forEach(function(a){
+    var pill=document.createElement('div');
+    pill.className='avatar-pill';
+    pill.innerHTML=
+      '<div class="av-circle" style="background:'+a.color+'" aria-hidden="true">'+a.name.slice(0,2)+'</div>'+
+      '<div><div class="av-name">'+a.name+'</div><div class="av-sub">數智分身</div></div>';
+    avEl.appendChild(pill);
+  });
+
+  gotoPage(3);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PAGE 4 圓桌會議 — 工程師演示區 Hook
+// 進入 PAGE 4 時會呼叫此函數，工程師可在此初始化演示內容
+// 可透過 state.scene、state.role、state.roleColor 取得當前情境資料
+// ─────────────────────────────────────────────────────────────────
+function initRoundtable(){
+  // TODO: 工程師在此初始化 AI 圓桌會議演示
+  // 範例：loadDemoContent(state.scene, state.role);
+}
+
+// Per-scene achievement headline (第一段：你做到了什麼)
+var ACHIEVEMENT = {
+  s1:{
+    headline:'你剛才用 <em class="em-win">3 分鐘</em>，完成了一個通常要 <em class="em-old">3 天</em> 的 <em class="em-old">急單</em> 決策',
+    sub:'身為{role}，你與數智分身協同處理了急單缺料、產線排程與交期承諾，做出了一個跨部門都能接受的判斷。'
+  },
+  s2:{
+    headline:'你剛才用 <em class="em-win">AI 分身</em>，掃完了人工需要 <em class="em-old">一整天</em> 的 <em class="em-old">缺料清單</em>',
+    sub:'身為{role}，你不再是「打單機器人」——數智分身幫你盤點缺口、比對替代料源，你只需要拍板。'
+  },
+  s3:{
+    headline:'你剛才在 <em class="em-win">工單開工前</em>，提前攔截了一個會讓產線 <em class="em-old">停線</em> 的 <em class="em-old">缺料風險</em>',
+    sub:'身為{role}，你與分身一起完成了料況確認，從被動救火轉為主動預測，準確驅動開工決策。'
+  },
+  s4:{
+    headline:'你剛才把 <em class="em-old">237 張堆積的名片</em>，變成 <em class="em-win">今天就能跟進</em> 的 18 個商機',
+    sub:'身為{role}，你不再手動輸入名片資料——數智分身完成了辨識、分級與 CRM 匯入，你只需要打電話。'
+  },
+  s5:{
+    headline:'你剛才讓 <em class="em-win">3 人團隊</em>，完成了原本要 <em class="em-old">資安顧問</em> 才能做的 <em class="em-old">ERP 風險評估</em>',
+    sub:'身為{role}，你不需要懂 SBOM 或 Linux——法規顧問 Agent 幫你掃描、產出修復清單，老闆可以放心了。'
+  },
+  s6:{
+    headline:'你剛才讓 <em class="em-old">月底碼頭大塞車</em>，變成 <em class="em-win">40 分鐘</em> 順暢完成',
+    sub:'身為{role}，你與分身聯手讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'
+  }
+};
+
+function buildSummary(){
+  var s=state.scene;
+  if(!s)return;
+
+  // ① 你做到了什麼
+  var ach=ACHIEVEMENT[s.id]||{headline:'你剛完成了一場 AI 決策體驗',sub:'身為{role}，你與數智分身協同完成了這個場景。'};
+  document.getElementById('p5SceneTag').textContent=s.name;
+  document.getElementById('p5Headline').innerHTML=ach.headline;
+  document.getElementById('p5AchSub').textContent=ach.sub.replace('{role}',state.role);
+
+  // ② 突破了什麼 — 雷達形狀更新 + 橫向說明列
+  var dims=DIMS[s.id]||DIMS.s1;
+  // 雷達：人力=上(top), 能力=右(right), 思維=下(bottom), 時空=左(left)
+  var cx=80,cy=80,maxR=60;
+  function axisPoint(axisName,val){
+    var ratio=val/100;
+    var r=maxR*ratio;
+    var angles={人力:270,能力:0,思維:90,時空:180};
+    var deg=angles[axisName]||0;
+    var rad=deg*Math.PI/180;
+    return (cx+r*Math.cos(rad)).toFixed(1)+','+(cy+r*Math.sin(rad)).toFixed(1);
+  }
+  var pts=dims.map(function(d){return axisPoint(d.axis,d.val);}).join(' ');
+  var shape=document.getElementById('p5RadarShape');
+  if(shape)shape.setAttribute('points',pts);
+
+  var dimsCol=document.getElementById('p5DimsCol');
+  dimsCol.innerHTML='';
+  dims.forEach(function(d){
+    var badgeBg=d.color+'22';
+    var row=document.createElement('div');
+    row.className='p5-dim-row';
+    row.style.borderLeft='3px solid '+d.color;
+    row.innerHTML=
+      '<div class="p5-dim-left">'+
+        '<div class="p5-dim-axis" style="color:'+d.color+'">'+d.axis+'</div>'+
+        '<div class="p5-dim-num" style="color:'+d.color+'">'+d.val+'</div>'+
+        '<div class="p5-dim-badge" style="color:'+d.color+';background:'+badgeBg+'">'+d.badge+'</div>'+
+      '</div>'+
+      '<div class="p5-dim-right">'+
+        '<div class="p5-dim-text">'+d.desc+'</div>'+
+      '</div>';
+    dimsCol.appendChild(row);
+  });
+
+  // ③ 可以帶走什麼 — 分身能力卡
+  var abs=ABILITIES[s.id]||[];
+  var grid=document.getElementById('p5TakeawayGrid');
+  grid.innerHTML='';
+  abs.forEach(function(a){
+    var card=document.createElement('div');
+    card.className='p5-takeaway-card';
+    card.innerHTML=
+      '<div class="p5-tk-name">'+a.n+'</div>'+
+      '<div class="p5-tk-role">'+a.r+'</div>'+
+      '<div class="p5-tk-value">'+a.d+'</div>';
+    grid.appendChild(card);
+  });
+}
+
+var DIMS = {
+  s1:[
+    {axis:'人力',val:75,badge:'突破',color:'#1B5E36',desc:'場景已把 PM、採購、業務與廠長納入同一決策框架，大幅縮短急單跨部門往返協調時間'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置 STP、ATP/CTP、TCO、供應風控與談判腳本等職能，具備高可用的專家代理雛形'},
+    {axis:'思維',val:100,badge:'完整展現',color:'#4A148C',desc:'將「接單機會」拆解為可承諾量、條件式上修、風險轉嫁與獲利邊界的多因子決策思維'},
+    {axis:'時空',val:25,badge:'初探',color:'#E65100',desc:'強調 3 分鐘完成決策，但目前仍以單場會議為主，尚未展現跨廠協調與持續監控能力'}
+  ],
+  s2:[
+    {axis:'人力',val:70,badge:'突破',color:'#1B5E36',desc:'採購分身自動掃描品號，大幅減少人工翻查庫存所需的人力投入'},
+    {axis:'能力',val:80,badge:'突破',color:'#1565C0',desc:'預置缺料盤點、替代料比對與緊急詢價等採購職能，開箱即用'},
+    {axis:'思維',val:60,badge:'展現',color:'#4A148C',desc:'能針對缺料緊急程度自動排序，協助採購聚焦在高優先決策'},
+    {axis:'時空',val:50,badge:'展現',color:'#E65100',desc:'支援即時庫存比對，不受辦公時間與地點限制'}
+  ],
+  s3:[
+    {axis:'人力',val:80,badge:'突破',color:'#1B5E36',desc:'工單開工前自動解析用料需求，減少生管人工比對的重複勞動'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置料況預測、安全庫存比對與缺料預警等生產管理職能'},
+    {axis:'思維',val:70,badge:'展現',color:'#4A148C',desc:'從被動救火轉為主動預測，建立開工前料況確認機制'},
+    {axis:'時空',val:60,badge:'展現',color:'#E65100',desc:'可在工單開工前提早偵測缺料風險，爭取補料時間'}
+  ],
+  s4:[
+    {axis:'人力',val:85,badge:'突破',color:'#1B5E36',desc:'OCR 自動辨識名片，業務人員不再需要手動輸入聯絡資訊'},
+    {axis:'能力',val:80,badge:'突破',color:'#1565C0',desc:'預置名片掃描、客戶分級與 CRM 串接能力，展覽後立即可用'},
+    {axis:'思維',val:65,badge:'展現',color:'#4A148C',desc:'自動依職稱、產業、規模評分分級，協助業務聚焦高潛力客戶'},
+    {axis:'時空',val:70,badge:'展現',color:'#E65100',desc:'展覽當天即可完成名單整理，第一時間觸達潛在客戶'}
+  ],
+  s5:[
+    {axis:'人力',val:90,badge:'突破',color:'#1B5E36',desc:'3 人 IT 團隊即可完成原本需要資安顧問的 ERP 系統評估'},
+    {axis:'能力',val:85,badge:'突破',color:'#1565C0',desc:'預置 NIST CSF 框架掃描與修復清單，不需要懂 SBOM 或 Linux'},
+    {axis:'思維',val:75,badge:'突破',color:'#4A148C',desc:'將資安風險轉化為可執行的優先處理清單，讓管理者看懂風險'},
+    {axis:'時空',val:55,badge:'展現',color:'#E65100',desc:'隨時可發起資安評估，不受資安專家在場與否的限制'}
+  ],
+  s6:[
+    {axis:'人力',val:80,badge:'突破',color:'#1B5E36',desc:'自動辨識廠商送貨單並產生進貨草稿，倉管不再逐筆核對'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置進貨辨識、驗收批退與自動過帳等倉儲管理職能'},
+    {axis:'思維',val:60,badge:'展現',color:'#4A148C',desc:'異常品項自動標紅提醒，讓驗收人員聚焦例外處理'},
+    {axis:'時空',val:65,badge:'展現',color:'#E65100',desc:'月底進貨高峰時，同時處理多批進貨不再造成碼頭塞車'}
+  ]
+};
+
+// Scene core summary per scene id
+var SCENE_CORE = {
+  s1:{label:'急單料況決策中樞：',text:'快速完成缺料、排程、換線、退料與交付承諾的整體判斷。'},
+  s2:{label:'缺料應變指揮中樞：',text:'即時盤點缺口、比對替代料源，從偵測到下單一氣呵成。'},
+  s3:{label:'開工料況安全守門：',text:'工單開工前自動確認料況，提前預警、準確驅動開工決策。'},
+  s4:{label:'名片商機轉化引擎：',text:'展覽名片秒變結構化名單，A 類潛客當天即可開始跟進。'},
+  s5:{label:'資安風險速診中樞：',text:'3 人 IT 團隊本週內完成 ERP 資安確認，老闆放心。'},
+  s6:{label:'進貨驗收自動化：',text:'廠商送貨單自動辨識轉單，進貨、驗收、過帳一氣呵成。'}
+};
+
+// Scene type tag per scene id
+var SCENE_TYPE = {
+  s1:'思維驅動型・高壓急單決策中樞',
+  s2:'流程自動化型・採購缺料應變',
+  s3:'預警監控型・生產料況管理',
+  s4:'資訊轉化型・商機開發加速',
+  s5:'合規防禦型・資安風險管理',
+  s6:'作業自動化型・倉儲進貨管理'
+};
+
+function resetExperience(){
+  state={page:1,role:'',roleColor:'',scene:null,history:[1]};
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('p1').classList.add('active');
+  document.querySelectorAll('.p1-role-card').forEach(function(c){
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed','false');
+  });
+  var btn=document.getElementById('p1Cta');
+  btn.disabled=true;
+  btn.textContent='查看推薦場景 \u00A0›';
+  // Clear pain bubble highlights
+  document.querySelectorAll('.p1-pain').forEach(function(p){
+    p.classList.remove('highlight');
+  });
+  document.getElementById('hudRole').classList.remove('show');
+  document.getElementById('hudBack').classList.remove('show');
+  updateHUD(1);
+  window.scrollTo(0,0);
+}
+// Init on load
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('p1Cta').disabled=true;
+});
+</script>
+<!-- ── Footer ── -->
+<footer style="
+  width:100%;
+  background:var(--ink);
+  color:rgba(255,255,255,.45);
+  text-align:center;
+  padding:16px 24px;
+  font-size:14px;
+  font-family:'DM Mono',monospace;
+  letter-spacing:.04em;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+">
+  Copyright&copy; 2026 股份有限公司 DATA SYSTEMS CO., LTD. All rights reserved.
+</footer>
+
+</body>
+</html>
