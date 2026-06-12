@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — UX Report v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111;--ink2:#444;--ink3:#888;
+  --bg:#F2F0EB;--surface:#FDFCFA;--surface2:#ECEAE4;
+  --brand:#1B2B5E;--brand2:#2D4DB8;
+  --green:#0D6B50;--amber:#854F0B;--blue:#185FA5;--purple:#4B42A8;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.06);
+  --r:6px;--r2:12px;--r3:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)}
+
+/* HEADER */
+.header{background:var(--brand);padding:40px 0 36px}
+.header-inner{max-width:900px;margin:0 auto;padding:0 32px}
+.h-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:12px}
+.h-title{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:700;color:#fff;line-height:1.15;margin-bottom:10px}
+.h-sub{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;max-width:560px}
+.h-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.h-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55)}
+
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:40px 32px}
+@media(max-width:640px){.main{padding:28px 18px}}
+
+/* SCORES */
+.score-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:32px}
+.score-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 14px;text-align:center}
+.sc-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.sc-num.g{color:var(--green)}.sc-num.b{color:var(--blue)}.sc-num.a{color:var(--amber)}
+.sc-label{font-size:11px;color:var(--ink3);line-height:1.4}
+
+/* SECTIONS */
+.section{margin-bottom:8px}
+.s-header{
+  display:flex;align-items:center;gap:12px;cursor:pointer;
+  padding:16px 20px;
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);
+  transition:border-color .15s;user-select:none;
+}
+.s-header:hover{border-color:var(--brand2)}
+.section.open .s-header{border-radius:var(--r3) var(--r3) 0 0;border-bottom-color:transparent}
+.s-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--ink3);flex-shrink:0}
+.s-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--ink);flex:1}
+.s-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);flex-shrink:0}
+.s-chevron{font-size:11px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.section.open .s-chevron{transform:rotate(90deg)}
+
+.s-body{
+  display:none;
+  background:var(--surface);border:1px solid var(--border2);border-top:none;
+  border-radius:0 0 var(--r3) var(--r3);
+  padding:20px 22px;
+}
+.section.open .s-body{display:block}
+
+/* CONTENT */
+.block{margin-bottom:20px}
+.block:last-child{margin-bottom:0}
+.block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.body-text{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:8px}
+.body-text b{color:var(--ink);font-weight:500}
+.body-text em{color:var(--blue);font-style:normal}
+
+/* DECISION */
+.dec{display:flex;gap:12px;background:var(--surface2);border-radius:0 var(--r2) var(--r2) 0;border-left:3px solid var(--brand);padding:10px 14px;margin:8px 0;font-size:13px;color:var(--ink2);line-height:1.65}
+.dec.g{border-left-color:var(--green)}
+.dec.a{border-left-color:var(--amber)}
+.dec.p{border-left-color:var(--purple)}
+.dec-lbl{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--ink3);white-space:nowrap;flex-shrink:0;margin-top:2px}
+.dec b{color:var(--ink);font-weight:500}
+
+/* PROCON */
+.procon{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+@media(max-width:520px){.procon{grid-template-columns:1fr}}
+.pc-col{background:var(--surface2);border-radius:var(--r);padding:12px 14px}
+.pc-lbl{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.06em;margin-bottom:8px}
+.pc-lbl.g{color:var(--green)}.pc-lbl.b{color:#B22}
+.pc-item{font-size:12px;color:var(--ink2);line-height:1.6;padding-left:12px;position:relative;margin-bottom:3px}
+.pc-item::before{content:'·';position:absolute;left:3px;color:var(--ink3)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.tbl th{background:var(--surface2);color:var(--ink);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);color:var(--ink2);vertical-align:top;line-height:1.6}
+.tbl tr:last-child td{border-bottom:none}
+.col-ok{color:var(--green);font-weight:500}.col-p{color:var(--amber);font-weight:500}.col-no{color:#B22;font-weight:500}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.tag{font-size:11px;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--ink2);border:0.5px solid var(--border2)}
+.tag.g{background:#E1F5EE;color:#0B5E43;border-color:rgba(13,107,80,.15)}
+.tag.b{background:#E6F1FB;color:#0C447C;border-color:rgba(24,95,165,.15)}
+.tag.a{background:#FDF3E3;color:#7A3B00;border-color:rgba(133,79,11,.15)}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border2);margin:16px 0}
+
+/* FLOW */
+.flow{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;overflow-x:auto;white-space:pre;line-height:1.8;color:var(--ink2);margin:8px 0}
+
+/* FOOTER */
+.footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);max-width:900px;margin-left:auto;margin-right:auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+.footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="h-eyebrow">AI AGENT — UX REPORT v6.0</div>
+    <h1 class="h-title">介面 UI/UX<br>優化說明書</h1>
+    <p class="h-sub">整合真實使用者回饋、主管 PDF 規劃目標（P20–24）、GA 數據洞察與本次所有實作改動，形成完整的設計決策脈絡。</p>
+    <div class="h-meta">
+      <span class="h-tag">202606-v6</span>
+      <span class="h-tag">HTML Prototype</span>
+      <span class="h-tag">自助體驗為主</span>
+      <span class="h-tag">P4 工程師填入</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- Scores -->
+  <div class="score-row">
+    <div class="score-card"><div class="sc-num b">7.5</div><div class="sc-label">/ 10<br>整體體驗流暢度<br>（排除 P4）</div></div>
+    <div class="score-card"><div class="sc-num g">12/12</div><div class="sc-label">主管目標<br>達成項目數</div></div>
+    <div class="score-card"><div class="sc-num g">5</div><div class="sc-label">使用者回饋<br>修正項目</div></div>
+    <div class="score-card"><div class="sc-num a">1</div><div class="sc-label">待補充<br>P4 演示內容</div></div>
+    <div class="score-card"><div class="sc-num b">1,796</div><div class="sc-label">體驗人次<br>GA 數據基準</div></div>
+    <div class="score-card"><div class="sc-num a">12%</div><div class="sc-label">體驗完成率<br>流失 72% 在選角色</div></div>
+  </div>
+
+  <!-- 01 背景與目標 -->
+  <div class="section open" id="s1">
+    <div class="s-header" onclick="toggle('s1')">
+      <div class="s-num">01</div>
+      <div class="s-title">背景與設計目標</div>
+      <div class="s-sub">Context</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">產品定義</div>
+        <p class="body-text">鼎新 AI 分身體驗中心是一個<b>自助式互動體驗平台</b>，讓企業使用者（製造業管理人員、職能主管）透過選擇自己的職能與工作場景，體驗 AI 分身如何在關鍵決策時刻替代人工協同——<em>減少跨部門溝通等待，直接進行決策討論與建議輸出</em>。</p>
+        <p class="body-text">使用者來自廣告或其他商品頁導流，進入後獨立完成體驗，不依賴業務陪同。每個元件都必須能自我解釋，不能依賴人工說明。</p>
+      </div>
+      <div class="block">
+        <div class="block-label">GA 數據基準（v2.0 會議確認）</div>
+        <p class="body-text">最大流失點在「進入體驗 → 選擇角色」，流失了 <b>72%</b>。使用者願意看（停留 6.5 分鐘），但流程認知門檻讓他們中途放棄。問題不在內容吸引力，在<em>引導與操作清晰度</em>。</p>
+        <div class="dec a">
+          <div class="dec-lbl">關鍵洞察</div>
+          <div>平均停留 6.5 分鐘，完成率只有 12%。使用者願意看，但流程讓他們在中途放棄。主管 PPT Slide 17 直接確認：「在『選擇角色』就遇到了最主要的流失。」</div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-label">主管規劃目標（PPT Slide 20–24）</div>
+        <div class="flow">歡迎大廳  →  選定職能  →  選擇場景  →  場景開場  →  圓桌會議  →  分身總結
+Step 1       Step 2       Step 3       Step 4       Step 5       結束
+             同時看見痛點  推薦+其他    三段式引導               雷達圖+CTA</div>
+        <p class="body-text">核心要求：移除重複角色選擇、全程 HUD 定向、三段式文案套版、強化「3天→3分鐘」說服點、CTA 改為「索取方案」+「訂閱最新消息」。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 流程架構 -->
+  <div class="section" id="s2">
+    <div class="s-header" onclick="toggle('s2')">
+      <div class="s-num">02</div>
+      <div class="s-title">流程架構改動</div>
+      <div class="s-sub">Navigation Flow</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">P1：歡迎大廳 + 選定職能（合併）</div>
+        <div class="procon">
+          <div class="pc-col">
+            <div class="pc-lbl g">✓ 改動</div>
+            <div class="pc-item">原本 P1 歡迎頁 + P2 選職能拆兩頁，合併為單一頁面</div>
+            <div class="pc-item">浮動痛點泡泡 ≥1200px 顯示；＜1200px 隱藏</div>
+            <div class="pc-item">選完職能後 CTA 才出現，按鈕文字帶入職能名稱</div>
+            <div class="pc-item">來源說明句加在標題前，3 秒建立「這跟我有關」的連結</div>
+          </div>
+          <div class="pc-col">
+            <div class="pc-lbl b">✗ 取捨</div>
+            <div class="pc-item">合併後歡迎頁情緒鋪陳空間變小</div>
+            <div class="pc-item">職能 grid 10 個選項等寬等高，缺乏視覺錨點（已知，後版優化）</div>
+          </div>
+        </div>
+        <div class="dec g"><div class="dec-lbl">對應目標</div><div>符合主管 Slide 20 動線簡化方向：移除重複選擇，讓使用者一次完成「我是誰」的定義。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">底部 Step Bar 移除</div>
+        <p class="body-text">HUD breadcrumb 已 sticky 全程可見，底部重複一條相同進度條造成視覺冗餘與使用者困惑。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>移除底部 step bar，保留 HUD breadcrumb。同步清除 <b>updateStepBar</b>、<b>#stepBar</b> 相關 CSS 與 JS。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">GoBack 導覽 Bug 修正</div>
+        <p class="body-text">原本 gotoPage() 每次都 push 頁碼進 history，重複進同一頁會堆疊，goBack() 需多按幾次才能退回。P3 → P2 的返回因此失效。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>gotoPage() 加 <b>if(n !== prev)</b> 才 push，同一頁不重複記錄。goBack() 改直接操作 DOM，不透過 gotoPage()，避免 history 再次增長。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 HUD -->
+  <div class="section" id="s3">
+    <div class="s-header" onclick="toggle('s3')">
+      <div class="s-num">03</div>
+      <div class="s-title">全程 HUD 設計</div>
+      <div class="s-sub">Navigation Bar</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">設計規格（對應 PPT Slide 18）</div>
+        <p class="body-text">全程固定頂部，讓使用者隨時知道「我是誰、我在哪裡」。PC（≥1200px）顯示完整 breadcrumb + 步驟名稱；行動版（＜1200px）改為點狀進度 + 當前步驟名稱。斷點統一 1200px，與 P1 浮動泡泡斷點一致。</p>
+        <div class="dec g"><div class="dec-lbl">包含元素</div><div>步驟進度（1–5）、職能標籤「你的職能：採購」（Step 2 選定後全程顯示）、返回按鈕、回到分身大廳。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">Logo 品牌化</div>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>HUD 左側從純文字改為品牌 SVG logo（白色濾鏡）+ 分隔線 + 「鼎新 Agent 體驗中心」文字，品牌識別感明確。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 P2 -->
+  <div class="section" id="s4">
+    <div class="s-header" onclick="toggle('s4')">
+      <div class="s-num">04</div>
+      <div class="s-title">P2：選擇場景頁</div>
+      <div class="s-sub">Scene Selection</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">情境卡片設計</div>
+        <p class="body-text">原本場景以純文字列表呈現，使用者看不出「為什麼選這個場景」。改為情境卡片，讓使用者<em>讀懂再點，而非點了才知道</em>。每張卡片包含：分類路徑標籤、場景名稱、痛點情境句（左側藍邊引言框）、分身彩色標籤（各職能色）、箭頭。</p>
+        <div class="dec g"><div class="dec-lbl">對應目標</div><div>符合 Slide 20 選擇場景步驟：推薦場景放上方，其他職能場景以 filter chip 切換，不讓使用者一次面對過多選擇。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">使用者回饋：身份確認橋接</div>
+        <p class="body-text">回饋：「跳到 P2 後不知道我是誰、我在哪、我要幹嘛。」根因是跳頁瞬間短期記憶被清空，sticky header 的職能 badge 太小太安靜，第一眼看不到。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>p2-body 頂部加身份確認橋接列：「<b>你是採購 → 選一個你想體驗的場景，點擊卡片進入</b>」，三個元素同字級（16px bold），視覺輕量但定向清楚。與 sticky header 疊加，不取代。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">使用者回饋：場景卡點擊提示</div>
+        <p class="body-text">回饋：「不知道卡片可以點進去。」卡片缺乏互動暗示，外觀像展示方塊。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>每張卡片底部加「點擊進入體驗 →」，預設 opacity:0，hover 時淡入（transition .15s）。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 P3 -->
+  <div class="section" id="s5">
+    <div class="s-header" onclick="toggle('s5')">
+      <div class="s-num">05</div>
+      <div class="s-title">P3：場景開場頁</div>
+      <div class="s-sub">Scene Intro</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">三段式文案架構（對應 PPT Slide 22 + Excel）</div>
+        <p class="body-text">依主管 PPT Slide 22，場景開場統一三段式結構，對應 Excel 三欄文案：</p>
+        <div class="dec"><div class="dec-lbl">段落 ①</div><div>情境痛點（紅色左邊線區塊）：衝擊感切入，使用者感受「這就是我的問題」。</div></div>
+        <div class="dec"><div class="dec-lbl">段落 ②</div><div>小秘書引導（glass 卡片，含分身 avatar 置中）：說明哪些分身參與、能做什麼。</div></div>
+        <div class="dec p"><div class="dec-lbl">整合調整</div><div>原本第三段「引導文案」與第二段重複（「不用從零訓練」說了兩遍）。整合進第二段 glass 卡片，刪除重複語彙，CTA 直接接在卡片底部，移除獨立的第三段容器。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">移除 eyebrow 標籤</div>
+        <p class="body-text">原本頁面頂部有「STEP 3 — 帶入數智分身」eyebrow，說廢話且重複 HUD 已顯示的步驟資訊。移除後改用場景名稱的 DM Mono 小標籤。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 P4 -->
+  <div class="section" id="s6">
+    <div class="s-header" onclick="toggle('s6')">
+      <div class="s-num">06</div>
+      <div class="s-title">P4：圓桌會議頁（工程師演示區）</div>
+      <div class="s-sub">Roundtable Demo</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">設計決策</div>
+        <p class="body-text">P4 演示內容由產品部工程師填入，UX 只保留框架。清空所有 chat UI、分身頭像圖、建議回覆，以及對應 CSS 和 JS（initRoundtable、addMsg、sendMsg、CHAT_SCRIPTS、SUGGESTIONS）。</p>
+        <div class="dec g"><div class="dec-lbl">保留元素</div><div><b>#p4-demo-area</b>：全高彈性主體區，工程師填入演示內容。<b>#p4-footer</b>：固定底部「查看分身能力總結」按鈕。完整 HTML 交接註解，說明可取用的 state 變數（state.role、state.scene、state.roleColor）。</div></div>
+        <div class="dec a"><div class="dec-lbl">已知缺口</div><div>P4 目前空白，P3 建立的情緒期待在此瞬間斷裂。這是內容缺失問題，非設計問題，待產品部填入後自動解決。本版評分排除 P4 不計入。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 P5 -->
+  <div class="section" id="s7">
+    <div class="s-header" onclick="toggle('s7')">
+      <div class="s-num">07</div>
+      <div class="s-title">P5：分身總結頁</div>
+      <div class="s-sub">Summary & CTA</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">Tab 改為垂直流程</div>
+        <p class="body-text">原本「現況突破」與「分身能力」兩個 tab，測試發現使用者不會主動點 tab，一半內容永遠被忽略。自助體驗的 discoverability 問題更嚴重。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>移除 tab，改為三段垂直流程：① 你做到了什麼（深色橫幅）→ ② 突破了什麼（雷達圖 + 說明列）→ ③ 這場體驗用到的分身陣容（卡片格）→ 轉換區 CTA。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">使用者回饋：「3 天 vs 3 分鐘」對比感（對應 PPT Slide 23）</div>
+        <p class="body-text">回饋：「3 天和 3 分鐘對比感不夠，顏色被背景吃掉。」根因是兩個數字用同一顏色，做成了並列而非對比。</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div><b>em-win（正面）</b>：#fff815 黃色 + 雙層發光 text-shadow。<b>em-old（負面）</b>：白色 + 底線（text-underline-offset: 3px），「被看見但不發光」。眼睛先被黃色吸引看到好結果，再注意到帶底線的舊世界，形成自然的 before/after 閱讀節奏。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">使用者回饋：分身卡片語意釐清</div>
+        <p class="body-text">回饋：「這些分身是體驗中的角色設定，還是我買了才能用的產品？」</p>
+        <div class="dec g"><div class="dec-lbl">最終處理</div><div>標題改為「這場體驗用到的分身陣容」，補說明：「以下分身在你剛才的體驗中協同運作，每一個都可以單獨部署到你的企業。」同時回答兩個問題。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 視覺設計 -->
+  <div class="section" id="s8">
+    <div class="s-header" onclick="toggle('s8')">
+      <div class="s-num">08</div>
+      <div class="s-title">視覺設計系統升級</div>
+      <div class="s-sub">Visual Design</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">設計風格方向</div>
+        <p class="body-text">主管預期：「DATA 3D 科技感 + 深紫空間感 + 乾淨 SaaS dashboard」。定調為 <em>SaaS 結構 + 空間感科技感</em>——清楚的資訊層級框架裡，用格線底暗示空間深度、品牌色發光暈染暗示科技能量，不採全深色（過於遊戲感）。</p>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">P2–P5 背景圖層</div>
+        <div class="dec g"><div class="dec-lbl">格線底</div><div>40px 格線紋理（rgba 3.5%）+ 頂部 radial-gradient 光暈，頁面有空間深度。</div></div>
+        <div class="dec g"><div class="dec-lbl">#scene-bg 方案</div><div>品牌背景圖改為獨立 position:fixed 的 div，不隨頁面切換重建，解決切換時背景閃爍問題。P1 顯示 bg-01，P2–P5 顯示 bg-02，透過 JS classList.toggle 切換。</div></div>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">Glass 卡片系統</div>
+        <p class="body-text">所有卡片統一：rgba(255,255,255,.82) + backdrop-filter:blur(12px) + 右上角 ::after 光暈偽元素，hover 時光暈加深、卡片上移 4px。從「平面白框」升級為「浮動玻璃板」。</p>
+      </div>
+      <div class="div"></div>
+      <div class="block">
+        <div class="block-label">字體規範</div>
+        <table class="tbl">
+          <tr><th>元素類型</th><th>字級</th><th>說明</th></tr>
+          <tr><td>主標題（h1）</td><td>clamp(30px, 4.4vw, 50px)</td><td>品牌漸層色</td></tr>
+          <tr><td>一般內文說明</td><td>14px</td><td>最小可接受值</td></tr>
+          <tr><td>p1-sub（副標題）</td><td>20px</td><td>主管指定</td></tr>
+          <tr><td>HUD 步驟文字</td><td>16px</td><td>導覽需要清晰</td></tr>
+          <tr><td>CTA 按鈕</td><td>16px</td><td>行動召喚需要清晰</td></tr>
+          <tr><td>裝飾性 DM Mono（eyebrow）</td><td>10–12px</td><td>純裝飾，例外保留</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 目標對照 -->
+  <div class="section" id="s9">
+    <div class="s-header" onclick="toggle('s9')">
+      <div class="s-num">09</div>
+      <div class="s-title">與主管規劃目標對照</div>
+      <div class="s-sub">Goal Alignment</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="block">
+        <div class="block-label">產品即聚客平台 PDF（P20–24）逐項對照</div>
+        <table class="tbl">
+          <tr><th>主管規劃項目</th><th>狀態</th><th>說明</th></tr>
+          <tr><td>歡迎大廳確立角色，看見痛點</td><td class="col-ok">✓ 達成</td><td>P1 合併職能選擇，浮動痛點泡泡 + 選職能後 highlight</td></tr>
+          <tr><td>選定職能 + 選擇場景分開兩步</td><td class="col-ok">✓ 達成</td><td>P1 選職能、P2 選場景，各有清楚單一任務</td></tr>
+          <tr><td>場景分類不宜太多層</td><td class="col-ok">✓ 達成</td><td>推薦 2 張大卡 + 其他職能 filter chip，不超過兩層</td></tr>
+          <tr><td>場景開場小秘書三段式引導</td><td class="col-ok">✓ 達成</td><td>P3 對應 Excel 三段文案，整合第二三段去除重複</td></tr>
+          <tr><td>全程 HUD：我是誰 / 我在哪 / 步驟進度</td><td class="col-ok">✓ 達成</td><td>PC breadcrumb + mobile dots，全程顯示職能標籤</td></tr>
+          <tr><td>圓桌會議（P4）由產品端填入</td><td class="col-p">⚠ 框架完成</td><td>工程師交接區 + 完整 HTML 註解，待產品填入演示</td></tr>
+          <tr><td>分身總結簡化，聚焦現況突破 + 分身能力</td><td class="col-ok">✓ 達成</td><td>移除 tab，三段垂直流程 + 雷達圖 + 分身卡</td></tr>
+          <tr><td>「3天 vs 3分鐘」為核心說服點，強化顯示</td><td class="col-ok">✓ 達成</td><td>黃色發光 em-win vs 白底線 em-old，before/after 清楚</td></tr>
+          <tr><td>CTA 改為「索取方案」+「訂閱最新消息」</td><td class="col-ok">✓ 達成</td><td>P5 主 CTA 索取方案 + 次要訂閱</td></tr>
+          <tr><td>所有引導文字用第二人稱「你」</td><td class="col-ok">✓ 達成</td><td>P3 文案、P5 headline、橋接列全程第二人稱</td></tr>
+          <tr><td>訂閱：隨時接收最新數智分身資訊</td><td class="col-ok">✓ 達成</td><td>P5 次要按鈕保留</td></tr>
+          <tr><td>企業不須從零訓練，開箱即用</td><td class="col-ok">✓ 達成</td><td>P3 整合後一句話，P5 轉換區對應文案</td></tr>
+        </table>
+        <div class="dec g" style="margin-top:12px"><div class="dec-lbl">結論</div><div>主管 PDF 規劃的 12 個核心目標全數達成或框架到位。目前最大缺口是 P4 演示內容（產品部負責），其次是 P1 職能 grid 視覺錨點（後版優化）。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 待優化 -->
+  <div class="section" id="s10">
+    <div class="s-header" onclick="toggle('s10')">
+      <div class="s-num">10</div>
+      <div class="s-title">已知待優化項目</div>
+      <div class="s-sub">Backlog</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <table class="tbl">
+        <tr><th>優先級</th><th>項目</th><th>說明</th><th>狀態</th></tr>
+        <tr>
+          <td>🔴 最高</td>
+          <td>P4 演示內容填入</td>
+          <td>產品部工程師負責，UX 框架與交接文件已完成</td>
+          <td class="col-p">待產品部</td>
+        </tr>
+        <tr>
+          <td>🟡 中</td>
+          <td>P1 職能 grid 視覺錨點</td>
+          <td>10 個職能等寬等高缺乏層級，建議依決策層/執行層分組加小標題</td>
+          <td class="col-no">未做</td>
+        </tr>
+        <tr>
+          <td>🟡 中</td>
+          <td>P5 CTA 文案優化</td>
+          <td>「索取方案」語意模糊，B2B 使用者不知道點了之後會發生什麼（待主管確認文案方向）</td>
+          <td class="col-no">已知待定</td>
+        </tr>
+        <tr>
+          <td>🟢 低</td>
+          <td>品牌氣氛一致性</td>
+          <td>現有設計語言是現代 SaaS 通用語言，非鼎新專屬，如有品牌規範可對照調整</td>
+          <td class="col-no">未做</td>
+        </tr>
+        <tr>
+          <td>🟢 低</td>
+          <td>廣告導流品牌過渡</td>
+          <td>P1 已加入來源說明句，如能透過 URL 參數帶入來源產品名稱，個人化感更強</td>
+          <td class="col-p">部分完成</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-left"><a href="202606-ux-analysis.html" style="color:inherit;text-decoration:none">← 返回版本總覽</a></div>
+  <div class="footer-right">2026 — AI Agent UX Report v6</div>
+</footer>
+
+<script>
+function toggle(id){
+  document.getElementById(id).classList.toggle('open');
+}
+</script>
+</body>
+</html>
