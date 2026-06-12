@@ -81,7 +81,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
 <header class="header">
   <div class="header-inner">
     <div class="h-eyebrow">AI AGENT — UX REPORT HUB</div>
-    <h1 class="h-title">版本切換入口<br>v1.0 → v5.0</h1>
+    <h1 class="h-title">版本切換入口<br>v1.0 → v6.0</h1>
     <p class="h-sub">從會議前的推測分析，到會議後確認，到改版設計方向，到可互動原型。點擊各版本直接開啟對應 HTML。</p>
   </div>
 </header>
@@ -194,27 +194,31 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
       </div>
     </div>
 
-    <!-- V4 placeholder -->
+    <!-- V4 -->
     <div class="tl-item">
       <div class="tl-dot-wrap">
         <div class="tl-dot" style="background:#BA7517">v4</div>
       </div>
-      <div class="tl-card" style="border-style:dashed;opacity:.7">
+      <div class="tl-card">
         <div class="tl-head">
           <div>
-            <div class="tl-title">v4.0 — 待建立</div>
-            <div class="tl-date">下一次討論後補充</div>
+            <div class="tl-title">視覺升級 + 響應式優化</div>
+            <div class="tl-date">2026/06 — Glass 卡片 + 格線底背景</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
             <span class="tl-ver" style="background:#FAEEDA;color:#633806">v4.0</span>
-            <span class="tl-status" style="background:#FAEEDA;color:#633806">待建立</span>
+            <span class="tl-status status-done">✓ 完成</span>
           </div>
         </div>
-        <div class="tl-desc">此版本號在討論過程中未正式建立，從 v3.0 直接跳到 v5.0。若後續有新的設計迭代或主管回饋需要記錄，可在此建立 v4.0。</div>
+        <div class="tl-desc">P2–P5 全面視覺升級：格線底背景 + radial-gradient 光暈、glass 卡片（backdrop-filter）、品牌漸層 CTA、分身標籤各自職能色系。字體規範統一（最小 14px）、響應式斷點統一在 1200px、底部 step bar 移除。</div>
         <div class="tl-tags">
-          <span class="tl-tag" style="border-style:dashed">待定義</span>
+          <span class="tl-tag">Glass 卡片</span>
+          <span class="tl-tag">格線底背景</span>
+          <span class="tl-tag">字體規範 14px</span>
+          <span class="tl-tag">響應式 1200px</span>
+          <span class="tl-tag">Step Bar 移除</span>
         </div>
-        <div class="tl-note">建立後補充檔案連結</div>
+        <div class="tl-note">含於 202606-v5-prototype.html 迭代過程中</div>
       </div>
     </div>
 
@@ -223,7 +227,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
       <div class="tl-dot-wrap">
         <div class="tl-dot" style="background:#4B42A8">v5</div>
       </div>
-      <div class="tl-card" style="border-color:rgba(75,66,168,.3)">
+      <div class="tl-card">
         <div class="tl-head">
           <div>
             <div class="tl-title">新動線可互動原型</div>
@@ -231,7 +235,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
             <span class="tl-ver" style="background:#EEEDFE;color:#26215C">v5.0</span>
-            <span class="tl-status status-cur">最新版本</span>
+            <span class="tl-status status-done">✓ 完成</span>
           </div>
         </div>
         <div class="tl-desc">完全依照主管 PPT Slide P20–24 規劃生成的可互動原型。包含完整 5 步流程（歡迎大廳→選定職能→選擇場景→場景開場→分身總結）、全程 HUD、職能卡片含痛點文案、三段式場景開場、圓桌互動展示、結束頁雷達圖與雙 CTA。支援 6 種職能、7 個場景。</div>
@@ -249,6 +253,41 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
           <a class="tl-btn btn-dim" href="202606-design-log_20260611-01.html" target="_blank">📋 修改紀錄 01</a>
         </div>
         <div class="tl-note">檔案：202606-v5-prototype.html</div>
+      </div>
+    </div>
+
+    <!-- V6 -->
+    <div class="tl-item">
+      <div class="tl-dot-wrap">
+        <div class="tl-dot" style="background:#125BBC">v6</div>
+      </div>
+      <div class="tl-card" style="border-color:rgba(18,91,188,.35)">
+        <div class="tl-head">
+          <div>
+            <div class="tl-title">使用者回饋修正 + UI/UX 優化說明書</div>
+            <div class="tl-date">2026/06 — 真實使用者測試 + 主管目標對照</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <span class="tl-ver" style="background:#E6F1FB;color:#0C447C">v6.0</span>
+            <span class="tl-status status-cur">最新版本</span>
+          </div>
+        </div>
+        <div class="tl-desc">整合真實使用者體驗測試回饋（P2 定向問題、P5 對比感、分身語意模糊）與完整設計決策紀錄。對照主管 PDF 規劃目標（P20–24）逐項確認達成狀況，產出完整 UX 優化說明文件。包含視覺科技感升級（Glass + 格線底 + 品牌背景圖）、GoBack Bug 修正、P3 文案整合、P5 before/after 視覺語言、HUD Logo 品牌化。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">使用者回饋</span>
+          <span class="tl-tag">P2 身份定向</span>
+          <span class="tl-tag">P5 對比語言</span>
+          <span class="tl-tag">GoBack 修正</span>
+          <span class="tl-tag">Glass 視覺升級</span>
+          <span class="tl-tag">品牌背景圖</span>
+          <span class="tl-tag">主管目標對照</span>
+          <span class="tl-tag">HUD Logo</span>
+        </div>
+        <div class="tl-btns">
+          <a class="tl-btn btn-open" href="digiwin-v6-prototype.html" target="_blank" style="background:#125BBC">開啟 v6.0 原型 ↗</a>
+          <a class="tl-btn btn-dim" href="202606-v6-ux-report.html" target="_blank">📋 UI/UX 優化說明書</a>
+        </div>
+        <div class="tl-note">檔案：digiwin-v6-prototype.html｜說明書：202606-v6-ux-report.html</div>
       </div>
     </div>
 
@@ -282,6 +321,16 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
         <div class="file-icon">📄</div>
         <div class="file-name">202606-design-log_20260611-01.html</div>
         <div class="file-size">修改紀錄</div>
+      </div>
+      <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(18,91,188,.2)">
+        <div class="file-icon">🆕</div>
+        <div class="file-name">digiwin-v6-prototype.html</div>
+        <div style="font-size:11px;color:#125BBC;margin-left:auto;font-family:'DM Mono',monospace">v6 原型</div>
+      </div>
+      <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(18,91,188,.2)">
+        <div class="file-icon">🆕</div>
+        <div class="file-name">202606-v6-ux-report.html</div>
+        <div style="font-size:11px;color:#125BBC;margin-left:auto;font-family:'DM Mono',monospace">v6 說明書</div>
       </div>
     </div>
   </div>
