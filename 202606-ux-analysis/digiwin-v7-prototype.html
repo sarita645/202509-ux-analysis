@@ -1205,6 +1205,98 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   transition:opacity .15s;
 }
 .p5-reset:hover,.p2-switch-link:hover{opacity:.7;text-decoration:underline}
+
+/* ════════════════════════════════════════
+   Layer 1 — 頁面轉場動畫
+   ════════════════════════════════════════ */
+@keyframes slideInRight{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInLeft {from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp      {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn     {from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+
+.page-anim-right{animation:slideInRight .28s cubic-bezier(.22,1,.36,1) both}
+.page-anim-left {animation:slideInLeft  .28s cubic-bezier(.22,1,.36,1) both}
+.page-anim-up   {animation:fadeUp       .24s cubic-bezier(.22,1,.36,1) both}
+.page-anim-scale{animation:scaleIn      .22s cubic-bezier(.22,1,.36,1) both}
+
+/* ════════════════════════════════════════
+   Layer 2 — Stagger 進場（卡片、維度列）
+   ════════════════════════════════════════ */
+@keyframes staggerIn{
+  from{opacity:0;transform:translateY(20px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.stagger-item{
+  opacity:0;
+  animation:staggerIn .3s cubic-bezier(.22,1,.36,1) both;
+}
+.stagger-item:nth-child(1){animation-delay:.04s}
+.stagger-item:nth-child(2){animation-delay:.10s}
+.stagger-item:nth-child(3){animation-delay:.16s}
+.stagger-item:nth-child(4){animation-delay:.22s}
+.stagger-item:nth-child(5){animation-delay:.28s}
+.stagger-item:nth-child(n+6){animation-delay:.34s}
+
+/* ════════════════════════════════════════
+   Layer 3 — 按鈕 press 回饋
+   ════════════════════════════════════════ */
+.p1-cta:active,
+.p2-btn-go:active,
+.p3-start:active,
+.p5-btn-primary:active{
+  transform:scale(.97) translateY(1px)!important;
+  box-shadow:0 2px 8px rgba(var(--brand-rgb),.18)!important;
+}
+.p2-btn-sub:active,
+.p5-btn-secondary:active{
+  transform:scale(.97)!important;
+}
+
+/* ════════════════════════════════════════
+   Layer 4 — P1 職能 DD 選取彈跳
+   ════════════════════════════════════════ */
+@keyframes rolePop{
+  0%  {transform:scale(1)}
+  40% {transform:scale(1.06)}
+  70% {transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+.role-dd-item.just-selected{animation:rolePop .3s cubic-bezier(.22,1,.36,1)}
+
+/* ════════════════════════════════════════
+   Layer 5 — CTA 呼吸脈動（引導注意）
+   ════════════════════════════════════════ */
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 6px 20px rgba(var(--brand-rgb),.28)}
+  50%    {box-shadow:0 6px 28px rgba(var(--brand-rgb),.48),0 0 0 5px rgba(var(--brand-rgb),.08)}
+}
+.p1-cta:not(:disabled){animation:ctaPulse 2.6s ease-in-out infinite}
+.p1-cta:not(:disabled):hover,
+.p1-cta:not(:disabled):active{animation:none}
+
+/* ════════════════════════════════════════
+   Layer 6 — P5 雷達圖線條進場
+   ════════════════════════════════════════ */
+@keyframes radarDraw{
+  from{stroke-dashoffset:400}
+  to  {stroke-dashoffset:0}
+}
+#p5RadarShape{
+  stroke-dasharray:400;
+  stroke-dashoffset:400;
+  animation:radarDraw .7s cubic-bezier(.22,1,.36,1) .2s both;
+}
+
+/* ════════════════════════════════════════
+   prefers-reduced-motion：全部覆寫
+   ════════════════════════════════════════ */
+@media(prefers-reduced-motion:reduce){
+  .page-anim-right,.page-anim-left,.page-anim-up,.page-anim-scale,
+  .stagger-item,.role-dd-item.just-selected,#p5RadarShape{
+    animation:none!important;opacity:1!important;transform:none!important;
+  }
+  .p1-cta:not(:disabled){animation:none!important}
+}
 </style>
 </head>
 <body>
@@ -1519,14 +1611,34 @@ var ABILITIES = {
 
 function gotoPage(n){
   var prev=state.page;
-  document.getElementById('p'+prev).classList.remove('active');
-  document.getElementById('p'+n).classList.add('active');
-  // 只在跳到不同頁時才記錄 history，避免重複堆疊
-  if(n !== prev) state.history.push(n);
+  var prevEl=document.getElementById('p'+prev);
+  var nextEl=document.getElementById('p'+n);
+  var animClasses=['page-anim-right','page-anim-left','page-anim-up','page-anim-scale'];
+
+  // 清掉舊的 anim class
+  animClasses.forEach(function(cls){
+    if(prevEl)prevEl.classList.remove(cls);
+    if(nextEl)nextEl.classList.remove(cls);
+  });
+
+  if(prevEl)prevEl.classList.remove('active');
+  if(nextEl){
+    nextEl.classList.add('active');
+    // reflow 讓動畫重新觸發
+    void nextEl.offsetWidth;
+    if(n===5){
+      nextEl.classList.add('page-anim-scale');
+    } else if(n>prev){
+      nextEl.classList.add('page-anim-right');
+    } else {
+      nextEl.classList.add('page-anim-left');
+    }
+  }
+
+  if(n!==prev)state.history.push(n);
   state.page=n;
   updateHUD(n);
-  // 背景圖：P2-P5 顯示，P1 隱藏
-  document.getElementById('scene-bg').classList.toggle('show', n >= 2);
+  document.getElementById('scene-bg').classList.toggle('show',n>=2);
   window.scrollTo(0,0);
   if(n===2)buildScenePage();
   if(n===4)initRoundtable();
@@ -1737,7 +1849,7 @@ function buildScenePage(){
 
 function buildSceneCard(s, accentColor){
   var el=document.createElement('div');
-  el.className='p2-scard';
+  el.className='p2-scard stagger-item';
   var cats=(s.cat||'').split('›').map(function(t){return t.trim();}).filter(Boolean);
   var tagsHtml=cats.map(function(c){return '<span class="p2-scard-tag">'+c+'</span>';}).join('');
   el.innerHTML=
@@ -2150,15 +2262,15 @@ function buildSummary(){
 
   var dimsCol=document.getElementById('p5DimsCol');
   dimsCol.innerHTML='';
-  dims.forEach(function(d){
+  dims.forEach(function(d,idx){
     var badgeBg=d.color+'22';
     var row=document.createElement('div');
-    row.className='p5-dim-row';
+    row.className='p5-dim-row stagger-item';
     row.innerHTML=
       '<div class="p5-dim-bar" style="background:'+d.color+'"></div>'+
       '<div class="p5-dim-left">'+
         '<div class="p5-dim-axis" style="color:'+d.color+'">'+d.axis+'</div>'+
-        '<div class="p5-dim-num" style="color:'+d.color+'">'+d.val+'</div>'+
+        '<div class="p5-dim-num" style="color:'+d.color+'" data-target="'+d.val+'">0</div>'+
         '<div class="p5-dim-badge" style="color:'+d.color+';background:'+badgeBg+'">'+d.badge+'</div>'+
       '</div>'+
       '<div class="p5-dim-right">'+
@@ -2166,6 +2278,22 @@ function buildSummary(){
       '</div>';
     dimsCol.appendChild(row);
   });
+
+  // 數字從 0 計數到目標值
+  setTimeout(function(){
+    dimsCol.querySelectorAll('.p5-dim-num[data-target]').forEach(function(el,i){
+      var target=parseInt(el.dataset.target)||0;
+      var start=performance.now();
+      var dur=600+i*80;
+      function tick(now){
+        var t=Math.min((now-start)/dur,1);
+        var ease=1-Math.pow(1-t,3);
+        el.textContent=Math.round(ease*target);
+        if(t<1)requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  },300);
 
   // ③ 可以帶走什麼 — 分身能力卡
   var abs=ABILITIES[s.id]||[];
