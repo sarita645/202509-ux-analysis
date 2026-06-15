@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — v7 第四次討論記錄</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111;--ink2:#444;--ink3:#888;
+  --bg:#F2F0EB;--surface:#FDFCFA;--surface2:#ECEAE4;
+  --brand:#1B2B5E;--brand2:#2D4DB8;
+  --green:#0D6B50;--amber:#854F0B;--blue:#185FA5;--purple:#4B42A8;
+  --red:#9B1C1C;--teal:#0E6B6B;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.06);
+  --r:6px;--r2:12px;--r3:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)}
+
+.header{background:var(--brand);padding:40px 0 36px}
+.header-inner{max-width:860px;margin:0 auto;padding:0 32px}
+.h-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:12px}
+.h-title{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;color:#fff;line-height:1.15;margin-bottom:10px}
+.h-sub{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;max-width:560px}
+.h-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.h-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55)}
+
+.main{max-width:860px;margin:0 auto;padding:40px 32px 80px}
+@media(max-width:640px){.main{padding:28px 18px 60px}}
+
+/* SECTION */
+.section{margin-bottom:8px}
+.s-header{display:flex;align-items:center;gap:12px;cursor:pointer;padding:16px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);transition:border-color .15s;user-select:none}
+.s-header:hover{border-color:var(--brand2)}
+.section.open .s-header{border-radius:var(--r3) var(--r3) 0 0;border-bottom-color:transparent}
+.s-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--ink3);flex-shrink:0}
+.s-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--ink);flex:1}
+.s-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);flex-shrink:0}
+.s-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0}
+.badge-amber{background:#FDF3E3;color:var(--amber)}
+.badge-green{background:#E1F5EE;color:var(--green)}
+.badge-blue{background:#E6F1FB;color:var(--blue)}
+.badge-red{background:#FEF2F2;color:var(--red)}
+.badge-teal{background:#E0F5F5;color:var(--teal)}
+.badge-purple{background:#F3EFFE;color:var(--purple)}
+.s-chevron{font-size:11px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.section.open .s-chevron{transform:rotate(90deg)}
+.s-body{display:none;background:var(--surface);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--r3) var(--r3);padding:22px}
+.section.open .s-body{display:block}
+
+/* CONTENT */
+.block{margin-bottom:20px}
+.block:last-child{margin-bottom:0}
+.block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.body-text{font-size:13px;color:var(--ink2);line-height:1.75;margin-bottom:8px}
+.body-text b{color:var(--ink);font-weight:500}
+.body-text em{color:var(--blue);font-style:normal}
+
+/* QUOTE */
+.quote-block{margin:10px 0;border-radius:0 var(--r2) var(--r2) 0}
+.quote-block.me{border-left:3px solid var(--blue);background:#EEF4FC;padding:12px 16px}
+.quote-block.manager{border-left:3px solid var(--amber);background:#FEF9F0;padding:12px 16px}
+.quote-block.ai{border-left:3px solid var(--ink3);background:var(--surface2);padding:12px 16px}
+.quote-who{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;margin-bottom:6px}
+.quote-who.me{color:var(--blue)}
+.quote-who.manager{color:var(--amber)}
+.quote-who.ai{color:var(--ink3)}
+.quote-text{font-size:13px;color:var(--ink2);line-height:1.7}
+.quote-text b{color:var(--ink);font-weight:500}
+
+/* DEC */
+.dec{display:flex;gap:12px;background:var(--surface2);border-radius:0 var(--r2) var(--r2) 0;border-left:3px solid var(--brand);padding:10px 14px;margin:8px 0;font-size:13px;color:var(--ink2);line-height:1.65}
+.dec.g{border-left-color:var(--green)}
+.dec.a{border-left-color:var(--amber)}
+.dec.p{border-left-color:var(--purple)}
+.dec.r{border-left-color:var(--red)}
+.dec-lbl{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--ink3);white-space:nowrap;flex-shrink:0;margin-top:2px}
+
+/* QA THREAD */
+.qa-thread{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+
+/* DECISION TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.tbl th{background:var(--surface2);color:var(--ink);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--ink2);vertical-align:top;line-height:1.65}
+.tbl tr:last-child td{border-bottom:none}
+.col-keep{color:var(--green);font-weight:500}
+.col-change{color:var(--amber);font-weight:500}
+.col-new{color:var(--blue);font-weight:500}
+.col-hold{color:var(--ink3)}
+
+/* NEXT LIST */
+.next-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.next-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--surface2);border-radius:var(--r);font-size:13px;color:var(--ink2);line-height:1.6}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.nd-green{background:var(--green)}.nd-amber{background:var(--amber)}.nd-blue{background:var(--blue)}.nd-red{background:var(--red)}
+
+.div{height:1px;background:var(--border2);margin:16px 0}
+
+.footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);max-width:860px;margin-left:auto;margin-right:auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+.footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="h-eyebrow">AI AGENT — v7 第四次討論記錄</div>
+    <h1 class="h-title">設計檢討 × 主管會議<br>v7 最終決策</h1>
+    <p class="h-sub">以討論 03 的主管修改稿為起點，先進行設計方內部檢討，再與主管開會對齊，產出 v7 各頁面的最終執行方向。</p>
+    <div class="h-meta">
+      <span class="h-tag">2026/06</span>
+      <span class="h-tag">第四次討論</span>
+      <span class="h-tag">設計檢討 + 主管會議</span>
+      <span class="h-tag">最終決策</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 01 設計方內部檢討 -->
+  <div class="section open" id="s1">
+    <div class="s-header" onclick="toggle('s1')">
+      <div class="s-num">01</div>
+      <div class="s-title">設計方內部檢討（對照討論 03）</div>
+      <div class="s-sub">Design Review</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+
+      <div class="block">
+        <div class="block-label">P1 — Dropdown 會不會不直覺</div>
+        <div class="qa-thread">
+          <div class="quote-block me">
+            <div class="quote-who me">設計方</div>
+            <div class="quote-text">主管改成 Dropdown，讓使用者滾動選擇——這樣不會不直覺嗎？</div>
+          </div>
+          <div class="quote-block ai">
+            <div class="quote-who ai">設計檢討</div>
+            <div class="quote-text">Dropdown 適合「已知選項、已有明確選擇」的情境，例如選國家、選日期。但這裡使用者可能連自己算哪個職能都不確定，需要看到選項才能辨認。使用者掃描 10 個文字比下拉捲動更快。<br><br><b>問題不是選項太多，是視覺呈現方式。</b>主管改 Dropdown 的出發點是「畫面太亂」，但解法方向可以更好。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P1+P2 — 選兩次職能的邏輯矛盾</div>
+        <div class="qa-thread">
+          <div class="quote-block me">
+            <div class="quote-who me">設計方</div>
+            <div class="quote-text">P2 如果還能切換職能，那為什麼還需要 P1 先選一次？使用者要選兩次，邏輯說不通。</div>
+          </div>
+          <div class="quote-block ai">
+            <div class="quote-who ai">設計檢討</div>
+            <div class="quote-text">這是這個流程最大的邏輯矛盾。有兩種出路：<br><br><b>方向一</b>：P1 是入口儀式，P2 的切換是「如果想換」的後備，不是主要路徑。<br><b>方向二</b>：直接從 P2 開始，職能選擇在 P2 一次完成。<br><br>這個決定需要主管確認，因為 P1 的職能選擇是她設計的，她可能有用意。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P3 — 設計方在主管更新前不可能知道</div>
+        <div class="qa-thread">
+          <div class="quote-block me">
+            <div class="quote-who me">設計方</div>
+            <div class="quote-text">主管改 P3 成對話氣泡，但在她說出修改之前，我怎麼會知道需要這樣設計？</div>
+          </div>
+          <div class="quote-block ai">
+            <div class="quote-who ai">設計檢討</div>
+            <div class="quote-text">不會知道，這不是設計判斷失誤。對話氣泡的設計需要知道「P3 是廣告引流進入點」這個資訊，但那個資訊是主管後來才說的。在資訊不完整的情況下做了合理的設計，這是正確的。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P5 — Tab vs 垂直滾動哪個體驗比較好</div>
+        <div class="qa-thread">
+          <div class="quote-block me">
+            <div class="quote-who me">設計方</div>
+            <div class="quote-text">我本來移除 Tab 是因為想減少切換，但主管要恢復。哪個比較好？</div>
+          </div>
+          <div class="quote-block ai">
+            <div class="quote-who ai">設計檢討</div>
+            <div class="quote-text"><b>垂直滾動</b>對自助體驗更好——內容全部可見，使用者不需要主動發現 Tab。<br><b>Tab</b> 對現場 Demo 更好——頁面緊湊，業務可以選擇展示哪一半。<br><br>關鍵問題：這個頁面的主要使用情境是自助還是業務 Demo？如果是自助，垂直滾動更合適；如果也要被業務現場使用，Tab 有它的價值。這是情境取捨，不是哪個設計本身更好。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">去掉容器感——好壞比較與這個專案的適用性</div>
+        <div class="qa-thread">
+          <div class="quote-block me">
+            <div class="quote-who me">設計方</div>
+            <div class="quote-text">去掉容器感的好壞是什麼？為什麼在這個專案你也推薦——這跟你本來建議的做法不一樣，會想去除容器是基於哪種想法？</div>
+          </div>
+          <div class="quote-block ai">
+            <div class="quote-who ai">設計檢討</div>
+            <div class="quote-text"><b>之前建議 glass 卡片和多層容器是基於錯誤的前提。</b>當時針對「要有科技感、空間感」的視覺方向加了 glass 效果，但這讓每個元件都有了邊界，視覺上就是一層又一層，正是主管說的問題。<br><br><b>去掉容器感的好處</b>：視覺呼吸空間增加、視線更自然流動、頁面感覺更現代。<br><b>壞處</b>：去掉邊框後，元素關係需要靠排版和留白來表達，對設計精確度要求更高。<br><br><b>這個專案推薦去掉容器的原因</b>：產品核心體驗是「對話、協同、流暢」，過多容器讓它看起來像表單系統，而不是體驗空間。</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 02 與主管會議 -->
+  <div class="section open" id="s2">
+    <div class="s-header" onclick="toggle('s2')">
+      <div class="s-num">02</div>
+      <div class="s-title">與主管會議記錄</div>
+      <div class="s-badge badge-amber">各頁最新指示</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+
+      <div class="block">
+        <div class="block-label">P1 體驗大廳</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管</div>
+          <div class="quote-text">選單不要展開，左邊對話保留三個，而且可以透過職能選擇後，呈現對應痛點。</div>
+        </div>
+        <div class="dec g">
+          <div class="dec-lbl">解讀</div>
+          <div>職能選擇不用 Dropdown 也不用 10 個 grid，改為精簡形式（文字 tab 並排或小選單）。左側痛點泡泡固定三個，內容跟著選取職能動態切換。</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P2 選擇場景</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管</div>
+          <div class="quote-text">保留可在 P2 切換職能的功能，主要目的是能透過切換職能，看不同場景的轉換。</div>
+        </div>
+        <div class="dec g">
+          <div class="dec-lbl">解讀</div>
+          <div>P2 的職能切換定位明確：是讓使用者探索不同職能的場景，不是修正 P1 選錯的後備。切換入口要夠明顯，但不需要是視覺主角。</div>
+        </div>
+        <div class="dec a">
+          <div class="dec-lbl">待確認</div>
+          <div>P1 選職能 + P2 也能切換職能的邏輯重複問題，尚未在會議中得到明確解答。建議後續確認：P1 的職能選擇是否可以移除，直接從 P2 開始？</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P3 體驗開場</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管</div>
+          <div class="quote-text">進入體驗的部分還是採用一問一答的對話框方式呈現（右邊人類，左邊 AI）。所以會有問、答、描述、人物（下一個場景需要帶入的角色呈現，這個呈現看有沒有更好的動態方案）。</div>
+        </div>
+        <div class="dec g">
+          <div class="dec-lbl">確認內容</div>
+          <div>三組對話氣泡：右邊人類（使用者）、左邊 AI 分身。下方加入即將參與的角色人物呈現。</div>
+        </div>
+        <div class="dec a">
+          <div class="dec-lbl">待確認：動態方案</div>
+          <div>主管希望角色有「閃爍、呈現」的動態，讓使用者知道這邊在幹嘛。但 P3 的角色動態設計，建議等 P4 的產品方向確認後再做，避免方向做錯。建議先問主管：「P3 的角色動態是先做佔位版本，還是等 P4 確認後再執行？」</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P4 圓桌會議</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管</div>
+          <div class="quote-text">不動。</div>
+        </div>
+        <div class="dec">
+          <div class="dec-lbl">狀態</div>
+          <div>維持工程師框架，等產品部填入演示內容。</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">P5 場景總結</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管</div>
+          <div class="quote-text">現況突破和分身能力，還是製作成切換框，但需要明顯。主要是資料量過多，但又希望他們一點進來就能看到有什麼東西。</div>
+        </div>
+        <div class="dec g">
+          <div class="dec-lbl">確認</div>
+          <div>恢復 Tab，但 Tab 本身要夠大夠明顯，不能是小字連結。使用者進來第一眼就要知道「有兩個面向可以看」。</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">全站設計原則（會議整理）</div>
+        <div class="quote-block manager">
+          <div class="quote-who manager">主管 — 核心原則</div>
+          <div class="quote-text">
+            <b>先求有再優化</b>：先把需要的內容架構放進去，後續再微調 UI/UX 視覺。<br><br>
+            <b>精簡文字量</b>：畫面上絕對不要放太多文字，改用重點字詞，保留想像空間。<br><br>
+            <b>收納資訊</b>：善用 Tab 或彈窗做資訊層級切換，不要在單一畫面展開所有資訊。<br><br>
+            <b>一個畫面不滾動</b>：每個頁面的內容要在一個畫面內呈現完，不需要使用者滾動。<br><br>
+            <b>CTA Fixed at bottom</b>：CTA 固定於畫面下方，確保不同螢幕下都能被看見，主管非常在意 CTA 被遮擋的問題。<br><br>
+            <b>移除 Footer</b>：Footer 對體驗導向頁面是多餘的，直接移除。<br><br>
+            <b>RWD 基準</b>：以大眾通用比例為基準，確保核心元件不因為螢幕比例或字體縮放而跑版。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03 設計方評估 -->
+  <div class="section open" id="s3">
+    <div class="s-header" onclick="toggle('s3')">
+      <div class="s-num">03</div>
+      <div class="s-title">設計方對主管指示的評估</div>
+      <div class="s-sub">Design Assessment</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+
+      <div class="block">
+        <div class="block-label">完全同意，直接照做</div>
+        <div class="next-list">
+          <div class="next-item"><div class="nd nd-green"></div><div><b>精簡文字、用重點字詞：</b>現在版本文字太多，使用者掃描不到重點。</div></div>
+          <div class="next-item"><div class="nd nd-green"></div><div><b>P5 Tab 恢復且要明顯：</b>資料量大時 Tab 合理，關鍵是 Tab 夠大夠明顯。</div></div>
+          <div class="next-item"><div class="nd nd-green"></div><div><b>Footer 移除：</b>體驗導向頁面本來就不需要。</div></div>
+          <div class="next-item"><div class="nd nd-green"></div><div><b>CTA Fixed at bottom：</b>非常正確，現在的 CTA 在某些頁面需要滾動才看到。</div></div>
+          <div class="next-item"><div class="nd nd-green"></div><div><b>P4 不動：</b>正確，等產品部。</div></div>
+          <div class="next-item"><div class="nd nd-green"></div><div><b>去掉容器感：</b>符合產品的「對話、協同、流暢」體驗語言。</div></div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">同意方向，但執行需注意細節</div>
+        <div class="next-list">
+          <div class="next-item"><div class="nd nd-amber"></div><div><b>P1 職能選擇精簡：</b>方向對，但「不展開」的形式要確認——建議是幾個職能文字 Tab 並排，點選後左側痛點切換，比 Dropdown 直觀、比 10 個 grid 乾淨。</div></div>
+          <div class="next-item"><div class="nd nd-amber"></div><div><b>一個畫面不滾動：</b>P3 的對話三組＋角色呈現＋CTA 全部塞進一個畫面，空間非常緊張，需要嚴格控制各元素大小。</div></div>
+          <div class="next-item"><div class="nd nd-amber"></div><div><b>RWD 基準：</b>「大眾通用」需要定義明確——建議以 1280×800（常見業務筆電解析度）為設計基準，不是 1920×1080。</div></div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">建議保留設計方原版的地方</div>
+        <div class="next-list">
+          <div class="next-item"><div class="nd nd-blue"></div><div><b>P2 場景卡的情境句語氣：</b>主管把情境引言框改成普通描述段落，但情境句更有代入感。建議保留情境句的文字語氣，視覺上去掉引言框改成普通文字段落，同時達到「去容器感」和「讓使用者代入」兩個目標。</div></div>
+          <div class="next-item"><div class="nd nd-blue"></div><div><b>P5 before/after 視覺對比：</b>黃色發光「3 分鐘」vs 白底線「3 天」是整個體驗最有說服力的視覺錨點，在主管修改稿中消失了。建議保留在「現況突破」Tab 裡。</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 04 最終決策表 -->
+  <div class="section open" id="s4">
+    <div class="s-header" onclick="toggle('s4')">
+      <div class="s-num">04</div>
+      <div class="s-title">v7 最終決策總表</div>
+      <div class="s-badge badge-green">確認執行</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <table class="tbl">
+        <tr><th>頁面</th><th>項目</th><th>決策</th><th>來源</th></tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">P1 體驗大廳</td></tr>
+        <tr>
+          <td>職能選擇</td>
+          <td>改為精簡形式（文字 Tab 並排）</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>痛點泡泡</td>
+          <td>保留三個，內容跟著職能動態切換</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>CTA</td>
+          <td>選完職能後「進入數智空間 ›」文字連結</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">P2 選擇場景</td></tr>
+        <tr>
+          <td>職能切換</td>
+          <td>保留可就地切換，目的是探索不同場景</td>
+          <td class="col-keep">保留</td>
+          <td>主管確認</td>
+        </tr>
+        <tr>
+          <td>場景卡情境句</td>
+          <td>保留語氣，移除引言框邊框，改為普通段落</td>
+          <td class="col-keep">保留語氣</td>
+          <td>設計方建議</td>
+        </tr>
+        <tr>
+          <td>場景卡欄數</td>
+          <td>改為三欄</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>場景卡雙按鈕</td>
+          <td>「開始體驗」＋「前往訂閱」</td>
+          <td class="col-new">新增</td>
+          <td>主管指示</td>
+        </tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">P3 體驗開場</td></tr>
+        <tr>
+          <td>內容形式</td>
+          <td>一問一答對話氣泡（右人類、左 AI），三組</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>角色呈現</td>
+          <td>即將參與的分身角色，以人物插圖呈現</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>角色動態</td>
+          <td>佔位版本先上，等 P4 確認後再設計動態</td>
+          <td class="col-hold">待確認</td>
+          <td>設計方建議</td>
+        </tr>
+        <tr>
+          <td>CTA</td>
+          <td>單一大按鈕「開始體驗」，Fixed at bottom</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">P4 圓桌會議</td></tr>
+        <tr>
+          <td>全部</td>
+          <td>不動，等產品部填入演示內容</td>
+          <td class="col-hold">不動</td>
+          <td>主管確認</td>
+        </tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">P5 場景總結</td></tr>
+        <tr>
+          <td>現況突破 / 分身能力</td>
+          <td>恢復 Tab，但視覺要夠大夠明顯</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+        <tr>
+          <td>before/after 視覺對比</td>
+          <td>黃色「3 分鐘」vs 白底線「3 天」保留在現況突破 Tab</td>
+          <td class="col-keep">保留</td>
+          <td>設計方建議</td>
+        </tr>
+        <tr>
+          <td>CTA 橫幅</td>
+          <td>深藍色橫幅，Fixed at bottom</td>
+          <td class="col-change">改版</td>
+          <td>主管指示</td>
+        </tr>
+
+        <tr><td colspan="4" style="background:var(--surface2);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink3)">全站</td></tr>
+        <tr><td>Footer</td><td>移除</td><td class="col-change">移除</td><td>主管指示</td></tr>
+        <tr><td>文字量</td><td>全面精簡，改用重點字詞</td><td class="col-change">改版</td><td>主管指示</td></tr>
+        <tr><td>畫面滾動</td><td>每頁一個畫面，不滾動</td><td class="col-change">改版</td><td>主管指示</td></tr>
+        <tr><td>容器層次</td><td>去掉多層邊框容器，改用留白與大小對比建立層次</td><td class="col-change">改版</td><td>主管指示＋設計方</td></tr>
+        <tr><td>RWD 基準</td><td>以 1280×800 業務筆電為設計基準</td><td class="col-new">新增</td><td>設計方建議</td></tr>
+      </table>
+
+      <div class="div"></div>
+
+      <div class="block">
+        <div class="block-label">尚未確認的問題（下次討論前需釐清）</div>
+        <div class="next-list">
+          <div class="next-item"><div class="nd nd-red"></div><div><b>P1 + P2 職能選兩次的邏輯矛盾：</b>主管確認 P2 保留切換功能後，P1 的職能選擇步驟是否仍有存在必要？建議直接問主管：「P1 的職能選擇可以移除，讓使用者直接從 P2 開始嗎？」</div></div>
+          <div class="next-item"><div class="nd nd-red"></div><div><b>P3 角色動態：</b>佔位版本先做，但動態效果（閃爍、呈現方式）等 P4 方向確認後再設計。</div></div>
+          <div class="next-item"><div class="nd nd-amber"></div><div><b>P3 「約 3 分鐘」時間標示：</b>主管 PDF 有出現但會議中未確認是否保留，建議加入。</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-left"><a href="202606-ux-analysis.html" style="color:inherit;text-decoration:none">← 返回版本總覽</a></div>
+  <div class="footer-right">2026 — AI Agent v7 Discussion 04</div>
+</footer>
+
+<script>
+function toggle(id){document.getElementById(id).classList.toggle('open')}
+</script>
+</body>
+</html>
