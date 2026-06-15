@@ -873,14 +873,28 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
 @media(max-width:960px){.p2-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.p2-cards{grid-template-columns:1fr}}
-.p2-scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:20px;box-shadow:var(--sh-card);display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,transform .15s}
-.p2-scard:hover{box-shadow:var(--sh-lg);transform:translateY(-2px)}
-.p2-scard-tags{display:flex;gap:6px;flex-wrap:wrap}
-.p2-scard-tag{font-size:11px;color:var(--brand);background:var(--brand-light);border-radius:5px;padding:3px 9px;font-weight:600}
-.p2-scard-name{font-size:18px;font-weight:700;color:var(--ink)}
-.p2-scard-desc{font-size:13px;color:var(--ink2);line-height:1.7;min-height:44px}
-.p2-scard-btns{display:flex;gap:10px;margin-top:4px}
-.p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:rgba(255,255,255,.7);border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;backdrop-filter:blur(6px)}
+.p2-scard{
+  background:var(--surface);border:1px solid var(--border);
+  border-top:3px solid var(--brand);
+  border-radius:var(--r3);padding:0 0 16px;
+  box-shadow:var(--sh-card);
+  display:flex;flex-direction:column;gap:0;
+  transition:box-shadow .15s,transform .15s;
+  overflow:hidden;
+}
+.p2-scard:hover{box-shadow:var(--sh-lg);transform:translateY(-3px)}
+/* 置中標題區塊 */
+.p2-scard-top{
+  text-align:center;padding:20px 16px 16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:14px;
+}
+.p2-scard-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.p2-scard-tag{font-size:11px;color:var(--brand);background:var(--brand-light);border-radius:var(--r);padding:3px 9px;font-weight:600;font-family:'Noto Sans TC',sans-serif}
+.p2-scard-name{font-size:18px;font-weight:700;color:var(--ink);line-height:1.3}
+.p2-scard-desc{font-size:13px;color:var(--ink2);line-height:1.7;flex:1;padding:0 16px;min-height:56px;margin-bottom:14px}
+.p2-scard-btns{display:flex;gap:8px;padding:0 16px;margin-top:auto}
+.p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
 .p2-btn-sub:hover{border-color:var(--brand-mid);color:var(--brand)}
 .p2-btn-go{flex:1;padding:10px;border:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 14px rgba(var(--brand-rgb),.25);transition:all .15s}
 .p2-btn-go:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-1px)}
@@ -1090,9 +1104,6 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   color:var(--brand);background:var(--brand-light);
   border-radius:var(--r);border:none;
 }
-
-/* Scene Card accent bar → 改為頂部 4px 線 */
-.p2-scard{border-top:3px solid var(--brand)}
 
 /* Crisis Box（PDF：紅色左邊線危機框）*/
 .p3-crisis{
@@ -1407,7 +1418,9 @@ var SCENES = {
   採購: [
     { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['專案經理','採購','業務','廠長'], lead:'客戶突然要追加，身為採購，你將與數智分身一同擬定策略', steps:['客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。',' AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。'], agents:[{name:'PM',color:'#1B5E36'},{name:'業務',color:'#E65100'},{name:'廠長',color:'#4A148C'}] },
     { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','資材'], lead:'身為採購，你將協同 AI 分身快速掌握缺料風險', steps:['生產線急等用料，但採購人員還在忙著翻查數百項品號的可用庫存，光是轉單就耗掉一整天。','讓採購分身自動盤點缺口、比對替代料源，你只需要拍板關鍵決策。','擁有這組職能分身，你不用再當「打單機器人」，確保料件準時到位。'], agents:[{name:'採購',color:'#1B5E36'},{name:'倉管',color:'#006064'}] },
-    { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['採購','倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓採購進貨與進貨驗收批退 Agent 聯手——自動辨識廠商單據生成進貨單，加速驗收流程。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#1B5E36'},{name:'驗收',color:'#006064'}] }
+    { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['採購','倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓採購進貨與進貨驗收批退 Agent 聯手——自動辨識廠商單據生成進貨單，加速驗收流程。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#1B5E36'},{name:'驗收',color:'#006064'}] },
+    { id:'s7', name:'供應商績效評比', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','供應商'], lead:'你需要在季末快速評估哪些供應商值得續約', steps:['每季末都要評估幾十家供應商的交期準確率、品質良率和價格競爭力，但資料分散在多個系統，光是彙整就要一週。','AI 採購評鑑分身自動彙整交期、品質、成本三維指標，產出供應商評分矩陣與換廠建議。','下載供應商管理分身，每季評鑑從一週壓縮到當天完成，精準決定續約或替換。'], agents:[{name:'採購',color:'#1B5E36'},{name:'供應商分析',color:'#0277BD'}] },
+    { id:'s8', name:'詢比價智能加速', cat:'採購與供應鏈 › 採購詢比價', tags:['採購'], lead:'一張報價單等了三天，客戶的交期已經不夠了', steps:['臨時需求湧入，採購要同步詢問五家供應商、比較規格、確認交期——人工來回至少三天，黃金處理窗口就這樣白白流失。','AI 詢比價分身自動發送詢價單、彙整回覆、比對最佳報價，整個流程壓縮到 4 小時內完成。','下載詢比價加速分身，讓供應商回覆自動彙整，你只需要在最後環節拍板最優選擇。'], agents:[{name:'採購',color:'#1B5E36'},{name:'比價AI',color:'#E65100'}] }
   ],
   生管: [
     { id:'s3', name:'物料運補監管', cat:'生產管理 › 生產排程與插單管理', tags:['生管','倉管','物控'], lead:'身為生管，你將與分身一同確認開工前的料況安全', steps:['客戶臨時插單時、工單上線生產前，你真的知道料夠不夠嗎？多數情況，是開始生產了才發現缺料。','職能分身在工單開工前自動解析用料需求、即時比對庫存，並預測料況風險。','下載職能分身，協助預測缺料風險，準確驅動開工決策，提升生產效率。'], agents:[{name:'生管',color:'#1565C0'},{name:'物控',color:'#006064'},{name:'倉管',color:'#006064'}] },
@@ -1427,6 +1440,10 @@ var SCENES = {
   資材: [
     { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓「採購進貨」與「進貨驗收批退」Agent 聯手——自動辨識廠商單據生成進貨單。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#1B5E36'},{name:'驗收',color:'#006064'}] },
     { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['資材'], lead:'身為資材，你要在最短時間解決緊急缺料危機', steps:['生產線急等用料，採購還在翻查數百項品號的庫存，光是轉單就耗掉一整天。','讓採購進貨分身自動辨識廠商單據、生成進貨單，你只需要輸入驗收數即可。','擁有這組職能分身，從需求偵測到正式下單一氣呵成，確保料件準時到位。'], agents:[{name:'採購',color:'#1B5E36'},{name:'倉管',color:'#006064'}] }
+  ],
+  採購ext: [
+    { id:'s7', name:'供應商績效評比', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','供應商'], lead:'你需要在季末快速評估哪些供應商值得續約', steps:['每季末都要評估幾十家供應商的交期準確率、品質良率和價格競爭力，但資料分散在多個系統，光是彙整就要一週。','AI 採購評鑑分身自動彙整交期、品質、成本三維指標，產出供應商評分矩陣與換廠建議。','下載供應商管理分身，每季評鑑從一週壓縮到當天完成，精準決定續約或替換。'], agents:[{name:'採購',color:'#1B5E36'},{name:'供應商分析',color:'#0277BD'}] },
+    { id:'s8', name:'詢比價智能加速', cat:'採購與供應鏈 › 採購詢比價', tags:['採購'], lead:'一張報價單等了三天，客戶的交期已經不夠了', steps:['臨時需求湧入，採購要同步詢問五家供應商、比較規格、確認交期——人工來回至少三天，黃金處理窗口就這樣白白流失。','AI 詢比價分身自動發送詢價單、彙整回覆、比對最佳報價，整個流程壓縮到 4 小時內完成。','下載詢比價加速分身，讓供應商回覆自動彙整，你只需要在最後環節拍板最優選擇。'], agents:[{name:'採購',color:'#1B5E36'},{name:'比價AI',color:'#E65100'}] }
   ]
 };
 
@@ -1671,15 +1688,18 @@ function buildScenePage(){
 function buildSceneCard(s, accentColor){
   var el=document.createElement('div');
   el.className='p2-scard';
+  el.style.borderTopColor=accentColor||'var(--brand)';
   var cats=(s.cat||'').split('›').map(function(t){return t.trim();}).filter(Boolean);
   var tagsHtml=cats.map(function(c){return '<span class="p2-scard-tag">'+c+'</span>';}).join('');
   el.innerHTML=
-    '<div class="p2-scard-tags">'+tagsHtml+'</div>'+
-    '<div class="p2-scard-name">'+s.name+'</div>'+
+    '<div class="p2-scard-top">'+
+      '<div class="p2-scard-tags">'+tagsHtml+'</div>'+
+      '<div class="p2-scard-name">'+s.name+'</div>'+
+    '</div>'+
     '<div class="p2-scard-desc">'+s.steps[0]+'</div>'+
     '<div class="p2-scard-btns">'+
-      '<button class="p2-btn-sub" type="button" aria-label="前往訂閱">前往訂閱</button>'+
-      '<button class="p2-btn-go" type="button" aria-label="開始體驗：'+s.name+'">開始體驗</button>'+
+      '<button class="p2-btn-sub" type="button">前往訂閱</button>'+
+      '<button class="p2-btn-go" type="button">開始體驗</button>'+
     '</div>';
   el.querySelector('.p2-btn-go').onclick=function(){selectScene(s);};
   return el;
