@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — v7 第三次討論記錄</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111;--ink2:#444;--ink3:#888;
+  --bg:#F2F0EB;--surface:#FDFCFA;--surface2:#ECEAE4;
+  --brand:#1B2B5E;--brand2:#2D4DB8;
+  --green:#0D6B50;--amber:#854F0B;--blue:#185FA5;--purple:#4B42A8;
+  --red:#9B1C1C;--teal:#0E6B6B;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.06);
+  --r:6px;--r2:12px;--r3:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)}
+
+.header{background:var(--brand);padding:40px 0 36px}
+.header-inner{max-width:860px;margin:0 auto;padding:0 32px}
+.h-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:12px}
+.h-title{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;color:#fff;line-height:1.15;margin-bottom:10px}
+.h-sub{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7;max-width:560px}
+.h-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.h-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55)}
+
+.main{max-width:860px;margin:0 auto;padding:40px 32px 80px}
+@media(max-width:640px){.main{padding:28px 18px 60px}}
+
+.section{margin-bottom:8px}
+.s-header{display:flex;align-items:center;gap:12px;cursor:pointer;padding:16px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);transition:border-color .15s;user-select:none}
+.s-header:hover{border-color:var(--brand2)}
+.section.open .s-header{border-radius:var(--r3) var(--r3) 0 0;border-bottom-color:transparent}
+.s-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--ink3);flex-shrink:0}
+.s-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--ink);flex:1}
+.s-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);flex-shrink:0}
+.s-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0}
+.badge-amber{background:#FDF3E3;color:var(--amber)}
+.badge-green{background:#E1F5EE;color:var(--green)}
+.badge-blue{background:#E6F1FB;color:var(--blue)}
+.badge-red{background:#FEF2F2;color:var(--red)}
+.badge-teal{background:#E0F5F5;color:var(--teal)}
+.s-chevron{font-size:11px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.section.open .s-chevron{transform:rotate(90deg)}
+.s-body{display:none;background:var(--surface);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--r3) var(--r3);padding:22px}
+.section.open .s-body{display:block}
+
+.block{margin-bottom:20px}
+.block:last-child{margin-bottom:0}
+.block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.body-text{font-size:13px;color:var(--ink2);line-height:1.75;margin-bottom:8px}
+.body-text b{color:var(--ink);font-weight:500}
+.body-text em{color:var(--blue);font-style:normal}
+
+/* CHANGE LIST */
+.change-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.change-item{display:flex;gap:14px;padding:13px 16px;background:var(--surface2);border-radius:var(--r2);align-items:flex-start}
+.change-num{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--brand2);border-radius:4px;padding:2px 7px;flex-shrink:0;margin-top:1px}
+.change-body{flex:1}
+.change-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.change-desc{font-size:12px;color:var(--ink2);line-height:1.65}
+.change-from{font-size:11px;color:var(--ink3);margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);display:flex;gap:6px;flex-wrap:wrap;align-items:baseline}
+.from-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+.from-v6{background:#FEF2F2;color:var(--red);font-size:11px;padding:1px 7px;border-radius:3px}
+.from-v7{background:#E1F5EE;color:var(--green);font-size:11px;padding:1px 7px;border-radius:3px}
+.change-page{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;margin-top:1px}
+.page-p1{background:#FDF3E3;color:var(--amber)}
+.page-p2{background:#E6F1FB;color:var(--blue)}
+.page-p3{background:#E1F5EE;color:var(--green)}
+.page-p5{background:#F3EFFE;color:var(--purple)}
+
+/* SUMMARY TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.tbl th{background:var(--surface2);color:var(--ink);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.05em}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border2);color:var(--ink2);vertical-align:top;line-height:1.65}
+.tbl tr:last-child td{border-bottom:none}
+
+/* KEY THEME */
+.theme-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+@media(max-width:520px){.theme-row{grid-template-columns:1fr}}
+.theme-card{background:var(--surface2);border-radius:var(--r2);padding:14px 16px}
+.theme-icon{font-size:20px;margin-bottom:8px}
+.theme-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.theme-desc{font-size:12px;color:var(--ink2);line-height:1.6}
+
+.div{height:1px;background:var(--border2);margin:16px 0}
+
+.footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);max-width:860px;margin-left:auto;margin-right:auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+.footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="h-eyebrow">AI AGENT — v7 第三次討論記錄</div>
+    <h1 class="h-title">主管修改稿<br>逐頁改動紀錄</h1>
+    <p class="h-sub">主管提供 Figma 修改稿（大廳1_merged.pdf），針對 P1、P2、P3、P5 共提出 15 項改動，確立 v7 的執行方向。</p>
+    <div class="h-meta">
+      <span class="h-tag">2026/06</span>
+      <span class="h-tag">第三次討論</span>
+      <span class="h-tag">主管修改稿</span>
+      <span class="h-tag">15 項改動</span>
+      <span class="h-tag">待執行</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 00 整體方向 -->
+  <div class="section open" id="s0">
+    <div class="s-header" onclick="toggle('s0')">
+      <div class="s-num">00</div>
+      <div class="s-title">整體改版方向</div>
+      <div class="s-sub">Direction</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="theme-row">
+        <div class="theme-card">
+          <div class="theme-icon">🧹</div>
+          <div class="theme-title">資訊精簡</div>
+          <div class="theme-desc">Dropdown 取代 grid、取消橋接列、取消情境引言框。每個頁面的元件數量明顯減少，重複資訊合併為一處。</div>
+        </div>
+        <div class="theme-card">
+          <div class="theme-icon">💨</div>
+          <div class="theme-title">視覺呼吸感</div>
+          <div class="theme-desc">白底頁面、減少邊框容器、場景卡片三欄對齊、CTA 區塊用深色橫幅收尾。比 v6 的 glass 容器層次感更輕盈。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P1 -->
+  <div class="section open" id="s1">
+    <div class="s-header" onclick="toggle('s1')">
+      <div class="s-num">P1</div>
+      <div class="s-title">體驗大廳</div>
+      <div class="s-badge badge-amber">3 項改動</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="change-list">
+
+        <div class="change-item">
+          <div class="change-num">01</div>
+          <div class="change-page page-p1">P1</div>
+          <div class="change-body">
+            <div class="change-title">職能選擇改為 Dropdown 下拉選單</div>
+            <div class="change-desc">從現在的 10 個職能卡片 grid，改成「選擇你的工作職能 ＋ 下拉選單」的形式。點擊職能名稱後出現下拉清單，頁面保持乾淨，不佔用視覺空間。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">10 個職能卡片 grid 等寬排列</span>
+              <span class="from-label">→ v7</span><span class="from-v7">Dropdown 下拉清單</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">02</div>
+          <div class="change-page page-p1">P1</div>
+          <div class="change-body">
+            <div class="change-title">「進入數智空間 ›」改為文字連結樣式</div>
+            <div class="change-desc">選完職能後，旁邊直接出現「進入數智空間 ›」文字連結，不再是填滿式按鈕。視覺更輕，與職能名稱並排在同一行。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">漸層填滿 CTA 大按鈕</span>
+              <span class="from-label">→ v7</span><span class="from-v7">文字連結「進入數智空間 ›」</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">03</div>
+          <div class="change-page page-p1">P1</div>
+          <div class="change-body">
+            <div class="change-title">痛點泡泡跟著職能動態切換</div>
+            <div class="change-desc">左側浮動痛點泡泡的文字內容會根據選取的職能更換。採購選中時顯示採購的痛點，廠長選中時顯示廠長的痛點。不再是固定的三條通用文字。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">固定 3 條通用痛點，選職能後只有 highlight 效果</span>
+              <span class="from-label">→ v7</span><span class="from-v7">痛點文字隨職能切換</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- P2 -->
+  <div class="section open" id="s2">
+    <div class="s-header" onclick="toggle('s2')">
+      <div class="s-num">P2</div>
+      <div class="s-title">選擇場景</div>
+      <div class="s-badge badge-blue">5 項改動</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="change-list">
+
+        <div class="change-item">
+          <div class="change-num">04</div>
+          <div class="change-page page-p2">P2</div>
+          <div class="change-body">
+            <div class="change-title">職能 badge 改為可切換入口</div>
+            <div class="change-desc">左上角從靜態的「你是採購 → 選一個你想體驗的場景」橋接列，改成醒目的青綠色 badge「採購」＋旁邊「切換其他職能 ›」連結。使用者可以在 P2 就地切換職能，不需要退回 P1。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">靜態橋接列（你是採購 → 選場景）</span>
+              <span class="from-label">→ v7</span><span class="from-v7">可點擊的職能 badge ＋「切換其他職能 ›」</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">05</div>
+          <div class="change-page page-p2">P2</div>
+          <div class="change-body">
+            <div class="change-title">新增職能描述文字區塊</div>
+            <div class="change-desc">職能 badge 下方加入該職能的簡短描述段落，以及「職能的常見工作場景類型」標題。讓使用者在 P2 就能了解這個職能是做什麼的，補充 P1 跳過的脈絡說明。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">無職能描述，直接顯示場景卡片</span>
+              <span class="from-label">→ v7</span><span class="from-v7">職能描述段落 ＋ 常見場景類型標題</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">06</div>
+          <div class="change-page page-p2">P2</div>
+          <div class="change-body">
+            <div class="change-title">場景分類 filter 改為膠囊 Tab</div>
+            <div class="change-desc">從現在的小型 chip 切換列，改成較大的「全部 ╱ 生產管理 ╱ 採購與供應鏈」膠囊 tab。「全部」預設選中（青綠色填滿），未選的是白底圓框，視覺上更像導覽。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">小型 chip 切換列</span>
+              <span class="from-label">→ v7</span><span class="from-v7">膠囊 Tab（全部 / 生產管理 / 採購與供應鏈）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">07</div>
+          <div class="change-page page-p2">P2</div>
+          <div class="change-body">
+            <div class="change-title">場景卡片改為三欄橫排</div>
+            <div class="change-desc">從現在的兩欄改為三欄。卡片結構：場景名稱（大字）、分類標籤（兩個）、描述段落、「開始體驗」主按鈕 ＋「前往訂閱」次按鈕。取消左側藍邊情境引言框，改為直接的描述段落。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">兩欄卡片，含左側藍邊情境引言框</span>
+              <span class="from-label">→ v7</span><span class="from-v7">三欄卡片，描述段落 ＋ 雙按鈕</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">08</div>
+          <div class="change-page page-p2">P2</div>
+          <div class="change-body">
+            <div class="change-title">切換職能改為 Modal 彈窗</div>
+            <div class="change-desc">點擊「切換其他職能 ›」後出現一個彈窗，背景模糊，清單列出所有職能（採購、生管、倉管、業務、廠長、物控、產線班組長、IT 資訊、資材、專案經理），當前選中的以品牌色填滿反白顯示。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">無就地切換職能的機制（需退回 P1）</span>
+              <span class="from-label">→ v7</span><span class="from-v7">Modal 彈窗，背景模糊，清單可選</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- P3 -->
+  <div class="section open" id="s3">
+    <div class="s-header" onclick="toggle('s3')">
+      <div class="s-num">P3</div>
+      <div class="s-title">體驗開場</div>
+      <div class="s-badge badge-green">4 項改動</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="change-list">
+
+        <div class="change-item">
+          <div class="change-num">09</div>
+          <div class="change-page page-p3">P3</div>
+          <div class="change-body">
+            <div class="change-title">頂部加入職能 badge ＋ 場景名稱</div>
+            <div class="change-desc">「採購」青綠色 badge ＋「急單插單應變」場景名稱並排在頁面頂部，讓使用者進入 P3 就知道「我是誰、我在哪個場景」。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">場景名稱的 DM Mono 小標籤</span>
+              <span class="from-label">→ v7</span><span class="from-v7">職能 badge ＋ 場景名稱大字標題</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">10</div>
+          <div class="change-page page-p3">P3</div>
+          <div class="change-body">
+            <div class="change-title">內容改為對話氣泡形式</div>
+            <div class="change-desc">取消現在的三段區塊結構（痛點區 ＋ 分身卡片 ＋ 說明文字），改成兩個對話氣泡：上方白底氣泡為「場景痛點描述」（使用者視角），右側有藍色圓形代表使用者頭貼佔位；下方藍底氣泡為「痛點效益說明」（AI 分身視角），左側有藍色圓形代表分身。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">三段區塊（紅邊痛點 ＋ glass 分身卡 ＋ 引導文）</span>
+              <span class="from-label">→ v7</span><span class="from-v7">兩個對話氣泡（使用者痛點 ＋ AI 效益）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">11</div>
+          <div class="change-page page-p3">P3</div>
+          <div class="change-body">
+            <div class="change-title">分身召集改為插圖頭像 ＋ 文字標示</div>
+            <div class="change-desc">分身陣容的呈現從「彩色圓圈縮寫 avatar pill」改成「擬人插圖風格頭像 ＋ 分身名稱文字」的召集區塊，標題為「召集數智分身加入會議…」。頭像圖來源待替換為正式素材。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">彩色圓圈縮寫文字 avatar pill</span>
+              <span class="from-label">→ v7</span><span class="from-v7">插圖風格頭像 ＋ 分身名稱，置中排列</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">12</div>
+          <div class="change-page page-p3">P3</div>
+          <div class="change-body">
+            <div class="change-title">CTA 改為大型藍底單一按鈕「開始體驗」</div>
+            <div class="change-desc">取消「進入體驗 ›」＋「數智分身已準備就緒，等你拍板」的組合，改為單一、飽滿的深藍色「開始體驗」大按鈕置底，視覺重心明確，行動呼召更清楚。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">「數智分身已準備就緒」文字 ＋「進入體驗」漸層按鈕</span>
+              <span class="from-label">→ v7</span><span class="from-v7">單一深藍大按鈕「開始體驗」</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- P5 -->
+  <div class="section open" id="s5">
+    <div class="s-header" onclick="toggle('s5')">
+      <div class="s-num">P5</div>
+      <div class="s-title">場景總結</div>
+      <div class="s-badge badge-teal">3 項改動</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <div class="change-list">
+
+        <div class="change-item">
+          <div class="change-num">13</div>
+          <div class="change-page page-p5">P5</div>
+          <div class="change-body">
+            <div class="change-title">頂部加入職能 badge ＋ 場景名稱標示</div>
+            <div class="change-desc">「採購」badge ＋「急單插單應變」標題置頂，讓使用者在看總結前先記住自己剛才體驗了什麼場景、用什麼職能視角。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">深色 achievement 橫幅直接開始</span>
+              <span class="from-label">→ v7</span><span class="from-v7">職能 badge ＋ 場景名稱置頂</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">14</div>
+          <div class="change-page page-p5">P5</div>
+          <div class="change-body">
+            <div class="change-title">現況突破 / 分身能力改回 Tab 切換</div>
+            <div class="change-desc">主管將這兩個區塊改回 Tab 形式，顯示在同一個白色卡片容器內。「現況突破」預設選中（青綠色填滿），「分身能力」未選（白底圓框）。雷達圖置中，四個維度說明分列四邊。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">移除 Tab，改為垂直三段流程</span>
+              <span class="from-label">→ v7</span><span class="from-v7">恢復 Tab 切換（現況突破 / 分身能力）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="change-item">
+          <div class="change-num">15</div>
+          <div class="change-page page-p5">P5</div>
+          <div class="change-body">
+            <div class="change-title">底部 CTA 改為深藍色橫幅區塊</div>
+            <div class="change-desc">「企業數智分身，讓企業不需從零訓練 AI」文字 ＋「索取方案 ›」主按鈕 ＋「訂閱最新消息」次按鈕，整個 CTA 區改為深藍色背景橫幅，比 v6 的白底按鈕列視覺分量更重，收尾更有力。</div>
+            <div class="change-from">
+              <span class="from-label">v6</span><span class="from-v6">深色漸層轉換橫幅（分開於卡片外）</span>
+              <span class="from-label">→ v7</span><span class="from-v7">深藍橫幅 ＋ 主次按鈕並排，視覺一體</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 總覽 -->
+  <div class="section" id="s6">
+    <div class="s-header" onclick="toggle('s6')">
+      <div class="s-num">00</div>
+      <div class="s-title">改動總覽</div>
+      <div class="s-sub">Summary</div>
+      <div class="s-chevron">›</div>
+    </div>
+    <div class="s-body">
+      <table class="tbl">
+        <tr><th>頁面</th><th>改動項目</th><th>數量</th><th>執行狀態</th></tr>
+        <tr>
+          <td><b>P1</b> 體驗大廳</td>
+          <td>職能 Dropdown、文字連結 CTA、痛點動態切換</td>
+          <td>3</td>
+          <td style="color:var(--amber);font-weight:500">待執行</td>
+        </tr>
+        <tr>
+          <td><b>P2</b> 選擇場景</td>
+          <td>職能 badge 可切換、職能描述、膠囊 Tab、三欄卡片、Modal 切換</td>
+          <td>5</td>
+          <td style="color:var(--amber);font-weight:500">待執行</td>
+        </tr>
+        <tr>
+          <td><b>P3</b> 體驗開場</td>
+          <td>職能 badge、對話氣泡、插圖頭像、單一 CTA 按鈕</td>
+          <td>4</td>
+          <td style="color:var(--amber);font-weight:500">待執行</td>
+        </tr>
+        <tr>
+          <td><b>P4</b> 圓桌會議</td>
+          <td>無修改（產品部負責）</td>
+          <td>—</td>
+          <td style="color:var(--ink3)">不變</td>
+        </tr>
+        <tr>
+          <td><b>P5</b> 場景總結</td>
+          <td>職能 badge、Tab 恢復、深藍 CTA 橫幅</td>
+          <td>3</td>
+          <td style="color:var(--amber);font-weight:500">待執行</td>
+        </tr>
+        <tr style="background:var(--surface2)">
+          <td><b>合計</b></td>
+          <td></td>
+          <td><b>15</b></td>
+          <td style="color:var(--red);font-weight:500">待確認執行順序</td>
+        </tr>
+      </table>
+      <p class="body-text" style="margin-top:12px">⚠ <b>注意：P5 的 Tab 改動</b>與 v6 的設計決策方向相反（v6 特意移除 Tab 以提升發現性）。執行前建議與主管再確認 Tab 的 discoverability 問題是否已有對應解法，或是主管有其他考量。</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-left"><a href="202606-ux-analysis.html" style="color:inherit;text-decoration:none">← 返回版本總覽</a></div>
+  <div class="footer-right">2026 — AI Agent v7 Discussion 03</div>
+</footer>
+
+<script>
+function toggle(id){document.getElementById(id).classList.toggle('open')}
+</script>
+</body>
+</html>
