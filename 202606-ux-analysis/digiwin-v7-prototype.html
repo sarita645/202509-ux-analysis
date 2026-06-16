@@ -70,7 +70,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .hud-logo-sep{width:1px;height:14px;background:rgba(255,255,255,.25);flex-shrink:0}
 .hud-logo-title{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:.02em}
 .hud-steps{display:flex;align-items:center;gap:0}
-.hud-step{display:flex;align-items:center;gap:6px;font-size:16px;color:rgba(255,255,255,.4);padding:6px 10px;border-radius:4px;white-space:nowrap;transition:all .2s;cursor:default}
+.hud-step{display:flex;align-items:center;gap:6px;font-size:16px;color:rgba(255,255,255,.4);padding:6px 10px;border-radius:4px;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s;cursor:default}
 .hud-step.done{color:rgba(255,255,255,.65)}
 .hud-step.done .hs-dot{background:rgba(255,255,255,.5)}
 .hud-step.active{color:#fff;background:rgba(255,255,255,.12)}
@@ -124,7 +124,6 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   font-size:14px;color:#2c3e57;font-weight:500;
   box-shadow:0 10px 30px rgba(15,40,100,.13);
   display:flex;align-items:center;gap:9px;
-  animation:floaty 5.5s ease-in-out infinite;
 }
 .p1-pain-icon{flex-shrink:0;width:24px;height:24px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
 .p1-pain.highlight{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 12px 34px rgba(var(--brand-rgb),.35)}
@@ -182,7 +181,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p1-role-card{
   background:rgba(255,255,255,.92);border:1px solid #d4e0f2;
   border-radius:9px;padding:13px 6px;cursor:pointer;
-  transition:all .15s;text-align:center;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;text-align:center;
   font-size:16px;font-weight:500;color:var(--ink2);
   font-family:'Noto Sans TC',sans-serif;
   box-shadow:0 1px 2px rgba(20,50,120,.04);
@@ -193,7 +192,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   width:100%;padding:15px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;
   border:none;border-radius:var(--r2);font-size:16px;font-weight:700;
   cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  transition:all .15s;box-shadow:0 6px 20px rgba(var(--brand-rgb),.28);
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;box-shadow:0 6px 20px rgba(var(--brand-rgb),.28);
 }
 .p1-cta:hover:not(:disabled){background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 28px rgba(15,62,158,.38);transform:translateY(-2px)}
 .p1-cta:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
@@ -356,7 +355,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   padding:7px 16px;border:1px solid rgba(18,91,188,.15);border-radius:20px;
   font-size:14px;color:var(--ink2);cursor:pointer;
   background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
-  transition:all .15s;font-family:'Noto Sans TC',sans-serif;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;font-family:'Noto Sans TC',sans-serif;
 }
 .p2-other-chip:hover{border-color:rgba(49,162,239,.45);color:var(--brand)}
 .p2-other-chip.active{
@@ -369,7 +368,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-other-scene{
   background:rgba(255,255,255,.75);backdrop-filter:blur(8px);
   border:1px solid rgba(255,255,255,.7);border-radius:12px;
-  padding:14px 18px;cursor:pointer;transition:all .18s;
+  padding:14px 18px;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s;
   display:flex;align-items:center;gap:14px;margin-bottom:10px;
   box-shadow:0 2px 10px rgba(18,91,188,.05);
 }
@@ -511,7 +510,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   background:linear-gradient(135deg,var(--brand2),var(--brand));
   color:#fff;border:none;border-radius:12px;
   font-size:16px;font-weight:700;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif;transition:all .2s;
+  font-family:'Noto Sans TC',sans-serif;transition:background-color .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s;
   box-shadow:0 8px 24px rgba(var(--brand-rgb),.32);
 }
 .btn-launch:hover{
@@ -535,7 +534,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   color:#fff;border:none;border-radius:10px;
   font-size:14px;font-weight:600;cursor:pointer;
   font-family:'Noto Sans TC',sans-serif;
-  transition:all .15s;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;
   box-shadow:0 4px 14px rgba(91,45,142,.28);
 }
 .btn-end:hover{box-shadow:0 6px 20px rgba(91,45,142,.38);transform:translateY(-2px)}
@@ -578,12 +577,15 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 }
 .p5-ach-headline{
   font-size:clamp(18px,3vw,26px);font-weight:900;color:#fff;
-  line-height:1.3;margin-bottom:12px;
+  line-height:1.3;margin-bottom:12px;min-height:2.6em;
 }
 .p5-ach-headline em{
   color:#A8D8FF;font-style:normal;
   text-shadow:0 0 20px rgba(168,216,255,.5);
 }
+.type-caret{display:inline-block;width:2px;height:1em;margin-left:2px;background:#A8D8FF;vertical-align:-2px;animation:typeBlink .7s step-end infinite}
+@keyframes typeBlink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.type-caret{display:none}}
 .p5-ach-sub{font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:500px;margin:0 auto}
 
 /* ② section 標題 */
@@ -645,6 +647,10 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   transition:transform .18s, box-shadow .18s, border-color .18s;
   position:relative;overflow:hidden;
 }
+/* 依序浮現（切到「分身能力」分頁時觸發）*/
+.p5-takeaway-card.reveal{animation:p5CardIn .45s cubic-bezier(.2,.7,.3,1) both}
+@keyframes p5CardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.p5-takeaway-card.reveal{animation:none}}
 .p5-takeaway-card::after{
   content:'';position:absolute;top:-20px;right:-20px;
   width:70px;height:70px;
@@ -692,7 +698,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   background:#fff;color:var(--brand);
   border:none;border-radius:var(--r);font-size:15px;font-weight:700;
   cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  transition:all .15s;white-space:nowrap;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;white-space:nowrap;
   box-shadow:0 4px 14px rgba(8,28,80,.2);
 }
 .p5-btn-primary:hover{background:#EEF5FF;color:var(--brand-dark);box-shadow:0 6px 18px rgba(8,28,80,.28)}
@@ -702,7 +708,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   background:rgba(255,255,255,.12);backdrop-filter:blur(6px);
   color:#fff;border:1.5px solid rgba(255,255,255,.35);
   border-radius:var(--r);font-size:14px;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif;transition:all .15s;text-align:center;
+  font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;text-align:center;
 }
 .p5-btn-secondary:hover{border-color:rgba(49,162,239,.4);color:var(--brand)}
 .p5-reset{
@@ -770,7 +776,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 /* ── HUD compact progress (mobile) ──── */
 .hud-progress{display:none;align-items:center;gap:9px}
 .hud-dots{display:flex;align-items:center;gap:6px}
-.hd-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:all .2s;flex-shrink:0}
+.hd-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:background-color .2s,width .2s,border-radius .2s;flex-shrink:0}
 .hd-dot.done{background:rgba(255,255,255,.55)}
 .hd-dot.active{background:#fff;width:18px;border-radius:4px}
 .hud-cur{font-size:14px;color:#fff;white-space:nowrap;font-weight:500}
@@ -793,7 +799,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 }
 
 /* ── Floating AI assistant (bottom-right, presentational) ──── */
-.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:flex;align-items:center;gap:11px;animation:botIn .5s ease .3s both}
+.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:flex;align-items:center;gap:11px;animation:botIn .5s var(--ease-out) .3s both}
 @keyframes botIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .ai-bubble{
   position:relative;
@@ -814,7 +820,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   background:radial-gradient(circle at 35% 30%,#9a8ff5,#6c63e6 70%);
   box-shadow:0 10px 28px rgba(108,99,230,.42);
   display:flex;align-items:center;justify-content:center;overflow:hidden;
-  animation:botFloat 4s ease-in-out infinite;
+  animation:botFloat 4s var(--ease-in-out) infinite;
 }
 .ai-avatar img{width:100%;height:100%;object-fit:cover}
 @keyframes botFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -866,20 +872,25 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-role-pill{
   display:inline-flex;align-items:center;gap:8px;
   background:var(--brand);color:#fff;
-  border-radius:999px;padding:7px 16px;
-  font-size:14px;font-weight:700;
+  border:none;border-radius:999px;padding:7px 16px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
   box-shadow:0 2px 10px rgba(var(--brand-rgb),.2);
+  transition:background .15s,box-shadow .15s,transform .15s;
 }
+.p2-role-pill:hover{background:var(--brand-dark);box-shadow:0 4px 16px rgba(var(--brand-rgb),.32);transform:translateY(-1px)}
+.p2-role-pill:active{transform:translateY(0)}
 .p2-role-pill .p2-role-dot{
   width:8px;height:8px;border-radius:50%;
-  background:rgba(255,255,255,.8);flex-shrink:0;
+  background:rgba(255,255,255,.85);flex-shrink:0;
 }
-.p2-switch-link{
-  font-size:13px;color:var(--ink2);cursor:pointer;
-  background:none;border:none;font-family:'Noto Sans TC',sans-serif;
-  padding:0;transition:color .15s;
+.p2-role-switch{
+  font-size:12px;font-weight:500;color:rgba(255,255,255,.82);
+  padding-left:10px;margin-left:2px;
+  border-left:1px solid rgba(255,255,255,.32);
+  display:inline-flex;align-items:center;gap:4px;
 }
-.p2-switch-link:hover{color:var(--brand);}
+.p2-role-switch::after{content:'⌄';font-size:13px;line-height:1}
 
 /* P2 Modal */
 .p2-modal-bg{
@@ -892,7 +903,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   padding:28px 24px;width:340px;max-height:70vh;
   overflow-y:auto;
   box-shadow:0 20px 60px rgba(16,32,64,.22);
-  animation:modalIn .18s ease;
+  animation:modalIn var(--dur-base) var(--ease-out);
 }
 @keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .p2-modal-title{
@@ -907,7 +918,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   font-size:14px;font-weight:500;color:var(--ink2);
   border:1.5px solid var(--border);background:#fff;
   font-family:'Noto Sans TC',sans-serif;
-  text-align:center;transition:all .12s;
+  text-align:center;transition:background-color .12s,border-color .12s,color .12s,box-shadow .12s,transform .12s;
   display:flex;align-items:center;gap:8px;
 }
 .p2-modal-item:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--brand-light)}
@@ -915,7 +926,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .p2-desc-box{background:rgba(255,255,255,.7);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:26px}
 .p2-chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
-.p2-chip{background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:999px;padding:7px 18px;font-size:14px;color:var(--ink2);cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif}
+.p2-chip{background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:999px;padding:7px 18px;font-size:14px;color:var(--ink2);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;font-family:'Noto Sans TC',sans-serif}
 .p2-chip:hover{border-color:var(--brand-mid);color:var(--brand)}
 .p2-chip.active{background:var(--brand-light);border-color:var(--brand);color:var(--brand);font-weight:700}
 .p2-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
@@ -945,10 +956,14 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-scard-name{font-size:18px;font-weight:700;color:var(--ink);line-height:1.3}
 .p2-scard-desc{font-size:13px;color:var(--ink2);line-height:1.7;flex:1;padding:0 16px;min-height:56px;margin-bottom:14px}
 .p2-scard-btns{display:flex;gap:8px;padding:0 16px;margin-top:auto}
-.p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
 .p2-btn-sub:hover{border-color:var(--brand-mid);color:var(--brand)}
-.p2-btn-go{flex:1;padding:10px;border:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 14px rgba(var(--brand-rgb),.25);transition:all .15s}
+.p2-btn-go{flex:1;padding:10px;border:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 14px rgba(var(--brand-rgb),.25);transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
 .p2-btn-go:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-2px)}
+.p2-btn-go.is-loading{pointer-events:none;color:transparent;position:relative;transform:none}
+.p2-btn-go.is-loading::after{content:'';position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:btnspin .6s linear infinite}
+@keyframes btnspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.p2-btn-go.is-loading::after{animation:none}}
 
 /* P3 — AI 對話預覽（對照附圖）*/
 .p3-tags{display:flex;gap:8px;margin-bottom:14px;flex-shrink:0}
@@ -986,11 +1001,12 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 
 /* 訊息列：橫排（頭像 + 氣泡同一行）*/
 .p3-msg{display:flex;align-items:flex-start;gap:10px;max-width:86%}
-.p3-msg.user{flex-direction:row-reverse;margin-left:auto}
-.p3-msg.ai{flex-direction:row;margin-right:auto}
+.p3-msg.user{flex-direction:row;justify-content:flex-end;margin-left:auto}   /* 人類：氣泡在左、頭像在右 */
+.p3-msg.ai{flex-direction:row;margin-right:auto}                              /* AI：頭像在左 */
 
-/* 頭像 */
+/* 頭像（圓形框，可放大頭貼）*/
 .p3-av{
+  position:relative;overflow:hidden;
   width:38px;height:38px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:700;color:#fff;
@@ -998,6 +1014,8 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 }
 .p3-av.ai{background:var(--brand2)}
 .p3-av.user{background:var(--ok)}
+/* 使用者大頭貼：填入 USER_AVATAR_URL 後會蓋滿圓形框；留空則顯示職能首字 */
+.p3-av-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
 
 /* sender label 在氣泡內部頂端 */
 .p3-msg-label{
@@ -1093,10 +1111,13 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 /* 打字中動畫 */
 @keyframes typingBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
 .p3-typing{display:flex;align-items:center;gap:4px;padding:12px 15px!important;min-width:52px}
-.p3-typing span{width:7px;height:7px;border-radius:50%;background:#94A3B8;display:inline-block;animation:typingBounce 1.2s ease infinite}
+.p3-typing span{width:7px;height:7px;border-radius:50%;background:#94A3B8;display:inline-block;animation:typingBounce 1.2s var(--ease-in-out) infinite}
 .p3-typing span:nth-child(2){animation-delay:.15s}
 .p3-typing span:nth-child(3){animation-delay:.3s}
 .p3-start{max-width:none;margin-top:4px;flex-shrink:0}
+.p3-start.is-loading{pointer-events:none;opacity:.92}
+.cta-spin{display:inline-block;width:15px;height:15px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:btnspin .6s linear infinite}
+@media(prefers-reduced-motion:reduce){.cta-spin{animation:none}}
 
 /* P5 — 分頁 (現況突破 / 分身能力) */
 /* P5 Tab — 對照附圖 */
@@ -1125,6 +1146,8 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   padding:24px 22px;margin-bottom:20px;
 }
 .p5-tabpanel .p5-breakthrough{border:none;box-shadow:none;padding:0;margin:0;background:transparent;backdrop-filter:none}
+.p5-tab-fade{animation:fadeUp var(--dur-base) var(--ease-out)}
+@media(prefers-reduced-motion:reduce){.p5-tab-fade{animation:none}}
 
 /* P4 — 圓桌會議（動態對話）*/
 .page#p4.active{display:flex;flex-direction:column;min-height:calc(100vh - var(--hud-h))}
@@ -1150,12 +1173,12 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p4-msg-meta{font-size:11px;margin-bottom:4px;font-weight:700;font-family:'DM Mono',monospace}
 .p4-msg-text{font-size:13px;color:var(--ink);line-height:1.7}
 .p4-typing{text-align:center;font-size:12px;color:var(--ink3);padding:8px 0}
-.p4-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--brand2);display:inline-block;margin:0 1px;animation:typingDot 1.2s ease-in-out infinite}
+.p4-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--brand2);display:inline-block;margin:0 1px;animation:typingDot 1.2s var(--ease-in-out) infinite}
 @keyframes typingDot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 .p4-reply{margin-top:16px}
 .p4-reply-label{font-size:12px;color:var(--ink3);margin-bottom:8px}
 .p4-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.p4-chip{font-size:12px;padding:7px 14px;border-radius:20px;border:1px solid rgba(var(--brand-rgb),.2);color:var(--brand);background:rgba(255,255,255,.8);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.p4-chip{font-size:12px;padding:7px 14px;border-radius:20px;border:1px solid rgba(var(--brand-rgb),.2);color:var(--brand);background:rgba(255,255,255,.8);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
 .p4-chip:hover{background:rgba(var(--brand-rgb),.08);border-color:var(--brand)}
 .p4-input-row{display:flex;gap:8px}
 .p4-input{flex:1;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--ink);outline:none;font-family:'Noto Sans TC',sans-serif}
@@ -1273,7 +1296,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   70% {transform:scale(.97)}
   100%{transform:scale(1)}
 }
-.role-dd-item.just-selected{animation:rolePop .3s cubic-bezier(.22,1,.36,1)}
+.role-dd-item.just-selected{animation:rolePop .3s var(--ease-out)}
 
 /* ════════════════════════════════════════
    Layer 5 — CTA 呼吸脈動（引導注意）
@@ -1408,8 +1431,11 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 <section class="page" id="p2" aria-label="選擇場景">
   <div class="p2-body">
     <div class="p2-role-row">
-      <div class="p2-role-pill"><span class="p2-role-dot" id="p2RoleDot"></span><span id="p2RoleName">採購</span></div>
-      <button class="p2-switch-link" onclick="openP2Modal()" aria-label="切換其他職能">切換其他職能</button>
+      <button class="p2-role-pill" id="p2RolePill" onclick="openP2Modal()" aria-haspopup="dialog" aria-label="目前職能，點擊可切換其他職能">
+        <span class="p2-role-dot" id="p2RoleDot"></span>
+        <span id="p2RoleName">採購</span>
+        <span class="p2-role-switch">切換其他職能</span>
+      </button>
     </div>
     <div class="p2-desc-box" id="p2Desc"></div>
     <div class="p2-section-label">職能的常見工作場景類型</div>
@@ -1440,7 +1466,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
     </div>
     <div class="p3-join-hint" id="p3JoinHint">對話完成後分身將上線</div>
 
-    <button class="p1-cta p3-start" onclick="gotoPage(4)" aria-label="開始體驗">開始體驗 &nbsp;›</button>
+    <button class="p1-cta p3-start" onclick="enterRoundtable(this)" aria-label="開始體驗">開始體驗 &nbsp;›</button>
   </div>
 </section>
 
@@ -1544,10 +1570,6 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
         <button class="p5-btn-primary" aria-label="索取方案">索取方案 &nbsp;→</button>
       </div>
     </div>
-    <div class="p5-cta-secondary-row">
-      <button class="p5-btn-secondary" aria-label="換個場景再體驗" onclick="gotoPage(2)">換個場景再體驗</button>
-    </div>
-    <div class="p5-reset" onclick="resetExperience()" role="button" tabindex="0">← 換個角色重新開始</div>
 
   </div>
 </section>
@@ -1568,6 +1590,14 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 
 <script>
 var state = { page: 1, role: '', roleColor: '', scene: null, history: [1] };
+
+/* ────────────────────────────────────────────────────────────
+   使用者大頭貼（P3 對話預覽的人類頭像）
+   之後要換成真實大頭貼時，把圖片網址填到這裡即可；
+   留空字串時會顯示職能首字當作預留位置。
+   例：var USER_AVATAR_URL = 'https://your-cdn.com/avatar.png';
+   ──────────────────────────────────────────────────────────── */
+var USER_AVATAR_URL = '';
 
 var SCENES = {
   採購: [
@@ -1875,7 +1905,13 @@ function buildSceneCard(s, accentColor){
       '<button class="p2-btn-sub" type="button">前往訂閱</button>'+
       '<button class="p2-btn-go" type="button">開始體驗</button>'+
     '</div>';
-  el.querySelector('.p2-btn-go').onclick=function(){selectScene(s);};
+  el.querySelector('.p2-btn-go').onclick=function(){
+    var btn=this;
+    if(btn.classList.contains('is-loading'))return;   // 防連點
+    btn.classList.add('is-loading');
+    btn.setAttribute('aria-busy','true');
+    setTimeout(function(){ selectScene(s); }, 500);    // 先 loading 0.5s 再跳轉，遮住對話空白期
+  };
   return el;
 }
 
@@ -1906,6 +1942,9 @@ function buildOtherSceneRow(s, num){
 
 function selectScene(s){
   state.scene=s;
+  // 還原「開始體驗」按鈕狀態（從 P4 返回時）
+  var startBtn=document.querySelector('.p3-start');
+  if(startBtn){startBtn.classList.remove('is-loading');startBtn.innerHTML='開始體驗 &nbsp;›';}
   document.getElementById('p3TagRole').textContent=state.role;
   document.getElementById('p3SceneTag').textContent=s.name;
 
@@ -1983,13 +2022,21 @@ function selectScene(s){
       row.style.transition='opacity .25s,transform .25s';
 
       if(msg.who==='user'){
-        // 右：氣泡（內含職能 badge）+ 圓形頭像
+        // 左：氣泡（純文字，不顯示稱呼）；右：圓形頭像（可放大頭貼）
         row.innerHTML=
           '<div class="p3-bubble">'+
-            '<div class="p3-msg-label">'+(state.role||'你')+'</div>'+
             msg.text+
           '</div>'+
-          '<div class="p3-av user">'+(state.role||'你').slice(0,1)+'</div>';
+          // ▼▼▼ 使用者大頭貼放置處 ▼▼▼
+          // 之後在最上方設定 USER_AVATAR_URL 即可換成真實大頭貼；
+          // 有設定 → 顯示 <img>（蓋滿圓框）；未設定 → 顯示職能首字
+          '<div class="p3-av user">'+
+            (USER_AVATAR_URL
+              ? '<img class="p3-av-img" src="'+USER_AVATAR_URL+'" alt="使用者大頭貼" onerror="this.remove()">'
+              : '')+
+            (state.role||'你').slice(0,1)+
+          '</div>';
+          // ▲▲▲ 使用者大頭貼放置處 ▲▲▲
       } else {
         // 左：AI 頭像 + 白底氣泡
         row.innerHTML=
@@ -2071,8 +2118,33 @@ function onModalKey(e){if(e.key==='Escape')closeP2Modal();}
 
 function p5Tab(name){
   document.querySelectorAll('.p5-tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
-  document.getElementById('p5TabBreak').style.display=name==='break'?'block':'none';
-  document.getElementById('p5TabAbility').style.display=name==='ability'?'block':'none';
+  var show=name==='break'?document.getElementById('p5TabBreak'):document.getElementById('p5TabAbility');
+  var hide=name==='break'?document.getElementById('p5TabAbility'):document.getElementById('p5TabBreak');
+  hide.style.display='none';
+  show.style.display='block';
+  // 淡入過場
+  show.classList.remove('p5-tab-fade');
+  void show.offsetWidth;
+  show.classList.add('p5-tab-fade');
+  if(name==='ability')revealTakeawayCards();
+}
+
+// 進入圓桌會議：先 loading（情緒銜接「進入會議室」），再跳轉
+function enterRoundtable(btn){
+  if(btn.classList.contains('is-loading'))return;
+  btn.classList.add('is-loading');
+  btn.innerHTML='<span class="cta-spin" aria-hidden="true"></span>進入會議室…';
+  setTimeout(function(){ gotoPage(4); }, 550);
+}
+
+function revealTakeawayCards(){
+  var cards=document.querySelectorAll('#p5TakeawayGrid .p5-takeaway-card');
+  cards.forEach(function(c,i){
+    c.classList.remove('reveal');
+    void c.offsetWidth;            // 重置動畫
+    c.style.animationDelay=(i*0.09)+'s';
+    c.classList.add('reveal');
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -2247,6 +2319,37 @@ var ACHIEVEMENT = {
   }
 };
 
+// 打字機效果：逐字浮現，並保留 <em> 高亮樣式
+function typeHeadline(el, html, speed){
+  if(!el)return;
+  speed=speed||55;
+  // 解析成片段，保留每段是否為 em 及其 class
+  var tmp=document.createElement('div'); tmp.innerHTML=html;
+  var segs=[];
+  Array.prototype.forEach.call(tmp.childNodes,function(n){
+    if(n.nodeType===3) segs.push({t:n.textContent, c:''});
+    else if(n.nodeType===1) segs.push({t:n.textContent, c:n.className||''});
+  });
+  var total=segs.reduce(function(a,s){return a+s.t.length;},0);
+  // 尊重「減少動態」設定：直接顯示完整內容
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    el.innerHTML=html; return;
+  }
+  clearInterval(el._typeTimer);
+  var i=0;
+  el._typeTimer=setInterval(function(){
+    i++;
+    var remaining=i, out='';
+    for(var k=0;k<segs.length && remaining>0;k++){
+      var s=segs[k], take=Math.min(s.t.length, remaining), chunk=s.t.slice(0,take);
+      out += s.c ? '<em class="'+s.c+'">'+chunk+'</em>' : chunk;
+      remaining-=take;
+    }
+    el.innerHTML=out + (i<total ? '<span class="type-caret"></span>' : '');
+    if(i>=total) clearInterval(el._typeTimer);
+  }, speed);
+}
+
 function buildSummary(){
   var s=state.scene;
   if(!s)return;
@@ -2254,7 +2357,7 @@ function buildSummary(){
   // ① 你做到了什麼
   var ach=ACHIEVEMENT[s.id]||{headline:'你剛完成了一場 AI 決策體驗',sub:'身為{role}，你與數智分身協同完成了這個場景。'};
   document.getElementById('p5SceneTag').textContent=s.name;
-  document.getElementById('p5Headline').innerHTML=ach.headline;
+  typeHeadline(document.getElementById('p5Headline'), ach.headline, 55);
   document.getElementById('p5AchSub').textContent=ach.sub.replace('{role}',state.role);
 
   // ② 突破了什麼 — 雷達形狀更新 + 橫向說明列
