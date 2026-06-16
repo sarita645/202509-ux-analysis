@@ -783,22 +783,35 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .hd-dot.active{background:#fff;width:18px;border-radius:4px}
 .hud-cur{font-size:14px;color:#fff;white-space:nowrap;font-weight:500}
 
-@media(max-width:1199px){
-  .hud{padding:0 14px}
+/* <1420：進度條列縮成手機版（緊湊圓點），但盡量保留「你的職能 / 場景」 */
+@media(max-width:1419px){
+  .hud{padding:0 16px}
   .hud-left{overflow:visible;min-width:0}
   .hud-logo{padding-right:12px;margin-right:12px}
-  .hud-logo-sub{display:none}
-  .hud-steps{display:none}        /* hide the scrolling breadcrumb */
-  .hud-progress{display:flex}     /* show compact dots + current step */
-  .hud-right{gap:6px;margin-left:8px}
-  .hud-role{display:none!important}
-  .hud-scene{display:none!important}
+  .hud-steps{display:none}        /* 收起捲動式麵包屑 */
+  .hud-progress{display:flex}     /* 改顯示緊湊圓點 + 目前步驟 */
+  .hud-right{gap:8px;margin-left:10px}
+  .hud-role{font-size:13px;padding:4px 10px}
+  .hud-scene{font-size:12px;padding:4px 9px}
+}
+/* ≤1024：拿掉步驟文字（保留圓點），騰出空間讓職能/場景續留 */
+@media(max-width:1024px){
+  .hud{padding:0 14px}
+  .hud-cur{display:none}
   .hud-back{padding:5px 8px}
-  .hud-back .hb-text{display:none} /* arrow only on mobile */
+  .hud-back .hb-text{display:none} /* 窄螢幕只留箭頭 */
   .hud-home{padding:5px 6px;font-size:14px}
 }
+/* ≤860：空間真的不足時，先收起較長的「場景」，保留「你的職能」 */
+@media(max-width:860px){
+  .hud-scene{display:none!important}
+}
+/* ≤680：再不行才收起「你的職能」 */
+@media(max-width:680px){
+  .hud-role{display:none!important}
+}
+/* ≤560：極窄收尾 */
 @media(max-width:560px){
-  .hud-cur{display:none}          /* very narrow: dots only, no overflow */
   .hud{padding:0 10px}
   .hud-right{gap:4px}
   .hud-home{font-size:0;padding:6px;line-height:0}
@@ -897,7 +910,14 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   border-left:1px solid rgba(255,255,255,.32);
   display:inline-flex;align-items:center;gap:4px;
 }
-.p2-role-switch::after{content:'⌄';font-size:13px;line-height:1}
+.p2-role-switch::after{
+  content:'';flex-shrink:0;
+  width:0;height:0;
+  border-left:3.5px solid transparent;
+  border-right:3.5px solid transparent;
+  border-top:4px solid currentColor;
+  margin-top:1px;
+}
 
 /* P2 Modal */
 .p2-modal-bg{
@@ -1663,9 +1683,9 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 <section class="page" id="p4" aria-label="圓桌會議">
   <div class="p4-placeholder-wrap">
     <div class="p4-placeholder-text">
-      <span id="p4PlaceholderName">急單插單應變</span>場景示意
+      <span id="p4PlaceholderRole">採購</span> 視角 · <span id="p4PlaceholderName">急單插單應變</span><br>圓桌會議示意
     </div>
-    <div class="p4-placeholder-note">此區域由需求方內嵌體驗內容</div>
+    <div class="p4-placeholder-note">此處僅為框架佔位，正式圓桌會議的互動內容將由需求方內嵌——這不是最終畫面</div>
   </div>
   <div id="p4-footer">
     <button class="btn-end" onclick="gotoPage(5)" aria-label="查看分身能力總結">查看分身能力總結 &nbsp;›</button>
@@ -1826,6 +1846,29 @@ var ROLE_ALIAS = {
 };
 function scenesFor(role){ return SCENES[ROLE_ALIAS[role]||role] || []; }
 
+/* ── 視角（主角）解析 ──
+   state.role        = 使用者在 P1 選定的「本職」
+   state.viewpointRole = 在 P2 確認 Modal 選定、要以哪個視角體驗此場景（主角）
+   未選視角時，主角即為本職。 */
+function effRole(){ return state.viewpointRole || state.role; }
+function effColor(){ return state.viewpointColor || state.roleColor || '#125BBC'; }
+
+// 完整參與名單 = 本職 + 場景分身（依名稱去重）
+function sceneCast(s){
+  var cast=[], seen={};
+  var baseName=state.role;
+  if(baseName){ cast.push({name:baseName,color:state.roleColor||roleColorOf(baseName)}); seen[baseName]=true; }
+  (s.agents||[]).forEach(function(a){ if(!seen[a.name]){ cast.push({name:a.name,color:roleColorOf(a.name,a.color)}); seen[a.name]=true; } });
+  return cast;
+}
+// 數智分身（加入會議者）= 全名單去掉目前主角
+function joiningAgents(s){
+  var hero=effRole();
+  var others=sceneCast(s).filter(function(a){ return a.name!==hero; });
+  if(others.length) return others;
+  return (s.agents||[]).map(function(a){ return {name:a.name,color:roleColorOf(a.name,a.color)}; });
+}
+
 var ABILITIES = {
   s1:[{n:'GM決策協調分身',r:'急單決策',d:'跨部門協調，快速評估急單可行性與風險'},{n:'業務談判分身',r:'客戶溝通',d:'即時提供交期承諾與談判話術支援'},{n:'生產排程分身',r:'產能評估',d:'自動重排產線，計算最優插單位置'},{n:'供應鏈風控分身',r:'備料風控',d:'即時比對庫存，預測備料缺口與交期風險'}],
   s3:[{n:'生管主管分身',r:'工單管理',d:'自動解析工單用料需求並觸發預警'},{n:'物控專員分身',r:'庫存比對',d:'即時比對庫存與在途料，預測料況風險'},{n:'倉庫管理員分身',r:'倉儲調度',d:'協調倉儲調度，確保開工前料件到位'}],
@@ -1906,7 +1949,9 @@ function updateHUD(n){
   var role=document.getElementById('hudRole');
   var scene=document.getElementById('hudScene');
   var back=document.getElementById('hudBack');
-  if(state.role&&n>1){role.textContent='你的職能：'+state.role;role.classList.add('show');}
+  // 頁面 3 起：header 顯示「目前主角」（若在 P2 確認時選了不同視角）
+  var dispRole=(n>=3 && state.viewpointRole) ? state.viewpointRole : state.role;
+  if(dispRole&&n>1){role.textContent='你的職能：'+dispRole;role.classList.add('show');}
   else{role.classList.remove('show');}
   if(state.scene&&n>=3){scene.textContent='場景：'+state.scene.name;scene.classList.add('show');}
   else{scene.classList.remove('show');}
@@ -1914,7 +1959,12 @@ function updateHUD(n){
   else{back.classList.remove('show');}
 }
 
-var ROLE_COLORS={'採購':'#1B5E36','業務':'#E65100','廠長':'#4A148C','生管':'#1565C0','倉管':'#006064','物控':'#00838F','產線班組長':'#5D4037','IT資訊人員':'#B71C1C','資材':'#0277BD','專案經理':'#283593'};
+var ROLE_COLORS={'採購':'#36684A','業務':'#C46734','廠長':'#794EAD','生管':'#376BA7','倉管':'#006064','物控':'#00838F','產線班組長':'#125BBC','IT資訊人員':'#3E885F','資材':'#91873E','專案經理':'#A660BE'};
+
+// 分身名稱（簡寫）對應到職能名稱，讓場景分身沿用同一套職能顏色
+var AGENT_ALIAS={'PM':'專案經理','IT':'IT資訊人員'};
+// 若分身名稱本身是個職能，回傳該職能色；否則用場景自帶的 fallback 色
+function roleColorOf(name,fallback){ var k=AGENT_ALIAS[name]||name; return ROLE_COLORS[k]||fallback||'#125BBC'; }
 
 // 每個職能對應 3 句痛點（替換左側白色氣泡內容）
 var PAIN_DEFAULT=[
@@ -1951,6 +2001,7 @@ function onRoleSelect(val){
   if(!val)return;
   state.role=val;
   state.roleColor=ROLE_COLORS[val]||'#125BBC';
+  state.viewpointRole='';state.viewpointColor='';
   document.getElementById('p1Cta').disabled=false;
   updatePainBubbles(val);   // 白色氣泡，依職能替換內容
 }
@@ -2108,23 +2159,16 @@ function openViewpointModal(scene){
   var list = document.getElementById('vpModalList');
   list.innerHTML = '';
 
-  // 把目前職能排第一
-  var ROLE_COLORS = {
-    '採購':'#1B5E36','業務':'#E65100','廠長':'#4A148C','生管':'#1565C0',
-    '倉管':'#006064','物控':'#00838F','產線班組長':'#5D4037',
-    'IT資訊人員':'#B71C1C','資材':'#0277BD','專案經理':'#283593'
-  };
-
   var agentsInScene = scene.agents || [];
   var currentRole = state.role;
-  var currentColor = state.roleColor || ROLE_COLORS[currentRole] || '#125BBC';
+  var currentColor = state.roleColor || roleColorOf(currentRole);
 
   // 合併：目前職能 + 場景內其他職能（去重）
   var options = [];
   options.push({name: currentRole, color: currentColor, isCurrent: true});
   agentsInScene.forEach(function(a){
     if(a.name !== currentRole){
-      options.push({name: a.name, color: a.color, isCurrent: false});
+      options.push({name: a.name, color: roleColorOf(a.name, a.color), isCurrent: false});
     }
   });
 
@@ -2216,10 +2260,10 @@ function selectScene(s){
   // 還原「開始體驗」按鈕狀態（從 P4 返回時）
   var startBtn=document.querySelector('.p3-start');
   if(startBtn){startBtn.classList.remove('is-loading');startBtn.innerHTML='開始體驗 &nbsp;›';}
-  document.getElementById('p3TagRole').textContent=state.role;
+  document.getElementById('p3TagRole').textContent=effRole();
   document.getElementById('p3SceneTag').textContent=s.name;
 
-  var roleAbbr=(state.role||'我').slice(0,1);
+  var roleAbbr=(effRole()||'我').slice(0,1);
   var msgs=[
     {who:'user', text:s.steps[0]},
     {who:'ai',   text:'收到。我是 AI 數智助理，已掌握「'+s.name+'」的完整情境，正在為你召集對應的數智分身…'},
@@ -2238,7 +2282,7 @@ function selectScene(s){
   if(hint){hint.style.display='block';}
 
   var circles=[];
-  s.agents.forEach(function(a){
+  joiningAgents(s).forEach(function(a){
     var el=document.createElement('div');
     el.className='p3-join-av';
     var circle=document.createElement('div');
@@ -2314,7 +2358,7 @@ function selectScene(s){
             (USER_AVATAR_URL
               ? '<img class="p3-av-img" src="'+USER_AVATAR_URL+'" alt="使用者大頭貼" onerror="this.remove()">'
               : '')+
-            (state.role||'你').slice(0,1)+
+            (effRole()||'你').slice(0,1)+
           '</div>';
           // ▲▲▲ 使用者大頭貼放置處 ▲▲▲
       } else {
@@ -2360,11 +2404,11 @@ function selectScene(s){
 /* P2 切換職能下拉 */
 /* ── P2 切換職能 Modal ── */
 var ALL_ROLES_LIST=[
-  {name:'採購',color:'#1B5E36'},{name:'業務',color:'#E65100'},
-  {name:'廠長',color:'#4A148C'},{name:'生管',color:'#1565C0'},
+  {name:'採購',color:'#36684A'},{name:'業務',color:'#C46734'},
+  {name:'廠長',color:'#794EAD'},{name:'生管',color:'#376BA7'},
   {name:'倉管',color:'#006064'},{name:'物控',color:'#00838F'},
-  {name:'產線班組長',color:'#5D4037'},{name:'IT資訊人員',color:'#B71C1C'},
-  {name:'資材',color:'#0277BD'},{name:'專案經理',color:'#283593'}
+  {name:'產線班組長',color:'#125BBC'},{name:'IT資訊人員',color:'#3E885F'},
+  {name:'資材',color:'#91873E'},{name:'專案經理',color:'#A660BE'}
 ];
 
 function openP2Modal(){
@@ -2379,6 +2423,7 @@ function openP2Modal(){
     item.onclick=function(){
       state.role=r.name;
       state.roleColor=r.color;
+      state.viewpointRole='';state.viewpointColor='';
       closeP2Modal();
       buildScenePage();
     };
@@ -2519,6 +2564,8 @@ function initRoundtable(){
   var s=state.scene; if(!s)return;
   var ph=document.getElementById('p4PlaceholderName');
   if(ph) ph.textContent=s.name;
+  var pr=document.getElementById('p4PlaceholderRole');
+  if(pr) pr.textContent=effRole();
 }
 
 function rtShowReplies(s){
@@ -2540,7 +2587,7 @@ function rtShowReplies(s){
 
 function rtSend(s,text){
   var chat=document.getElementById('p4Chat');
-  rtAppend(chat,{roleLabel:(state.role||'您')+'（您）',content:text,isUser:true});
+  rtAppend(chat,{roleLabel:(effRole()||'您')+'（您）',content:text,isUser:true});
   document.getElementById('p4Reply').style.display='none';
   var typing=document.createElement('div');typing.className='p4-typing';typing.id='p4Typing';
   typing.innerHTML='<span class="p4-typing-dot"></span><span class="p4-typing-dot" style="animation-delay:.2s"></span><span class="p4-typing-dot" style="animation-delay:.4s"></span> AI 分身正在回應中…';
@@ -2623,7 +2670,7 @@ function buildSummary(){
   var ach=ACHIEVEMENT[s.id]||{headline:'你剛完成了一場 AI 決策體驗',sub:'身為{role}，你與數智分身協同完成了這個場景。'};
   document.getElementById('p5SceneTag').textContent=s.name;
   typeHeadline(document.getElementById('p5Headline'), ach.headline, 55);
-  document.getElementById('p5AchSub').textContent=ach.sub.replace('{role}',state.role);
+  document.getElementById('p5AchSub').textContent=ach.sub.replace('{role}',effRole());
 
   // ② 突破了什麼 — 雷達形狀更新 + 橫向說明列
   var dims=DIMS[s.id]||DIMS.s1;
@@ -2751,7 +2798,7 @@ var SCENE_TYPE = {
 };
 
 function resetExperience(){
-  state={page:1,role:'',roleColor:'',scene:null,history:[1]};
+  state={page:1,role:'',roleColor:'',scene:null,history:[1],viewpointRole:'',viewpointColor:'',pendingScene:null,pendingViewpoint:null};
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('p1').classList.add('active');
   var trig=document.getElementById('roleDDTrigger');
