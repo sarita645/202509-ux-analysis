@@ -26,6 +26,15 @@
   --sh-card:0 6px 20px rgba(20,50,120,.06);
   --sh-lg:0 14px 40px rgba(20,50,120,.12);
   --hud-h:52px;
+  /* ── Motion tokens ── */
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --dur-micro:100ms;
+  --dur-fast:180ms;
+  --dur-base:260ms;
+  --dur-slow:400ms;
+  --dur-page:280ms;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;overflow-x:hidden}
@@ -72,16 +81,15 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .hud-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:12px}
 .hud-role{font-family:'DM Mono',monospace;font-size:14px;color:#fff;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:4px;white-space:nowrap;display:none}
 .hud-role.show{display:block}
-.hud-back{font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;transition:all .15s;display:none}
+.hud-back{font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;transition:background var(--dur-micro),color var(--dur-micro),border-color var(--dur-micro) .15s;display:none}
 .hud-back.show{display:block}
 .hud-back:hover{background:rgba(255,255,255,.1);color:#fff}
 .hud-home{font-size:14px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 10px;border-radius:4px;white-space:nowrap;transition:color .15s}
 .hud-home:hover{color:rgba(255,255,255,.8)}
 
 /* ── PAGES ────────────────────────── */
-.page{display:none;min-height:calc(100vh - var(--hud-h));animation:fadeIn .25s ease}
+.page{display:none;min-height:calc(100vh - var(--hud-h))}
 .page.active{display:flex;flex-direction:column}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── PAGE 1: 歡迎大廳 + 選定職能 ────────────── */
 #p1{
@@ -127,8 +135,12 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .pain-4{left:10%;top:44%;animation-delay:0.6s}
 .pain-5{left:32%;top:44%;animation-delay:1.8s}
 .pain-6{left:8%;top:72%;animation-delay:3s}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@media(prefers-reduced-motion:reduce){.p1-pain{animation:none}}
+@keyframes floatyA{0%,100%{transform:translateY(0)   rotate(-.4deg)}50%{transform:translateY(-8px) rotate(.4deg)}}
+@keyframes floatyB{0%,100%{transform:translateY(-2px)rotate(.3deg)} 50%{transform:translateY(-10px)rotate(-.3deg)}}
+@keyframes floatyC{0%,100%{transform:translateY(0)   rotate(.5deg)} 50%{transform:translateY(-6px) rotate(-.5deg)}}
+.p1-pain:nth-child(1){animation:floatyA 5.8s var(--ease-in-out) infinite;animation-delay:0s}
+.p1-pain:nth-child(2){animation:floatyB 6.4s var(--ease-in-out) infinite;animation-delay:.6s}
+.p1-pain:nth-child(3){animation:floatyC 5.2s var(--ease-in-out) infinite;animation-delay:1.2s}
 
 /* ── Inline pain strip：<1200px 時取代懸浮泡泡 ── */
 .p1-pain-strip{
@@ -183,7 +195,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   cursor:pointer;font-family:'Noto Sans TC',sans-serif;
   transition:all .15s;box-shadow:0 6px 20px rgba(var(--brand-rgb),.28);
 }
-.p1-cta:hover:not(:disabled){background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 28px rgba(15,62,158,.38);transform:translateY(-1px)}
+.p1-cta:hover:not(:disabled){background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 28px rgba(15,62,158,.38);transform:translateY(-2px)}
 .p1-cta:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
 /* ── <1200px：收起懸浮泡泡，改為 inline strip ── */
@@ -526,7 +538,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   transition:all .15s;
   box-shadow:0 4px 14px rgba(91,45,142,.28);
 }
-.btn-end:hover{box-shadow:0 6px 20px rgba(91,45,142,.38);transform:translateY(-1px)}
+.btn-end:hover{box-shadow:0 6px 20px rgba(91,45,142,.38);transform:translateY(-2px)}
 
 /* ── PAGE 5: 分身總結 ────────────── */
 #p5{
@@ -882,7 +894,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   box-shadow:0 20px 60px rgba(16,32,64,.22);
   animation:modalIn .18s ease;
 }
-@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .p2-modal-title{
   font-size:15px;font-weight:700;color:var(--ink);
   margin-bottom:16px;text-align:center;
@@ -917,7 +929,11 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   transition:box-shadow .15s,transform .15s;
   overflow:hidden;
 }
-.p2-scard:hover{box-shadow:var(--sh-lg);transform:translateY(-3px)}
+.p2-scard:hover{
+  box-shadow:0 12px 36px rgba(var(--brand-rgb),.13);
+  transform:translateY(-2px);
+  border-color:rgba(var(--brand-rgb),.18);
+}
 /* 置中標題區塊 */
 .p2-scard-top{
   text-align:center;padding:20px 16px 16px;
@@ -932,7 +948,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
 .p2-btn-sub:hover{border-color:var(--brand-mid);color:var(--brand)}
 .p2-btn-go{flex:1;padding:10px;border:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 14px rgba(var(--brand-rgb),.25);transition:all .15s}
-.p2-btn-go:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-1px)}
+.p2-btn-go:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-2px)}
 
 /* P3 — AI 對話預覽（對照附圖）*/
 .p3-tags{display:flex;gap:8px;margin-bottom:14px;flex-shrink:0}
@@ -1095,7 +1111,9 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   flex:1;padding:16px;border:none;background:transparent;
   font-size:16px;font-weight:700;color:var(--ink3);
   cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  transition:all .15s;
+  transition:color var(--dur-fast) var(--ease-in-out),
+             background var(--dur-fast) var(--ease-in-out),
+             border-bottom-color var(--dur-fast) var(--ease-in-out);
   border-bottom:3px solid transparent;
 }
 .p5-tab.active{color:var(--brand);border-bottom:3px solid var(--brand);background:#fff}
@@ -1214,43 +1232,37 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 @keyframes fadeUp      {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes scaleIn     {from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
 
-.page-anim-right{animation:slideInRight .28s cubic-bezier(.22,1,.36,1) both}
-.page-anim-left {animation:slideInLeft  .28s cubic-bezier(.22,1,.36,1) both}
-.page-anim-up   {animation:fadeUp       .24s cubic-bezier(.22,1,.36,1) both}
-.page-anim-scale{animation:scaleIn      .22s cubic-bezier(.22,1,.36,1) both}
+.page-anim-right{animation:slideInRight var(--dur-page) var(--ease-out) both}
+.page-anim-left {animation:slideInLeft  var(--dur-page) var(--ease-out) both}
+.page-anim-up   {animation:fadeUp       var(--dur-base) var(--ease-out) both}
+.page-anim-scale{animation:scaleIn      var(--dur-base) var(--ease-spring) both}
 
 /* ════════════════════════════════════════
    Layer 2 — Stagger 進場（卡片、維度列）
    ════════════════════════════════════════ */
 @keyframes staggerIn{
-  from{opacity:0;transform:translateY(20px)}
+  from{opacity:0;transform:translateY(10px)}
   to  {opacity:1;transform:translateY(0)}
 }
 .stagger-item{
   opacity:0;
-  animation:staggerIn .3s cubic-bezier(.22,1,.36,1) both;
+  animation:staggerIn var(--dur-base) var(--ease-out) both;
 }
-.stagger-item:nth-child(1){animation-delay:.04s}
+.stagger-item:nth-child(1){animation-delay:.05s}
 .stagger-item:nth-child(2){animation-delay:.10s}
-.stagger-item:nth-child(3){animation-delay:.16s}
-.stagger-item:nth-child(4){animation-delay:.22s}
-.stagger-item:nth-child(5){animation-delay:.28s}
-.stagger-item:nth-child(n+6){animation-delay:.34s}
+.stagger-item:nth-child(3){animation-delay:.15s}
+.stagger-item:nth-child(4){animation-delay:.20s}
+.stagger-item:nth-child(5){animation-delay:.25s}
+.stagger-item:nth-child(n+6){animation-delay:.30s}
 
 /* ════════════════════════════════════════
-   Layer 3 — 按鈕 press 回饋
+   Layer 3 — 按鈕 press 回饋（無 !important）
    ════════════════════════════════════════ */
-.p1-cta:active,
-.p2-btn-go:active,
-.p3-start:active,
-.p5-btn-primary:active{
-  transform:scale(.97) translateY(1px)!important;
-  box-shadow:0 2px 8px rgba(var(--brand-rgb),.18)!important;
-}
-.p2-btn-sub:active,
-.p5-btn-secondary:active{
-  transform:scale(.97)!important;
-}
+.p1-cta:active{transform:scale(.96) translateY(1px);box-shadow:0 2px 6px rgba(var(--brand-rgb),.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p2-btn-go:active{transform:scale(.96) translateY(1px);box-shadow:0 2px 6px rgba(var(--brand-rgb),.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p3-start:active{transform:scale(.97);transition:transform var(--dur-micro)}
+.p5-btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(8,28,80,.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p2-btn-sub:active,.p5-btn-secondary:active{transform:scale(.97);transition:transform var(--dur-micro)}
 
 /* ════════════════════════════════════════
    Layer 4 — P1 職能 DD 選取彈跳
@@ -1270,7 +1282,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   0%,100%{box-shadow:0 6px 20px rgba(var(--brand-rgb),.28)}
   50%    {box-shadow:0 6px 28px rgba(var(--brand-rgb),.48),0 0 0 5px rgba(var(--brand-rgb),.08)}
 }
-.p1-cta:not(:disabled){animation:ctaPulse 2.6s ease-in-out infinite}
+.p1-cta:not(:disabled){animation:ctaPulse 2.6s var(--ease-in-out) infinite}
 .p1-cta:not(:disabled):hover,
 .p1-cta:not(:disabled):active{animation:none}
 
@@ -1292,10 +1304,11 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
    ════════════════════════════════════════ */
 @media(prefers-reduced-motion:reduce){
   .page-anim-right,.page-anim-left,.page-anim-up,.page-anim-scale,
-  .stagger-item,.role-dd-item.just-selected,#p5RadarShape{
+  .stagger-item,.role-dd-item.just-selected,#p5RadarShape,
+  .p1-pain,.ai-bot,.ai-icon,.p1-cta:not(:disabled){
     animation:none!important;opacity:1!important;transform:none!important;
+    transition:none!important;
   }
-  .p1-cta:not(:disabled){animation:none!important}
 }
 </style>
 </head>
