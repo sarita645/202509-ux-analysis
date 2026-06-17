@@ -794,6 +794,13 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   .hud-back .hb-text{display:none} /* 窄螢幕只留箭頭 */
   .hud-home{padding:5px 6px;font-size:14px}
 }
+/* ≤480px：隱藏 HUD 標題文字，只保留 logo placeholder */
+@media(max-width:480px){
+  .hud-logo-title{display:none}
+  .hud-logo-sep{display:none}
+  .hud-logo-placeholder{width:48px}
+  .hud{padding:0 12px}
+}
 /* ≤860：空間真的不足時，先收起較長的「場景」，保留「你的職能」 */
 @media(max-width:860px){
   .hud-scene{display:none!important}
@@ -863,11 +870,14 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p1-dd-trigger.has-val .p1-dd-label{color:var(--ink)}
 .p1-dd-caret{color:var(--brand);font-size:14px;transition:transform .18s;flex-shrink:0}
 .p1-dd.open .p1-dd-caret{transform:rotate(180deg)}
+/* 改用 fixed 定位確保手機可滾動，不被父層 overflow 裁切 */
 .p1-dd-panel{
-  position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:60;
+  position:fixed;z-index:9000;
   background:#fff;border:1px solid var(--border);border-radius:14px;
-  box-shadow:var(--sh-lg);padding:10px;
+  box-shadow:0 8px 40px rgba(20,50,120,.15);padding:10px;
   display:grid;grid-template-columns:1fr 1fr;gap:2px;
+  max-height:60vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  width:min(520px, calc(100vw - 32px));
 }
 .p1-dd-panel[hidden]{display:none}
 .p1-dd-item{
@@ -2172,7 +2182,15 @@ function updateHUD(n){
   else{back.classList.remove('show');}
 }
 
-var ROLE_COLORS={'採購':'#36684A','業務':'#C46734','廠長':'#794EAD','生管':'#376BA7','倉管':'#006064','物控':'#00838F','產線班組長':'#125BBC','IT資訊人員':'#3E885F','資材':'#91873E','專案經理':'#A660BE'};
+var ROLE_COLORS={
+  '採購':'#36684A','業務':'#C46734','廠長':'#794EAD','生管':'#376BA7',
+  '倉管':'#006064','物控':'#00838F','產線班組長':'#125BBC','IT資訊人員':'#3E885F',
+  '資材':'#91873E','專案經理':'#A660BE',
+  '總經理':'#B71C1C','財務主管':'#1A237E','品保主管':'#4E342E',
+  '研發工程師':'#1B5E20','業務主管':'#E65100','供應商管理':'#37474F',
+  '人資主管':'#880E4F','行銷企劃':'#0D47A1','客服主管':'#4A148C',
+  '數位轉型主管':'#004D40'
+};
 
 // 分身名稱（簡寫）對應到職能名稱，讓場景分身沿用同一套職能顏色
 var AGENT_ALIAS={
@@ -2241,8 +2259,25 @@ function toggleRoleDD(e){
   if(e)e.stopPropagation();
   var dd=document.getElementById('roleDD');
   var open=dd.classList.toggle('open');
-  document.getElementById('roleDDPanel').hidden=!open;
+  var panel=document.getElementById('roleDDPanel');
+  panel.hidden=!open;
   document.getElementById('roleDDTrigger').setAttribute('aria-expanded',open?'true':'false');
+  if(open){
+    // 計算 trigger 位置，讓 fixed panel 對齊
+    var trig=document.getElementById('roleDDTrigger');
+    var rect=trig.getBoundingClientRect();
+    panel.style.top=(rect.bottom+6)+'px';
+    panel.style.left=Math.max(16,rect.left)+'px';
+    panel.style.width=rect.width+'px';
+    // 若超出底部則往上展開
+    var panelH=Math.min(window.innerHeight*0.6, 400);
+    if(rect.bottom+panelH+10>window.innerHeight){
+      panel.style.top='auto';
+      panel.style.bottom=(window.innerHeight-rect.top+6)+'px';
+    } else {
+      panel.style.bottom='auto';
+    }
+  }
 }
 function closeRoleDD(){
   var dd=document.getElementById('roleDD');if(!dd)return;
