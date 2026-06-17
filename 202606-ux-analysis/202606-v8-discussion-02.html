@@ -2693,7 +2693,7 @@ function buildPgSummary(s){
     recRow.appendChild(btn);
   }
 
-  // ── 3 秒後依序顯示三張卡片，10s 後自動收合 ──
+  // ── 3 秒後依序顯示三張卡片（不自動收合，需手動點 ✕ 才收起） ──
   if(_pgwCollapseTimer) clearTimeout(_pgwCollapseTimer);
   var wrap=document.getElementById('pgWidget');
   var bot=document.getElementById('aiBotWrap');
@@ -2717,10 +2717,8 @@ function buildPgSummary(s){
     }, delays[i]);
   });
 
-  // 8 秒後（卡片全出現後 4 秒）自動收合
-  _pgwCollapseTimer=setTimeout(function(){
-    collapseToBell();
-  }, 10000);
+  // 不再自動收合：卡片會保留，直到使用者手動點各卡的 ✕ 關閉
+  // （三張都關閉後才會收合成右下角頭像，由 closePgwCard 處理）
 }
 var ALL_ROLES_LIST=[
   {name:'採購',color:'#36684A'},{name:'業務',color:'#C46734'},
