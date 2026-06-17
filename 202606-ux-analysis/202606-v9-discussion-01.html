@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — v9 討論記錄 + 修改規格</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#111;--ink2:#444;--ink3:#888;
+  --bg:#F2F0EB;--surface:#FDFCFA;--surface2:#ECEAE4;
+  --brand:#1B2B5E;--brand2:#2D4DB8;
+  --purple:#5B2D8E;--teal:#0E6B6B;--green:#0D6B50;
+  --amber:#854F0B;--blue:#185FA5;--red:#9B1C1C;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.06);
+  --r:6px;--r2:12px;--r3:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink)}
+
+.header{background:var(--purple);padding:40px 0 36px}
+.header-inner{max-width:880px;margin:0 auto;padding:0 32px}
+.h-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:12px}
+.h-title{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;color:#fff;line-height:1.15;margin-bottom:10px}
+.h-sub{font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;max-width:600px}
+.h-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.h-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55)}
+
+.main{max-width:880px;margin:0 auto;padding:36px 32px 80px}
+@media(max-width:640px){.main{padding:24px 18px 60px}}
+
+/* ACCORDION */
+.section{margin-bottom:8px}
+.s-header{display:flex;align-items:center;gap:12px;cursor:pointer;padding:15px 20px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);transition:border-color .15s;user-select:none}
+.s-header:hover{border-color:var(--purple)}
+.section.open .s-header{border-radius:var(--r3) var(--r3) 0 0;border-bottom-color:transparent}
+.s-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--ink3);flex-shrink:0}
+.s-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:var(--ink);flex:1}
+.s-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0}
+.badge-purple{background:#F3EFF8;color:var(--purple)}
+.badge-amber{background:#FDF3E3;color:var(--amber)}
+.badge-teal{background:#E0F5F5;color:var(--teal)}
+.badge-blue{background:#E6F1FB;color:var(--blue)}
+.badge-red{background:#FEF2F2;color:var(--red)}
+.badge-green{background:#E1F5EE;color:var(--green)}
+.s-chevron{font-size:11px;color:var(--ink3);transition:transform .2s;flex-shrink:0}
+.section.open .s-chevron{transform:rotate(90deg)}
+.s-body{display:none;background:var(--surface);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--r3) var(--r3);padding:22px 24px}
+.section.open .s-body{display:block}
+
+/* CONTENT */
+.block{margin-bottom:20px}.block:last-child{margin-bottom:0}
+.block-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.body-text{font-size:13px;color:var(--ink2);line-height:1.75;margin-bottom:8px}
+.body-text b{color:var(--ink);font-weight:600}
+.body-text em{color:var(--purple);font-style:normal}
+
+.divider{height:1px;background:var(--border2);margin:18px 0}
+
+/* CHANGE ITEMS */
+.change-list{display:flex;flex-direction:column;gap:8px}
+.change-item{display:flex;gap:12px;padding:13px 16px;background:var(--surface2);border-radius:var(--r2);align-items:flex-start}
+.cn{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:2px 7px;flex-shrink:0;margin-top:2px}
+.cn-purple{background:var(--purple)}
+.cn-amber{background:var(--amber)}
+.cn-blue{background:var(--blue)}
+.cn-red{background:var(--red)}
+.cn-green{background:var(--green)}
+.cn-teal{background:var(--teal)}
+.change-page{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.pg-p2{background:#EEF4FC;color:var(--blue)}
+.pg-p3{background:#F3EFF8;color:var(--purple)}
+.pg-p5{background:#FFF7ED;color:#9A3412}
+.pg-all{background:#E0F5F5;color:var(--teal)}
+.pg-memo{background:#F3F4F6;color:#6B7280}
+.change-body{flex:1}
+.change-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.change-desc{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.change-desc code{font-family:'DM Mono',monospace;font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;color:var(--purple)}
+
+/* QUOTE */
+.q{border-radius:0 var(--r2) var(--r2) 0;padding:12px 16px;margin:8px 0;font-size:13px;line-height:1.7;color:var(--ink2)}
+.q.purple{border-left:3px solid var(--purple);background:#F5F0FA}
+.q.blue  {border-left:3px solid var(--blue);background:#EEF4FC}
+.q.green {border-left:3px solid var(--green);background:#EDFAF4}
+.q.amber {border-left:3px solid var(--amber);background:#FDF5E3}
+.q.red   {border-left:3px solid var(--red);background:#FEF2F2}
+.q-lbl{font-family:'DM Mono',monospace;font-size:10px;font-weight:600;margin-bottom:6px}
+.q.purple .q-lbl{color:var(--purple)}
+.q.blue   .q-lbl{color:var(--blue)}
+.q.green  .q-lbl{color:var(--green)}
+.q.amber  .q-lbl{color:var(--amber)}
+.q.red    .q-lbl{color:var(--red)}
+
+/* FLOW */
+.flow{display:flex;flex-direction:column;gap:0;margin:10px 0}
+.flow-step{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border2)}
+.flow-step:last-child{border-bottom:none}
+.flow-n{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--purple);background:#F3EFF8;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.flow-body{flex:1}
+.flow-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.flow-desc{font-size:12px;color:var(--ink2);line-height:1.6}
+
+.footer{max-width:880px;margin:0 auto;padding:24px 32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-left,.footer-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="h-eyebrow">AI AGENT EXPERIENCE CENTER — v9 DISCUSSION</div>
+    <h1 class="h-title">v9 討論記錄<br>+ 修改規格</h1>
+    <p class="h-sub">因需求方前後端串接時程問題，調整畫面互動邏輯；同步修正文案內容與多頁樣式細節。</p>
+    <div class="h-meta">
+      <span class="h-tag">2026/06</span>
+      <span class="h-tag">v9</span>
+      <span class="h-tag">前後端串接因應</span>
+      <span class="h-tag">P2/P3/P5 修改</span>
+      <span class="h-tag">文案修正</span>
+      <span class="h-tag">檔名統一</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- 00 背景說明 -->
+<div class="section open" id="s0">
+  <div class="s-header" onclick="toggle('s0')">
+    <div class="s-num">00</div>
+    <div class="s-title">調整背景</div>
+    <div class="s-badge badge-amber">重要前提</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+    <div class="block">
+      <div class="block-label">原因</div>
+      <p class="body-text">需求方正在進行前後端串接，<b>因版本更新時程來不及</b>，本次改動以不影響串接為前提，調整畫面互動流程與文案內容。</p>
+    </div>
+    <div class="block">
+      <div class="block-label">調整原則</div>
+      <div class="q purple"><div class="q-lbl">原則</div>P1 不動，主要改動集中在 P2 互動流程調整（將 Modal 下移至 P3）、P3 對話文案與分段邏輯重組、P5 區塊刪減與文案更新，以及全站 <code>digiwin-</code> 檔名改為 <code>202606-</code>。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 01 P2 修改 -->
+<div class="section open" id="s1">
+  <div class="s-header" onclick="toggle('s1')">
+    <div class="s-num">01</div>
+    <div class="s-title">P2 選擇場景 — 刪除再次確認 Modal</div>
+    <div class="s-badge badge-blue">互動流程調整</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+    <div class="block">
+      <div class="block-label">修改前</div>
+      <p class="body-text">點「開始體驗」→ 彈出「選擇體驗視角」Modal → 確認後進 P3</p>
+    </div>
+    <div class="block">
+      <div class="block-label">修改後</div>
+      <p class="body-text">點「開始體驗」→ <b>直接進 P3</b>，職能視角確認框移至 P3 頁面內（AI 對話和分身召集之間）。</p>
+    </div>
+    <div class="change-list">
+      <div class="change-item">
+        <div class="cn cn-blue">P2-1</div>
+        <div class="change-page pg-p2">P2</div>
+        <div class="change-body">
+          <div class="change-title">刪除 vpModal（職能視角選擇彈跳視窗）</div>
+          <div class="change-desc">移除 <code>id="vpModal"</code> HTML 區塊、<code>openViewpointModal()</code>、<code>closeViewpointModal()</code>、<code>confirmViewpoint()</code> 函數，以及相關 CSS（<code>.vp-modal-*</code>）。場景卡「開始體驗」按鈕 onclick 改為直接呼叫 <code>selectScene(s)</code>，不再開 Modal。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 02 P3 修改 -->
+<div class="section open" id="s2">
+  <div class="s-header" onclick="toggle('s2')">
+    <div class="s-num">02</div>
+    <div class="s-title">P3 體驗開場 — 流程重組 + 文案修正</div>
+    <div class="s-badge badge-purple">主要改動</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+
+    <div class="block">
+      <div class="block-label">新的 P3 五段式流程</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-n">1</div>
+          <div class="flow-body">
+            <div class="flow-title">AI 數智助理對話預覽（固定兩則）</div>
+            <div class="flow-desc">先顯示小秘書開場對話，告知場景痛點與分身能力，底部包含備註文字。</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-n">2</div>
+          <div class="flow-body">
+            <div class="flow-title">職能視角選擇（原 P2 Modal 下移至此）</div>
+            <div class="flow-desc">顯示「急單插單應變 — 你可以選擇的職能」，一行 3 個，使用者選擇體驗視角。</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-n">3</div>
+          <div class="flow-body">
+            <div class="flow-title">使用者選擇職能後觸發分身召集</div>
+            <div class="flow-desc">使用者點選職能後，「數智分身加入會議…」區塊出現，分身 Avatar 從離線→上線（硬幣翻面動畫）。</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-n">4</div>
+          <div class="flow-body">
+            <div class="flow-title">其他職能分身依序加入</div>
+            <div class="flow-desc">根據場景的 agents 陣列，逐個分身翻面上線，燈號變綠。</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-n">5</div>
+          <div class="flow-body">
+            <div class="flow-title">使用者點選「開始體驗」進入 P4</div>
+            <div class="flow-desc">分身上線完畢後，底部「開始體驗 ›」按鈕可用，點擊進入 P4。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="block">
+      <div class="block-label">P3 對話內容規格（固定兩則）</div>
+      <div class="q blue">
+        <div class="q-lbl">第一則 — 職能小秘書（使用者氣泡，右側）</div>
+        客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。
+      </div>
+      <div class="q purple">
+        <div class="q-lbl">第二則 — AI 回應（左側）</div>
+        鼎新 AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。
+      </div>
+      <div class="q green">
+        <div class="q-lbl">對話框底部備註（固定顯示於對話卡片內）</div>
+        下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。
+      </div>
+      <p class="body-text" style="margin-top:10px">備註：原本的第 3、4 則對話（使用者追問 / AI 分析完畢）<b>全部刪除</b>，固定只保留兩則。</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="block">
+      <div class="block-label">職能選擇框規格（從 P2 Modal 移植至 P3）</div>
+      <div class="change-list">
+        <div class="change-item">
+          <div class="cn cn-purple">P3-A</div>
+          <div class="change-body">
+            <div class="change-title">標題文字修改</div>
+            <div class="change-desc">原：「選擇體驗視角」+ 「這個場景有多個職能參與，選擇你想以哪個視角進入體驗」<br>改：<b>「急單插單應變 　你可以選擇的職能」</b>（副標題整段刪除）</div>
+          </div>
+        </div>
+        <div class="change-item">
+          <div class="cn cn-purple">P3-B</div>
+          <div class="change-body">
+            <div class="change-title">職能選項排列：一行 3 個</div>
+            <div class="change-desc">原 Modal 為縱向單欄列表，改為 <code>grid-template-columns: repeat(3, 1fr)</code> 三欄排列，維持卡片樣式（職能色圓點 + 職能名）。</div>
+          </div>
+        </div>
+        <div class="change-item">
+          <div class="cn cn-purple">P3-C</div>
+          <div class="change-body">
+            <div class="change-title">各階段間加入動畫過渡</div>
+            <div class="change-desc">每個階段完成後才顯示下一個階段：對話顯示完 → 職能選擇框淡入 → 選擇職能後 → 分身召集區淡入。使用 fadeUp（opacity + translateY）動畫，每段 delay 約 300ms。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 03 P5 修改 -->
+<div class="section open" id="s3">
+  <div class="s-header" onclick="toggle('s3')">
+    <div class="s-num">03</div>
+    <div class="s-title">P5 場景總結 — 區塊刪減 + 文案更新</div>
+    <div class="s-badge badge-red">刪減 + 文案</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+    <div class="change-list">
+
+      <div class="change-item">
+        <div class="cn cn-red">P5-1</div>
+        <div class="change-page pg-p5">P5</div>
+        <div class="change-body">
+          <div class="change-title">刪除頂部成就描述欄位</div>
+          <div class="change-desc">整個刪除「身為採購，你不再是『打單機器人』——數智分身幫你盤點缺口、比對替代料源，你只需要拍板。」這個 <code>.p5-ach-sub</code> 區塊。</div>
+        </div>
+      </div>
+
+      <div class="change-item">
+        <div class="cn cn-red">P5-2</div>
+        <div class="change-page pg-p5">P5</div>
+        <div class="change-body">
+          <div class="change-title">「現況突破」Tab — 雷達圖上方新增標題與內文</div>
+          <div class="change-desc">在雷達圖上方加入：<br>
+          <b>標題：</b>思維驅動型·高壓急單決策中樞<br>
+          <b>內文：</b>此場景不是單純模擬「是否接單」，而是把急單決策拆成可承諾量、成本邊界、客戶條件與內部執行限制的多層判斷。它最有說服力的地方，在於讓管理者看見：AI 分身不只是提供答案，而是能協助企業建立更成熟的接單決策機制。</div>
+        </div>
+      </div>
+
+      <div class="change-item">
+        <div class="cn cn-red">P5-3</div>
+        <div class="change-page pg-p5">P5</div>
+        <div class="change-body">
+          <div class="change-title">「分身能力」Tab — 刪除說明文字</div>
+          <div class="change-desc">整個刪除「以下分身在你剛才的體驗中協同運作，每一個都可以單獨部署到你的企業。」（<code>.p5-takeaway-note</code> 元素）</div>
+        </div>
+      </div>
+
+      <div class="change-item">
+        <div class="cn cn-red">P5-4</div>
+        <div class="change-page pg-p5">P5</div>
+        <div class="change-body">
+          <div class="change-title">「分身能力」Tab — 預設顯示 5–7 個分身卡片</div>
+          <div class="change-desc">目前分身卡片由場景 agents 動態生成（最多 3–4 個）。需補充預設資料讓每個場景至少有 5 個分身卡，最多 7 個，讓分身能力 Tab 內容更豐富。</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 04 全站 / 其他 -->
+<div class="section open" id="s4">
+  <div class="s-header" onclick="toggle('s4')">
+    <div class="s-num">04</div>
+    <div class="s-title">全站調整 — 檔名統一 + 命名規範</div>
+    <div class="s-badge badge-teal">全站</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+    <div class="change-list">
+      <div class="change-item">
+        <div class="cn cn-teal">ALL-1</div>
+        <div class="change-page pg-all">全站</div>
+        <div class="change-body">
+          <div class="change-title">檔名前綴統一：<code>digiwin-</code> → <code>202606-</code></div>
+          <div class="change-desc"><code>digiwin-v6-prototype.html</code> → <code>202606-v6-prototype.html</code><br><code>digiwin-v7-prototype.html</code> → <code>202606-v7-prototype.html</code><br><code>digiwin-v8-prototype.html</code> → <code>202606-v8-prototype.html</code><br>同步更新 <code>202606-ux-analysis.html</code> 內所有連結與資料夾結構。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 Memo — 次要待辦 -->
+<div class="section" id="s5">
+  <div class="s-header" onclick="toggle('s5')">
+    <div class="s-num">05</div>
+    <div class="s-title">MEMO — 次要待辦（後續陸續處理）</div>
+    <div class="s-badge badge-amber">低優先</div>
+    <div class="s-chevron">›</div>
+  </div>
+  <div class="s-body">
+    <div class="change-list">
+      <div class="change-item">
+        <div class="cn cn-amber">M-1</div>
+        <div class="change-page pg-memo">P1</div>
+        <div class="change-body">
+          <div class="change-title">職能下拉選單溢出問題</div>
+          <div class="change-desc">P1 在解析度不足的裝置上，職能下拉選單底部會被 footer 遮擋。需求方未來可能增加至 20+ 個職能，需優化：建議改為 fixed 定位的自訂 dropdown panel，或改用獨立 Modal 呈現職能清單。</div>
+        </div>
+      </div>
+      <div class="change-item">
+        <div class="cn cn-amber">M-2</div>
+        <div class="change-page pg-memo">P1</div>
+        <div class="change-body">
+          <div class="change-title">P1 手機版響應式</div>
+          <div class="change-desc">P1 目前未充分考慮手機板排版，痛點泡泡、背景圖、右側文字區塊的行動裝置斷點需要重新規劃。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-left"><a href="202606-ux-analysis.html" style="color:inherit;text-decoration:none">← 返回版本總覽</a></div>
+  <div class="footer-right">2026/06 — AI Agent v9 討論記錄</div>
+</footer>
+
+<script>
+function toggle(id){document.getElementById(id).classList.toggle('open')}
+</script>
+</body>
+</html>

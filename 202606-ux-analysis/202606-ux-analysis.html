@@ -81,7 +81,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
 <header class="header">
   <div class="header-inner">
     <div class="h-eyebrow">AI AGENT — UX REPORT HUB</div>
-    <h1 class="h-title">版本切換入口<br>v1.0 → v8.0</h1>
+    <h1 class="h-title">版本切換入口<br>v1.0 → v9.0</h1>
     <p class="h-sub">從會議前的推測分析，到會議後確認，到改版設計方向，到可互動原型。點擊各版本直接開啟對應 HTML。</p>
   </div>
 </header>
@@ -339,7 +339,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
       <div class="tl-dot-wrap">
         <div class="tl-dot" style="background:#0E6B6B">v8</div>
       </div>
-      <div class="tl-card" style="border-color:rgba(14,107,107,.25)">
+      <div class="tl-card" style="border-color:rgba(14,107,107,.15)">
         <div class="tl-head">
           <div>
             <div class="tl-title">v8 修正版原型 — 需求方回饋整合</div>
@@ -347,7 +347,7 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
             <span class="tl-ver" style="background:#E0F5F5;color:#0E6B6B">v8.0</span>
-            <span class="tl-status" style="background:#E0F5F5;color:#0E6B6B">進行中</span>
+            <span class="tl-status status-done">✓ 完成</span>
           </div>
         </div>
         <div class="tl-desc">v7 示意版提交需求方後，依回饋執行的修正版本。主要改動：P2 職能視角切換方案 D（Modal 確認）、HUD 加入場景 tag、P4 場景示意佔位、P3 對話氣泡重構（逐條動畫 → 分身上線）、P5 右下角 Widget（進度卡 + 推薦卡，10 秒收合為 AI 頭像）、全站 ai-bot 調整（P1–P4 隱藏，P5 收合後顯示）。</div>
@@ -358,14 +358,47 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
           <span class="tl-tag">P3 對話重構</span>
           <span class="tl-tag">P5 Widget</span>
           <span class="tl-tag">ai-bot 調整</span>
-          <span class="tl-tag">進度卡</span>
-          <span class="tl-tag">推薦卡</span>
         </div>
         <div class="tl-btns">
-          <a class="tl-btn btn-open" href="digiwin-v8-prototype.html" target="_blank" style="background:#0E6B6B">開啟 v8 原型 ↗</a>
+          <a class="tl-btn btn-open" href="202606-v8-prototype.html" target="_blank" style="background:#0E6B6B">開啟 v8 原型 ↗</a>
           <a class="tl-btn btn-dim" href="202606-v8-discussion-01.html" target="_blank">討論 01 + 修改紀錄</a>
         </div>
-        <div class="tl-note">原型：digiwin-v8-prototype.html｜修改紀錄：202606-v8-discussion-01.html</div>
+        <div class="tl-note">原型：202606-v8-prototype.html｜修改紀錄：202606-v8-discussion-01.html</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V9 討論 -->
+  <div style="margin-top:20px">
+    <div class="tl-item">
+      <div class="tl-dot-wrap">
+        <div class="tl-dot" style="background:#5B2D8E">v9</div>
+      </div>
+      <div class="tl-card" style="border-color:rgba(91,45,142,.25)">
+        <div class="tl-head">
+          <div>
+            <div class="tl-title">v9 前後端串接因應版 — 互動流程 + 文案調整</div>
+            <div class="tl-date">2026/06 — v8 完成後，因應需求方串接時程</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <span class="tl-ver" style="background:#F3EFF8;color:#5B2D8E">v9 進行中</span>
+            <span class="tl-status" style="background:#F3EFF8;color:#5B2D8E">待執行</span>
+          </div>
+        </div>
+        <div class="tl-desc">因需求方前後端串接時程壓縮，調整畫面互動邏輯：P1 不動、P2 刪除職能視角確認 Modal（移至 P3）、P3 對話固定兩則並重組五段流程、P5 刪除冗餘區塊並更新文案。同步統一全站檔名前綴（digiwin- → 202606-）。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">P2 刪除 Modal</span>
+          <span class="tl-tag">P3 流程重組</span>
+          <span class="tl-tag">P3 對話文案</span>
+          <span class="tl-tag">P5 區塊刪減</span>
+          <span class="tl-tag">P5 文案更新</span>
+          <span class="tl-tag">檔名統一</span>
+          <span class="tl-tag">P1 memo</span>
+        </div>
+        <div class="tl-btns">
+          <a class="tl-btn btn-open" href="202606-v9-discussion-01.html" target="_blank" style="background:#5B2D8E">討論 01 ↗</a>
+        </div>
+        <div class="tl-note">討論 01：202606-v9-discussion-01.html｜狀態：待執行 HTML 改版</div>
       </div>
     </div>
   </div>
@@ -400,18 +433,18 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
         <div class="file-size">修改紀錄</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(18,91,188,.2)">
-        <div class="file-icon">🆕</div>
-        <div class="file-name">digiwin-v6-prototype.html</div>
+        <div class="file-icon">📄</div>
+        <div class="file-name">202606-v6-prototype.html</div>
         <div style="font-size:11px;color:#125BBC;margin-left:auto;font-family:'DM Mono',monospace">v6 原型</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(18,91,188,.2)">
-        <div class="file-icon">🆕</div>
+        <div class="file-icon">📄</div>
         <div class="file-name">202606-v6-ux-report.html</div>
         <div style="font-size:11px;color:#125BBC;margin-left:auto;font-family:'DM Mono',monospace">v6 說明書</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(155,28,28,.2)">
-        <div class="file-icon">🆕</div>
-        <div class="file-name">digiwin-v7-prototype.html</div>
+        <div class="file-icon">📄</div>
+        <div class="file-name">202606-v7-prototype.html</div>
         <div style="font-size:11px;color:#9B1C1C;margin-left:auto;font-family:'DM Mono',monospace">v7 原型</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(155,28,28,.2)">
@@ -435,14 +468,24 @@ html,body{min-height:100vh;font-family:'Noto Sans TC',sans-serif;background:var(
         <div style="font-size:11px;color:#9B1C1C;margin-left:auto;font-family:'DM Mono',monospace">v7 討論 04</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(14,107,107,.3)">
-        <div class="file-icon">🆕</div>
-        <div class="file-name">digiwin-v8-prototype.html</div>
+        <div class="file-icon">📄</div>
+        <div class="file-name">202606-v8-prototype.html</div>
         <div style="font-size:11px;color:#0E6B6B;margin-left:auto;font-family:'DM Mono',monospace">v8 原型</div>
       </div>
       <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(14,107,107,.3)">
         <div class="file-icon">📄</div>
         <div class="file-name">202606-v8-discussion-01.html</div>
         <div style="font-size:11px;color:#0E6B6B;margin-left:auto;font-family:'DM Mono',monospace">v8 討論 + 修改紀錄</div>
+      </div>
+      <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(91,45,142,.3)">
+        <div class="file-icon">🆕</div>
+        <div class="file-name">202606-v9-prototype.html</div>
+        <div style="font-size:11px;color:#5B2D8E;margin-left:auto;font-family:'DM Mono',monospace">v9 原型（待建立）</div>
+      </div>
+      <div class="file-row" style="padding-left:28px;border-left:2px solid rgba(91,45,142,.3)">
+        <div class="file-icon">🆕</div>
+        <div class="file-name">202606-v9-discussion-01.html</div>
+        <div style="font-size:11px;color:#5B2D8E;margin-left:auto;font-family:'DM Mono',monospace">v9 討論 01</div>
       </div>
     </div>
   </div>
