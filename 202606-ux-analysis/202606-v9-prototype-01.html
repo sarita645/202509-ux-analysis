@@ -677,7 +677,11 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .p5-convert-headline{font-size:17px;font-weight:700;color:#fff;margin-bottom:8px}
 .p5-convert-sub{font-size:14px;color:rgba(255,255,255,.68);line-height:1.65}
 .p5-convert-sub strong{color:#A8D8FF}
-.p5-convert-cta{flex-shrink:0;position:relative}
+.p5-cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:500px){
+  .p5-cta-btns{flex-direction:column;width:100%}
+  .p5-cta-btns .p5-btn-secondary,.p5-cta-btns .p5-btn-primary{width:100%;text-align:center;justify-content:center}
+}
 .p5-convert .p5-btn-primary{
   background:#fff;color:var(--brand);
   box-shadow:0 6px 18px rgba(8,28,80,.25);
@@ -1752,7 +1756,6 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
         <span class="p2-role-switch">切換其他職能</span>
       </button>
     </div>
-    <div class="p2-desc-box" id="p2Desc"></div>
     <div class="p2-section-label">職能的常見工作場景類型</div>
     <div class="p2-chips" id="p2Chips"></div>
     <div class="p2-cards" id="p2Cards"></div>
@@ -1884,7 +1887,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
         <div class="p5-convert-headline">開箱即用，<em style="color:#fff;font-style:normal;text-decoration:underline;text-underline-offset:3px;">不需要從零訓練 AI</em></div>
         <div class="p5-convert-sub">下載分身，預置能力立即可用——並且會隨著使用習慣持續強化，<strong>越用越懂你的企業</strong>。</div>
       </div>
-      <div class="p5-convert-cta" style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="p5-convert-cta p5-cta-btns">
         <button class="p5-btn-secondary" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.45);color:#fff" aria-label="訂閱最新消息">訂閱最新消息</button>
         <button class="p5-btn-primary" aria-label="索取方案或連繫我們" onclick="openContactModal()">索取方案或連繫我們 &nbsp;→</button>
       </div>
@@ -2257,19 +2260,18 @@ function buildRoleDD(){
 }
 function toggleRoleDD(e){
   if(e)e.stopPropagation();
+  if(window.innerWidth<600){ openRoleSheet(); return; }
   var dd=document.getElementById('roleDD');
   var open=dd.classList.toggle('open');
   var panel=document.getElementById('roleDDPanel');
   panel.hidden=!open;
   document.getElementById('roleDDTrigger').setAttribute('aria-expanded',open?'true':'false');
   if(open){
-    // 計算 trigger 位置，讓 fixed panel 對齊
     var trig=document.getElementById('roleDDTrigger');
     var rect=trig.getBoundingClientRect();
     panel.style.top=(rect.bottom+6)+'px';
     panel.style.left=Math.max(16,rect.left)+'px';
     panel.style.width=rect.width+'px';
-    // 若超出底部則往上展開
     var panelH=Math.min(window.innerHeight*0.6, 400);
     if(rect.bottom+panelH+10>window.innerHeight){
       panel.style.top='auto';
@@ -2278,6 +2280,35 @@ function toggleRoleDD(e){
       panel.style.bottom='auto';
     }
   }
+}
+function openRoleSheet(){
+  var sheet=document.getElementById('roleSheet');
+  var grid=document.getElementById('roleSheetGrid');
+  grid.innerHTML='';
+  Object.keys(ROLE_COLORS).forEach(function(role){
+    var it=document.createElement('div');
+    it.className='rs-item'+(state.role===role?' selected':'');
+    it.innerHTML='<span class="rs-dot" style="background:'+ROLE_COLORS[role]+'"></span>'+role;
+    it.onclick=function(){
+      pickRole(role);
+      closeRoleSheet();
+    };
+    grid.appendChild(it);
+  });
+  sheet.style.display='flex';
+  requestAnimationFrame(function(){ sheet.classList.add('show'); });
+  document.body.style.overflow='hidden';
+}
+function closeRoleSheet(){
+  var sheet=document.getElementById('roleSheet');
+  var panel=document.getElementById('roleSheetPanel');
+  panel.style.animation='sheetDown .25s cubic-bezier(.22,1,.36,1) both';
+  setTimeout(function(){
+    sheet.style.display='none';
+    sheet.classList.remove('show');
+    panel.style.animation='';
+    document.body.style.overflow='';
+  },240);
 }
 function closeRoleDD(){
   var dd=document.getElementById('roleDD');if(!dd)return;
@@ -2340,7 +2371,6 @@ function buildScenePage(){
   var color=state.roleColor||'#125BBC';
   document.getElementById('p2RoleName').textContent=role;
   document.getElementById('p2RoleDot').style.background=color;
-  document.getElementById('p2Desc').textContent=roleDesc(role);
 
   var roleScenes=scenesFor(role);
   var chipsEl=document.getElementById('p2Chips');
@@ -3231,6 +3261,19 @@ document.addEventListener('DOMContentLoaded', function(){
   buildRoleDD();
 });
 </script>
+<!-- ── Role Bottom Sheet (mobile < 600px) ── -->
+<div id="roleSheet" style="display:none" aria-modal="true" role="dialog" aria-label="選擇職能">
+  <div id="roleSheetBackdrop" onclick="closeRoleSheet()"></div>
+  <div id="roleSheetPanel">
+    <div id="roleSheetHandle"></div>
+    <div id="roleSheetHeader">
+      <span>選擇你的工作職能</span>
+      <button onclick="closeRoleSheet()" aria-label="關閉">✕</button>
+    </div>
+    <div id="roleSheetGrid"></div>
+  </div>
+</div>
+
 <!-- ── Contact Modal ── -->
 <div id="contactModal" style="display:none;position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
   <!-- Backdrop -->
@@ -3343,6 +3386,59 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <style>
 @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ── Role Bottom Sheet ── */
+#roleSheet{position:fixed;inset:0;z-index:8000;display:none;align-items:flex-end}
+#roleSheet.show{display:flex}
+#roleSheetBackdrop{
+  position:absolute;inset:0;
+  background:rgba(16,24,59,.45);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#roleSheetPanel{
+  position:relative;z-index:1;width:100%;
+  background:#fff;border-radius:20px 20px 0 0;
+  padding:0 0 env(safe-area-inset-bottom,16px);
+  max-height:80vh;display:flex;flex-direction:column;
+  animation:sheetUp .3s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes sheetDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+#roleSheetHandle{
+  width:36px;height:4px;border-radius:2px;
+  background:#d4dae6;margin:12px auto 0;flex-shrink:0;
+}
+#roleSheetHeader{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 12px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  font-size:16px;font-weight:700;color:var(--ink);
+}
+#roleSheetHeader button{
+  width:28px;height:28px;border:none;background:var(--muted-light);
+  border-radius:50%;color:var(--ink2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+#roleSheetGrid{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 16px 20px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.rs-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:14px 8px;border-radius:12px;cursor:pointer;
+  border:1.5px solid var(--border);background:#fff;
+  font-family:'Noto Sans TC',sans-serif;font-size:13px;
+  font-weight:500;color:var(--ink2);text-align:center;
+  transition:border-color .15s,background .15s,color .15s,box-shadow .15s;
+}
+.rs-item:active{transform:scale(.96)}
+.rs-item.selected{
+  border-color:var(--brand);background:var(--brand-light);
+  color:var(--brand);font-weight:700;
+  box-shadow:0 0 0 3px rgba(var(--brand-rgb),.12);
+}
+.rs-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 </style>
 
 <script>
