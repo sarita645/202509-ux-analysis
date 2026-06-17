@@ -2619,24 +2619,27 @@ function collapseToBell(){
 }
 
 function expandPgWidget(){
-  var wrap=document.getElementById('pgWidget');
   var bell=document.getElementById('pgwBell');
   if(bell) bell.style.display='none';
-  if(wrap){
-    wrap.style.display='flex';
-    // 重新顯示還沒被 X 掉的卡片
-    ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
-      var el=document.getElementById(id);
-      if(el&&el.dataset.dismissed!=='1'){
-        el.style.display='flex';
-        el.style.opacity='';
-        el.style.transform='';
-        el.style.animation='none';
-        void el.offsetWidth;
-        el.style.animation='pgwSlideIn .25s var(--ease-out) both';
-      }
-    });
-  }
+
+  var wrap=document.getElementById('pgWidget');
+  if(wrap) wrap.style.display='flex';
+
+  // 只顯示進度（Card2）和推薦（Card3），跳過完成通知（Card1）
+  ['pgwCard2','pgwCard3'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.style.display='flex';
+    el.style.opacity='';
+    el.style.transform='';
+    el.style.animation='none';
+    void el.offsetWidth;
+    el.style.animation='pgwSlideIn .28s var(--ease-out) '+(i*120)+'ms both';
+  });
+
+  // Card1 確保隱藏
+  var c1=document.getElementById('pgwCard1');
+  if(c1) c1.style.display='none';
 }
 
 function updatePgWidget(page){
