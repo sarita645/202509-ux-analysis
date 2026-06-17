@@ -1659,7 +1659,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 <nav class="hud" role="navigation" aria-label="體驗進度導覽">
   <div class="hud-left">
     <div class="hud-logo">
-      <div class="hud-logo-placeholder" aria-hidden="true"></div>
+      <img src="https://www.digiwin.com.tw/images/logo.svg?v=1" alt="鼎新數智" class="hud-logo-img">
       <span class="hud-logo-sep"></span>
       <span class="hud-logo-title">AI Agent 體驗中心</span>
     </div>
@@ -2024,7 +2024,18 @@ var ROLE_ALIAS = {
   '倉管':'資材',
   '物控':'生管',
   '產線班組長':'廠長',
-  '專案經理':'採購'
+  '專案經理':'採購',
+  // 新增職能對應
+  '總經理':'廠長',
+  '財務主管':'廠長',
+  '品保主管':'廠長',
+  '研發工程師':'生管',
+  '業務主管':'業務',
+  '供應商管理':'採購',
+  '人資主管':'IT資訊',
+  '行銷企劃':'業務',
+  '客服主管':'業務',
+  '數位轉型主管':'IT資訊'
 };
 function scenesFor(role){ return SCENES[ROLE_ALIAS[role]||role] || []; }
 
