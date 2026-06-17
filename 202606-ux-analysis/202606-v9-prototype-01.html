@@ -1,0 +1,3181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent — 體驗中心 v7.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* brand standard colors */
+  --brand:#125BBC;--brand-dark:#0E4A9A;--brand2:#31A2EF;--brand-mid:#31A2EF;
+  --brand-pale:#AEDCFF;--brand-light:#E6F2FE;
+  --brand-rgb:18,91,188;            /* #125BBC channels for tinted shadows/rings */
+  --brand-grad:linear-gradient(135deg,#31A2EF,#125BBC);
+  --accent:#5B2D8E;--accent2:#7B3DB5;--accent-light:#EDE7F6;
+  /* semantic / status (from kit) */
+  --ok:#16A34A;--ok-light:#E6F6EC;--warn:#D97706;--warn-light:#FBF0E0;
+  --danger:#DC2626;--danger-light:#FCE9E9;--muted:#64748B;--muted-light:#EDF1F6;
+  --ink:#16243B;--ink2:#475569;--ink3:#8593A6;
+  --bg:#F4F8FE;--surface:#FFFFFF;--surface2:#EDF2FB;
+  --border:#E2E9F4;--border2:#EDF1F8;
+  --r:8px;--r2:12px;--r3:16px;
+  /* soft, blue-tinted elevation (kit feel) */
+  --sh-sm:0 1px 3px rgba(20,50,120,.06);
+  --sh:0 4px 16px rgba(20,50,120,.07);
+  --sh-card:0 6px 20px rgba(20,50,120,.06);
+  --sh-lg:0 14px 40px rgba(20,50,120,.12);
+  --hud-h:52px;
+  /* ── Motion tokens ── */
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-in-out:cubic-bezier(.4,0,.2,1);
+  --dur-micro:100ms;
+  --dur-fast:180ms;
+  --dur-base:260ms;
+  --dur-slow:400ms;
+  --dur-page:280ms;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;overflow-x:hidden}
+/* 底圖在 #scene-bg(z-index:-1)，body 需透明才不會把它蓋住；底色保留在 html */
+body{background:transparent}
+
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ── Base form controls (design-kit style) ──── */
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit]),
+textarea,select{
+  font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 13px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input::placeholder,textarea::placeholder{color:var(--ink3)}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):focus,
+textarea:focus,select:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+/* accent for native controls */
+input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--brand)}
+
+/* ── HUD ──────────────────────────── */
+.hud{
+  width:100%;background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:var(--hud-h);
+  position:sticky;top:0;z-index:100;
+  flex-shrink:0;
+}
+.hud-left{display:flex;align-items:center;gap:0;overflow-x:auto}
+.hud-logo{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,.5);padding-right:20px;border-right:1px solid rgba(255,255,255,.15);margin-right:16px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:10px}
+.hud-logo-placeholder{width:80px;height:20px;flex-shrink:0}
+.hud-logo-img{height:20px;width:auto;filter:brightness(0) invert(1);flex-shrink:0}
+.hud-logo-sep{width:1px;height:14px;background:rgba(255,255,255,.25);flex-shrink:0}
+.hud-logo-title{font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);letter-spacing:.02em}
+.hud-steps{display:flex;align-items:center;gap:0}
+.hud-step{display:flex;align-items:center;gap:6px;font-size:16px;color:rgba(255,255,255,.4);padding:6px 10px;border-radius:4px;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s;cursor:default}
+.hud-step.done{color:rgba(255,255,255,.65)}
+.hud-step.done .hs-dot{background:rgba(255,255,255,.5)}
+.hud-step.active{color:#fff;background:rgba(255,255,255,.12)}
+.hud-step.active .hs-dot{background:#fff}
+.hs-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;transition:background .2s}
+.hs-num{font-family:'DM Mono',monospace;font-size:14px}
+.hud-sep{color:rgba(255,255,255,.2);font-size:14px;padding:0 2px;flex-shrink:0}
+.hud-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:12px}
+.hud-role{font-family:'DM Mono',monospace;font-size:14px;color:#fff;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:4px;white-space:nowrap;display:none}
+.hud-role.show{display:block}
+.hud-scene{font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);padding:4px 10px;border-radius:4px;white-space:nowrap;display:none;border:1px solid rgba(255,255,255,.18)}
+.hud-scene.show{display:block}
+.hud-back{font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;transition:background var(--dur-micro),color var(--dur-micro),border-color var(--dur-micro) .15s;display:none}
+.hud-back.show{display:block}
+.hud-back:hover{background:rgba(255,255,255,.1);color:#fff}
+.hud-home{font-size:14px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 10px;border-radius:4px;white-space:nowrap;transition:color .15s}
+.hud-home:hover{color:rgba(255,255,255,.8)}
+
+/* ── PAGES ────────────────────────── */
+.page{display:none;min-height:calc(100vh - var(--hud-h))}
+.page.active{display:flex;flex-direction:column}
+
+/* ── PAGE 1: 歡迎大廳 + 選定職能 ────────────── */
+#p1{
+  padding:0;align-items:stretch;justify-content:flex-start;
+  min-height:calc(100vh - var(--hud-h));
+  position:relative;overflow:hidden;background:#e9f0fa;
+}
+/* full-bleed atmosphere image + right-side legibility fade */
+.p1-bg{
+  position:absolute;inset:0;z-index:0;
+  background:#e9f0fa url('images/202509-v5-prototype_bg-01.jpg') no-repeat;
+  background-size:cover;background-position:center left;
+}
+.p1-bg::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg,rgba(245,248,253,0) 26%,rgba(245,248,253,.55) 52%,rgba(245,248,253,.9) 78%);
+}
+
+.p1-layout{
+  position:relative;z-index:2;width:100%;max-width:1320px;margin:0 auto;
+  min-height:calc(100vh - var(--hud-h));
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:48px 60px;
+}
+
+/* ── floating pain bubbles：桌機 ≥1200px ── */
+.p1-pains{position:absolute;inset:0;z-index:1;pointer-events:none}
+.p1-pain{
+  position:absolute;white-space:nowrap;
+  background:rgba(255,255,255,.94);border:1px solid rgba(20,50,120,.08);
+  border-radius:22px;padding:11px 18px;
+  font-size:14px;color:#2c3e57;font-weight:500;
+  box-shadow:0 10px 30px rgba(15,40,100,.13);
+  display:flex;align-items:center;gap:9px;
+}
+.p1-pain-icon{flex-shrink:0;width:24px;height:24px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.p1-pain.highlight{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 12px 34px rgba(var(--brand-rgb),.35)}
+.p1-pain.highlight .p1-pain-icon{background:rgba(255,255,255,.22)}
+.pain-1{left:14%;top:64%;animation-delay:0s}
+.pain-2{left:27%;top:54%;animation-delay:1.2s}
+.pain-3{left:24%;top:74%;animation-delay:2.4s}
+.pain-4{left:10%;top:44%;animation-delay:0.6s}
+.pain-5{left:32%;top:44%;animation-delay:1.8s}
+.pain-6{left:8%;top:72%;animation-delay:3s}
+@keyframes floatyA{0%,100%{transform:translateY(0)   rotate(-.4deg)}50%{transform:translateY(-8px) rotate(.4deg)}}
+@keyframes floatyB{0%,100%{transform:translateY(-2px)rotate(.3deg)} 50%{transform:translateY(-10px)rotate(-.3deg)}}
+@keyframes floatyC{0%,100%{transform:translateY(0)   rotate(.5deg)} 50%{transform:translateY(-6px) rotate(-.5deg)}}
+.p1-pain:nth-child(1){animation:floatyA 5.8s var(--ease-in-out) infinite;animation-delay:0s}
+.p1-pain:nth-child(2){animation:floatyB 6.4s var(--ease-in-out) infinite;animation-delay:.6s}
+.p1-pain:nth-child(3){animation:floatyC 5.2s var(--ease-in-out) infinite;animation-delay:1.2s}
+
+/* ── Inline pain strip：<1200px 時取代懸浮泡泡 ── */
+.p1-pain-strip{
+  display:none; /* 桌機隱藏 */
+  flex-wrap:wrap;gap:8px;
+  padding:14px 24px 0;
+  position:relative;z-index:2;
+}
+.p1-pain-strip-item{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.9);border:1px solid rgba(20,50,120,.1);
+  border-radius:20px;padding:7px 14px;
+  font-size:14px;color:#2c3e57;font-weight:500;
+  box-shadow:0 2px 8px rgba(15,40,100,.08);
+  transition:background .15s,color .15s;
+}
+.p1-pain-strip-item.highlight{
+  background:var(--brand);color:#fff;border-color:transparent;
+}
+.p1-pain-strip-icon{
+  flex-shrink:0;width:20px;height:20px;
+  background:var(--brand-light);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+.p1-pain-strip-item.highlight .p1-pain-strip-icon{background:rgba(255,255,255,.22)}
+
+/* right-side content block */
+.p1-content{width:min(560px,54%);display:flex;flex-direction:column}
+.p1-eyebrow{font-family:'DM Mono',monospace;font-size:14px;color:var(--brand);letter-spacing:.16em;margin-bottom:10px;text-transform:uppercase;font-weight:500}
+.p1-source-hint{
+  font-size:15px;color:var(--ink2);line-height:1.6;
+  margin-bottom:14px;
+}
+.p1-title{font-size:clamp(30px,4.4vw,50px);font-weight:900;line-height:1.16;letter-spacing:-.01em;margin-bottom:16px;color:var(--brand);background:linear-gradient(120deg,#31A2EF,#125BBC);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.p1-sub{font-size:20px;color:var(--ink2);line-height:1.75;margin-bottom:34px;max-width:420px}
+.p1-roles-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.p1-roles-sub{font-size:14px;color:var(--ink3);margin-bottom:18px;line-height:1.6}
+.p1-role-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:26px}
+.p1-role-card{
+  background:rgba(255,255,255,.92);border:1px solid #d4e0f2;
+  border-radius:9px;padding:13px 6px;cursor:pointer;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;text-align:center;
+  font-size:16px;font-weight:500;color:var(--ink2);
+  font-family:'Noto Sans TC',sans-serif;
+  box-shadow:0 1px 2px rgba(20,50,120,.04);
+}
+.p1-role-card:hover{border-color:var(--brand-mid);color:var(--brand);box-shadow:0 4px 12px rgba(var(--brand-rgb),.12)}
+.p1-role-card.selected{border-color:var(--brand);background:var(--brand-light);color:var(--brand);font-weight:700;box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+.p1-cta{
+  width:100%;padding:15px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;
+  border:none;border-radius:var(--r2);font-size:16px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;box-shadow:0 6px 20px rgba(var(--brand-rgb),.28);
+}
+.p1-cta:hover:not(:disabled){background:linear-gradient(135deg,var(--brand),var(--brand-dark));box-shadow:0 10px 28px rgba(15,62,158,.38);transform:translateY(-2px)}
+.p1-cta:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* ── <1200px：收起懸浮泡泡，改為 inline strip ── */
+@media(max-width:1199px){
+  .p1-pains{display:none}
+  .p1-pain-strip{display:none}
+  .p1-layout{
+    justify-content:center;
+    padding:24px 32px 48px;
+    align-items:flex-start;
+    min-height:auto;
+  }
+  .p1-bg{opacity:.25}
+  .p1-bg::after{background:rgba(245,248,253,.7)}
+  .p1-content{width:100%;max-width:600px}
+  .p1-title{font-size:clamp(24px,5vw,36px)}
+  .p1-sub{font-size:16px}
+  .p1-roles-sub{font-size:14px}
+  .p1-role-grid{grid-template-columns:repeat(4,1fr)}
+  .p1-role-card{font-size:14px;padding:11px 4px}
+}
+
+/* ── <768px：職能格改 3 欄 ── */
+@media(max-width:768px){
+  .p1-layout{padding:20px 20px 40px}
+  .p1-pain-strip{padding:12px 20px 0}
+  .p1-pain-strip-item{font-size:13px;padding:6px 11px}
+  .p1-role-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .p1-role-card{font-size:14px}
+  .p1-roles-title{font-size:16px}
+}
+
+/* ── <480px：職能格 2 欄 ── */
+@media(max-width:480px){
+  .p1-role-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── PAGE 2 (選擇場景) ────────────── */
+#p2{
+  padding:0;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(49,162,239,.11) 0%, transparent 70%),
+    rgba(242,246,253,.55);
+}
+
+/* sticky header — 磨砂玻璃 */
+.p2-header{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(18,91,188,.08);
+  padding:14px 32px 12px;
+  position:sticky;top:var(--hud-h);z-index:10;
+  box-shadow:0 2px 16px rgba(18,91,188,.06);
+}
+.p2-header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+/* 職能 badge — 發光邊框 */
+.p2-role-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(230,242,254,.9);
+  border:1px solid rgba(var(--brand-rgb),.3);
+  border-radius:20px;padding:4px 12px 4px 8px;
+  font-size:14px;color:var(--brand);font-weight:700;
+  white-space:nowrap;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(var(--brand-rgb),.07), 0 0 12px rgba(49,162,239,.12);
+}
+.p2-role-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--brand);
+  box-shadow:0 0 6px rgba(49,162,239,.7);
+}
+.p2-header-text{flex:1;min-width:0}
+.p2-title{font-size:16px;font-weight:700;color:var(--ink);line-height:1.3}
+.p2-sub{font-size:14px;color:var(--ink3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Body */
+.p2-body{max-width:960px;margin:0 auto;padding:28px 32px 48px}
+@media(max-width:600px){.p2-body{padding:18px 16px 36px}}
+
+.p2-section-label{
+  font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.12em;
+  color:var(--ink3);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.p2-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(18,91,188,.15),transparent)}
+
+/* ── 卡片佈局 ── */
+.p2-rec-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;align-items:start}
+@media(max-width:700px){.p2-rec-layout{grid-template-columns:1fr}}
+
+/* Glass 卡片 */
+.sc-card{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px;cursor:pointer;
+  transition:transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s, border-color .2s;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 24px rgba(18,91,188,.07), 0 1px 4px rgba(18,91,188,.05);
+}
+/* 卡片右上角微光暈 */
+.sc-card::after{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:120px;height:120px;
+  background:radial-gradient(circle, rgba(49,162,239,.07) 0%, transparent 70%);
+  pointer-events:none;transition:background .2s;
+}
+.sc-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(18,91,188,.13), 0 4px 12px rgba(18,91,188,.07);
+  border-color:rgba(49,162,239,.38);
+}
+.sc-card:hover::after{background:radial-gradient(circle, rgba(49,162,239,.15) 0%, transparent 70%)}
+
+/* accent 條 — 發光 */
+.sc-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:16px 0 0 16px;box-shadow:2px 0 8px rgba(49,162,239,.2)}
+
+.sc-cat{font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.06em;color:var(--ink3);margin-bottom:8px}
+.sc-name{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.3}
+
+/* 情境引言 */
+.sc-situation{
+  background:rgba(18,91,188,.04);
+  border-left:3px solid rgba(49,162,239,.45);
+  border-radius:0 8px 8px 0;padding:10px 14px;
+  font-size:14px;color:var(--ink2);line-height:1.65;
+  margin-bottom:14px;font-style:italic;flex:1;
+}
+
+.sc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:4px}
+.sc-agents{display:flex;align-items:center;gap:4px;flex-wrap:wrap;flex:1}
+
+.sc-agent-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:4px;
+  font-size:14px;font-weight:600;
+  border:1px solid currentColor;
+}
+.sc-agent-tag-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* 箭頭 — 品牌漸層 + 發光 */
+.sc-arrow{
+  width:30px;height:30px;background:var(--brand-grad);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;flex-shrink:0;
+  transition:transform .15s, box-shadow .15s;
+  box-shadow:0 2px 8px rgba(var(--brand-rgb),.28);
+}
+.sc-card:hover .sc-arrow{transform:translateX(3px);box-shadow:0 4px 14px rgba(var(--brand-rgb),.4)}
+
+/* Other roles filter row */
+.p2-others-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.p2-other-chip{
+  padding:7px 16px;border:1px solid rgba(18,91,188,.15);border-radius:20px;
+  font-size:14px;color:var(--ink2);cursor:pointer;
+  background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;font-family:'Noto Sans TC',sans-serif;
+}
+.p2-other-chip:hover{border-color:rgba(49,162,239,.45);color:var(--brand)}
+.p2-other-chip.active{
+  border-color:var(--brand);background:rgba(var(--brand-rgb),.07);
+  color:var(--brand);font-weight:600;
+  box-shadow:0 0 0 2px rgba(var(--brand-rgb),.1);
+}
+
+/* Other scenes list */
+.p2-other-scene{
+  background:rgba(255,255,255,.75);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.7);border-radius:12px;
+  padding:14px 18px;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s;
+  display:flex;align-items:center;gap:14px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(18,91,188,.05);
+}
+.p2-other-scene:hover{
+  border-color:rgba(49,162,239,.32);
+  box-shadow:0 6px 20px rgba(18,91,188,.09);
+  transform:translateX(3px);
+}
+.pos-num{
+  flex-shrink:0;width:26px;height:26px;
+  background:rgba(18,91,188,.07);color:var(--brand);
+  border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;
+}
+.pos-body{flex:1}
+.pos-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.pos-pain{font-size:14px;color:var(--ink3);line-height:1.5}
+.pos-agents{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.pos-agent-tag{
+  font-size:14px;font-weight:600;padding:2px 8px;border-radius:4px;
+  border:1px solid currentColor;
+  display:inline-flex;align-items:center;gap:3px;
+}
+.pos-agent-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+/* ── PAGE 3: 場景開場 ────────────── */
+#p3{
+  padding:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(49,162,239,.1) 0%, transparent 65%),
+    rgba(242,246,253,.55);
+  align-items:center;justify-content:center;
+}
+.p3-inner{
+  width:100%;max-width:680px;margin:0 auto;
+  /* 內容增加後可在單頁內捲動 */
+  height:calc(100vh - var(--hud-h));
+  display:flex;flex-direction:column;gap:12px;
+  padding:20px 28px 16px;
+  overflow-y:auto;
+}
+@media(max-width:600px){.p3-inner{padding:14px 18px 12px;gap:10px}}
+
+/* 場景標籤 */
+.p3-scene-tag{
+  display:inline-flex;align-items:center;
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;
+  font-weight:700;text-transform:uppercase;
+  color:var(--brand);background:rgba(var(--brand-rgb),.08);
+  border:1px solid rgba(var(--brand-rgb),.18);
+  border-radius:6px;padding:4px 12px;
+  align-self:flex-start;
+}
+
+/* ① 痛點情境 */
+.p3-crisis{
+  background:linear-gradient(135deg,rgba(220,38,38,.06),rgba(220,38,38,.03));
+  border:1px solid rgba(220,38,38,.18);
+  border-left:4px solid #DC2626;
+  border-radius:0 12px 12px 0;
+  padding:20px 22px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.p3-crisis-icon{
+  font-size:22px;flex-shrink:0;margin-top:2px;
+  filter:drop-shadow(0 2px 4px rgba(220,38,38,.3));
+}
+.p3-crisis-text{
+  font-size:16px;font-weight:600;color:#7F1D1D;
+  line-height:1.65;
+  /* 關鍵數字自動加重 */
+}
+
+/* ② 分身區塊 */
+.p3-divider{height:1px;background:var(--border);margin:16px 0}
+.p3-agents-section{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px 22px 20px;
+  box-shadow:0 4px 20px rgba(18,91,188,.07);
+}
+.p3-agents-label{
+  font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);
+  margin-bottom:14px;
+}
+/* avatar pills 置中 */
+.dividers-section{
+  display:flex;gap:10px;margin-bottom:16px;
+  flex-wrap:wrap;
+  justify-content:center;  /* 置中 */
+}
+.avatar-pill{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(18,91,188,.06);
+  transition:box-shadow .15s,border-color .15s;
+}
+.avatar-pill:hover{border-color:rgba(49,162,239,.3);box-shadow:0 4px 16px rgba(18,91,188,.1)}
+.av-circle{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.15);
+}
+.av-name{font-size:16px;color:var(--ink);font-weight:600}
+.av-sub{font-size:14px;color:var(--ink3)}
+.p3-ability-text{
+  font-size:14px;color:var(--ink2);line-height:1.7;
+  padding-top:4px;border-top:1px solid var(--border2);
+}
+
+/* ③ 啟動區塊 */
+.p3-launch-section{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:16px;padding:22px 22px 20px;
+  box-shadow:0 4px 20px rgba(18,91,188,.07);
+  text-align:center;
+}
+.p3-launch-hint{
+  font-size:14px;color:var(--ink2);line-height:1.7;
+  margin-bottom:16px;
+}
+.p4-ready{
+  font-size:15px;font-weight:600;color:var(--brand);
+  margin-bottom:16px;
+  text-shadow:0 0 16px rgba(49,162,239,.25);
+}
+.btn-launch{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));
+  color:#fff;border:none;border-radius:12px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:background-color .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s;
+  box-shadow:0 8px 24px rgba(var(--brand-rgb),.32);
+}
+.btn-launch:hover{
+  background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+  box-shadow:0 12px 30px rgba(var(--brand-rgb),.42);
+  transform:translateY(-2px);
+}
+
+/* ── PAGE 4: 圓桌會議（框架）── */
+#p4{
+  padding:0;flex-direction:column;
+  background:rgba(242,246,253,.55);
+}
+.btn-end{
+  padding:11px 30px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;
+  box-shadow:0 4px 14px rgba(91,45,142,.28);
+}
+.btn-end:hover{box-shadow:0 6px 20px rgba(91,45,142,.38);transform:translateY(-2px)}
+
+/* ── PAGE 5: 分身總結 ────────────── */
+#p5{
+  padding:0;align-items:stretch;
+  background:
+    radial-gradient(ellipse 70% 35% at 50% 0%, rgba(49,162,239,.09) 0%, transparent 65%),
+    rgba(242,246,253,.55);
+}
+.p5-wrap{width:100%;max-width:820px;margin:0 auto;padding:32px 28px 52px}
+@media(max-width:600px){.p5-wrap{padding:20px 16px 40px}}
+
+/* ① 你做到了什麼 — 更豐富的深色橫幅 */
+.p5-achievement{
+  background:linear-gradient(135deg,var(--brand-dark) 0%,var(--brand) 55%,var(--brand2) 100%);
+  border-radius:var(--r3);padding:28px 28px 24px;margin-bottom:24px;
+  text-align:center;
+  box-shadow:var(--sh-lg);
+  position:relative;overflow:hidden;
+}
+/* 橫幅內光暈裝飾 */
+.p5-achievement::before{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:300px;height:200px;
+  background:radial-gradient(ellipse, rgba(255,255,255,.1) 0%, transparent 70%);
+  pointer-events:none;
+}
+.p5-ach-scene{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);
+  border-radius:6px;padding:4px 14px;
+  font-size:14px;font-weight:700;color:#D6EAFF;
+  font-family:'DM Mono',monospace;letter-spacing:.06em;
+  margin-bottom:18px;
+}
+.p5-ach-headline{
+  font-size:clamp(18px,3vw,26px);font-weight:900;color:#fff;
+  line-height:1.3;margin-bottom:12px;min-height:2.6em;
+}
+.p5-ach-headline em{
+  color:#A8D8FF;font-style:normal;
+  text-shadow:0 0 20px rgba(168,216,255,.5);
+}
+.type-caret{display:inline-block;width:2px;height:1em;margin-left:2px;background:#A8D8FF;vertical-align:-2px;animation:typeBlink .7s step-end infinite}
+@keyframes typeBlink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.type-caret{display:none}}
+.p5-ach-sub{font-size:14px;color:rgba(255,255,255,.65);line-height:1.7;max-width:500px;margin:0 auto}
+
+/* ② section 標題 */
+.p5-section-title{
+  font-size:14px;font-weight:700;color:var(--ink3);
+  letter-spacing:.08em;text-transform:uppercase;
+  font-family:'DM Mono',monospace;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.p5-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(18,91,188,.15),transparent)}
+
+/* ② 突破 — glass card */
+.p5-breakthrough{
+  display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;
+}
+.p5-radar-col{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:160px;
+}
+.p5-radar-caption{font-size:13px;color:var(--ink3);text-align:center;line-height:1.4;margin-top:4px}
+.p5-dims-col{flex:1;min-width:240px;display:flex;flex-direction:column;gap:0}
+/* 維度列：附圖樣式 — 左側彩色粗線 + 軸名/數字/badge + 說明文字 */
+.p5-dim-row{
+  display:flex;align-items:stretch;
+  padding:14px 0;
+  border-bottom:1px solid var(--border2);
+}
+.p5-dim-row:last-child{border-bottom:none}
+.p5-dim-row:hover{background:transparent}
+.p5-dim-bar{
+  width:4px;border-radius:2px;flex-shrink:0;
+  margin-right:14px;align-self:stretch;min-height:40px;
+}
+.p5-dim-left{flex-shrink:0;width:64px;text-align:left}
+.p5-dim-axis{font-size:14px;font-weight:700;margin-bottom:1px}
+.p5-dim-num{
+  font-family:'DM Mono',monospace;font-size:26px;font-weight:800;line-height:1;
+  margin-bottom:4px;
+}
+.p5-dim-badge{
+  font-size:10px;font-weight:700;padding:2px 6px;
+  border-radius:4px;display:inline-block;
+  font-family:'DM Mono',monospace;
+}
+.p5-dim-right{flex:1;display:flex;align-items:center;padding-left:8px}
+.p5-dim-text{font-size:14px;color:var(--ink2);line-height:1.65}
+
+/* ③ 帶走什麼 — glass cards */
+.p5-takeaway-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));
+  gap:12px;margin-bottom:32px;
+}
+.p5-takeaway-card{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:12px;padding:18px 16px;
+  display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 3px 16px rgba(18,91,188,.06);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+  position:relative;overflow:hidden;
+}
+/* 依序浮現（切到「分身能力」分頁時觸發）*/
+.p5-takeaway-card.reveal{animation:p5CardIn .45s cubic-bezier(.2,.7,.3,1) both}
+@keyframes p5CardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.p5-takeaway-card.reveal{animation:none}}
+.p5-takeaway-card::after{
+  content:'';position:absolute;top:-20px;right:-20px;
+  width:70px;height:70px;
+  background:radial-gradient(circle, rgba(91,45,142,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.p5-takeaway-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(18,91,188,.11);
+  border-color:rgba(91,45,142,.25);
+}
+.p5-tk-name{font-size:16px;font-weight:700;color:var(--accent);line-height:1.3}
+.p5-tk-role{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.05em;color:var(--ink3)}
+.p5-tk-value{font-size:14px;color:var(--ink2);line-height:1.55;flex:1}
+/* 詳細卡：跨整列，內含 300-500 字說明 */
+.p5-takeaway-card.is-detail{grid-column:1/-1}
+.p5-tk-long{
+  margin-top:12px;padding-top:14px;
+  border-top:1px solid var(--border2);
+  font-size:13.5px;color:var(--ink2);line-height:1.95;text-align:left;
+}
+
+/* ④ 轉換區 */
+.p5-convert{
+  background:linear-gradient(135deg,var(--brand-dark),var(--brand));
+  border-radius:var(--r3);padding:24px 28px;margin-bottom:20px;
+  box-shadow:var(--sh-lg);
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  position:relative;overflow:hidden;
+}
+.p5-convert::before{
+  content:'';position:absolute;bottom:-40px;right:-40px;
+  width:180px;height:180px;
+  background:radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 65%);
+  pointer-events:none;
+}
+.p5-convert-text{flex:1;min-width:200px;position:relative}
+.p5-convert-headline{font-size:17px;font-weight:700;color:#fff;margin-bottom:8px}
+.p5-convert-sub{font-size:14px;color:rgba(255,255,255,.68);line-height:1.65}
+.p5-convert-sub strong{color:#A8D8FF}
+.p5-convert-cta{flex-shrink:0;position:relative}
+.p5-convert .p5-btn-primary{
+  background:#fff;color:var(--brand);
+  box-shadow:0 6px 18px rgba(8,28,80,.25);
+}
+.p5-convert .p5-btn-primary:hover{
+  background:#EDF5FF;color:var(--brand-dark);
+  box-shadow:0 8px 24px rgba(8,28,80,.32);
+}
+.p5-btn-primary{
+  padding:12px 24px;
+  background:#fff;color:var(--brand);
+  border:none;border-radius:var(--r);font-size:15px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(8,28,80,.2);
+}
+.p5-btn-primary:hover{background:#EEF5FF;color:var(--brand-dark);box-shadow:0 6px 18px rgba(8,28,80,.28)}
+.p5-cta-secondary-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.p5-btn-secondary{
+  flex:1;min-width:140px;padding:12px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(6px);
+  color:#fff;border:1.5px solid rgba(255,255,255,.35);
+  border-radius:var(--r);font-size:14px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;text-align:center;
+}
+.p5-btn-secondary:hover{border-color:rgba(49,162,239,.4);color:var(--brand)}
+.p5-reset{
+  display:block;width:100%;text-align:center;
+  font-size:14px;color:var(--ink3);cursor:pointer;padding:8px;
+}
+.p5-reset:hover{color:var(--ink)}
+/* ── P2–P5 共用背景圖（獨立 fixed 層，不隨頁面切換重建）── */
+#scene-bg{
+  display:none;
+  position:fixed;inset:0;z-index:-1;
+  background:url('images/202509-v5-prototype_bg-02.jpg') center/cover no-repeat;
+  background-color:#eef4fd;
+  pointer-events:none;
+}
+#scene-bg.show{display:block}
+/* body / inner content 在背景圖上方 */
+.p2-body,.p3-inner,.p4-demo-area,#p4-footer,.p5-wrap{position:relative;z-index:1}
+/* sticky header 維持在最上層 */
+.p2-header{position:sticky;top:var(--hud-h);z-index:50}
+
+
+/* ── P2 身份確認橋接 ── */
+.p2-identity-bridge{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 4px 14px;margin-bottom:6px;
+}
+.p2-bridge-role{
+  font-size:16px;font-weight:800;color:var(--brand);
+  white-space:nowrap;
+}
+.p2-bridge-arrow{
+  font-size:16px;color:var(--ink3);flex-shrink:0;
+}
+.p2-bridge-task{
+  font-size:16px;font-weight:800;color:var(--ink);line-height:1.5;
+}
+
+/* ── P5 before/after em 對比 ── */
+.p5-ach-headline .em-win{
+  color:#fff815;font-style:normal;
+  text-shadow:0 0 22px rgba(255,248,21,.5), 0 0 6px rgba(255,248,21,.3);
+}
+.p5-ach-headline .em-old{
+  color:#fff;font-style:normal;
+  text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.5);
+  text-underline-offset:3px;
+}
+
+/* ── P5 分身說明小字 ── */
+.p5-takeaway-note{
+  font-size:13px;color:var(--ink3);line-height:1.6;
+  margin-bottom:16px;margin-top:-8px;
+}
+
+/* ── sc-card 點擊提示 ── */
+.sc-click-hint{
+  font-size:12px;color:var(--brand);font-weight:600;
+  text-align:right;margin-top:6px;
+  opacity:0;transition:opacity .15s;
+  font-family:'DM Mono',monospace;letter-spacing:.04em;
+}
+.sc-card:hover .sc-click-hint{opacity:1}
+
+/* ── HUD compact progress (mobile) ──── */
+.hud-progress{display:none;align-items:center;gap:9px}
+.hud-dots{display:flex;align-items:center;gap:6px}
+.hd-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.28);transition:background-color .2s,width .2s,border-radius .2s;flex-shrink:0}
+.hd-dot.done{background:rgba(255,255,255,.55)}
+.hd-dot.active{background:#fff;width:18px;border-radius:4px}
+.hud-cur{font-size:14px;color:#fff;white-space:nowrap;font-weight:500}
+
+/* <1420：進度條列縮成手機版（緊湊圓點），但盡量保留「你的職能 / 場景」 */
+@media(max-width:1419px){
+  .hud{padding:0 16px}
+  .hud-left{overflow:visible;min-width:0}
+  .hud-logo{padding-right:12px;margin-right:12px}
+  .hud-steps{display:none}        /* 收起捲動式麵包屑 */
+  .hud-progress{display:flex}     /* 改顯示緊湊圓點 + 目前步驟 */
+  .hud-right{gap:8px;margin-left:10px}
+  .hud-role{font-size:13px;padding:4px 10px}
+  .hud-scene{font-size:12px;padding:4px 9px}
+}
+/* ≤1024：拿掉步驟文字（保留圓點），騰出空間讓職能/場景續留 */
+@media(max-width:1024px){
+  .hud{padding:0 14px}
+  .hud-cur{display:none}
+  .hud-back{padding:5px 8px}
+  .hud-back .hb-text{display:none} /* 窄螢幕只留箭頭 */
+  .hud-home{padding:5px 6px;font-size:14px}
+}
+/* ≤860：空間真的不足時，先收起較長的「場景」，保留「你的職能」 */
+@media(max-width:860px){
+  .hud-scene{display:none!important}
+}
+/* ≤680：再不行才收起「你的職能」 */
+@media(max-width:680px){
+  .hud-role{display:none!important}
+}
+/* ≤560：極窄收尾 */
+@media(max-width:560px){
+  .hud{padding:0 10px}
+  .hud-right{gap:4px}
+  .hud-home{font-size:0;padding:6px;line-height:0}
+  .hud-home::before{content:'⌂';font-size:20px;line-height:1;color:rgba(255,255,255,.55)}
+}
+
+/* ── Floating AI assistant (bottom-right, presentational) ──── */
+.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:none;align-items:center;gap:11px;pointer-events:auto;cursor:pointer}
+@keyframes botIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.ai-bubble{display:none} /* 不使用，改為 hover tooltip */
+.ai-bubble-top,.ai-bubble-main{display:none}
+.ai-avatar{
+  width:62px;height:62px;border-radius:50%;flex-shrink:0;
+  background:radial-gradient(circle at 35% 30%,#9a8ff5,#6c63e6 70%);
+  box-shadow:0 10px 28px rgba(108,99,230,.42);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  animation:botFloat 4s var(--ease-in-out) infinite;
+  position:relative;
+}
+.ai-avatar img{width:100%;height:100%;object-fit:cover}
+/* Hover tooltip */
+.ai-avatar::after{
+  content:'可以點開看訊息';
+  position:absolute;
+  right:calc(100% + 10px);
+  top:50%;transform:translateY(-50%);
+  background:rgba(22,36,59,.82);color:#fff;
+  font-size:12px;font-family:'Noto Sans TC',sans-serif;
+  white-space:nowrap;padding:5px 12px;border-radius:6px;
+  pointer-events:none;
+  opacity:0;transition:opacity .2s;
+}
+.ai-avatar:hover::after{opacity:1}
+@keyframes botFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media(max-width:560px){
+  .ai-bot{right:14px;bottom:14px}
+  .ai-avatar{width:52px;height:52px}
+}
+@media(prefers-reduced-motion:reduce){.ai-bot,.ai-avatar{animation:none}}
+/* ═══ REDESIGN (P1/P2/P3/P5 per mockups) ═══ */
+
+/* P1 —職能下拉選單 */
+.p1-eyebrow{display:none}
+.p1-dd{position:relative;margin-bottom:18px;max-width:520px}
+.p1-dd-trigger{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:rgba(255,255,255,.96);
+  border:1px solid #d4e0f2;border-radius:10px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;font-size:15px;color:var(--ink);
+  box-shadow:0 2px 10px rgba(20,50,120,.05);text-align:left;
+  transition:border-color .15s,box-shadow .15s;
+}
+.p1-dd-trigger:hover{border-color:var(--brand-mid)}
+.p1-dd.open .p1-dd-trigger{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+.p1-dd-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.p1-dd-label{flex:1;color:var(--ink3)}
+.p1-dd-trigger.has-val .p1-dd-label{color:var(--ink)}
+.p1-dd-caret{color:var(--brand);font-size:14px;transition:transform .18s;flex-shrink:0}
+.p1-dd.open .p1-dd-caret{transform:rotate(180deg)}
+.p1-dd-panel{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:60;
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--sh-lg);padding:10px;
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;
+}
+.p1-dd-panel[hidden]{display:none}
+.p1-dd-item{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  border-radius:8px;cursor:pointer;font-size:14px;color:var(--ink);
+  transition:background .12s;
+}
+.p1-dd-item:hover,.p1-dd-item:focus{background:var(--brand-light);outline:none}
+.p1-dd-item-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+@media(max-width:560px){.p1-dd-panel{grid-template-columns:1fr}}
+.p1-cta{max-width:520px}
+
+/* P2 — 場景選擇（卡片浮於資料空間背景上） */
+.p2-role-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.p2-role-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--brand);color:#fff;
+  border:none;border-radius:999px;padding:7px 16px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  box-shadow:0 2px 10px rgba(var(--brand-rgb),.2);
+  transition:background .15s,box-shadow .15s,transform .15s;
+}
+.p2-role-pill:hover{background:var(--brand-dark);box-shadow:0 4px 16px rgba(var(--brand-rgb),.32);transform:translateY(-1px)}
+.p2-role-pill:active{transform:translateY(0)}
+.p2-role-pill .p2-role-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.85);flex-shrink:0;
+}
+.p2-role-switch{
+  font-size:12px;font-weight:500;color:rgba(255,255,255,.82);
+  padding-left:10px;margin-left:2px;
+  border-left:1px solid rgba(255,255,255,.32);
+  display:inline-flex;align-items:center;gap:4px;
+}
+.p2-role-switch::after{
+  content:'';flex-shrink:0;
+  width:0;height:0;
+  border-left:3.5px solid transparent;
+  border-right:3.5px solid transparent;
+  border-top:4px solid currentColor;
+  margin-top:1px;
+}
+
+/* P2 Modal */
+.p2-modal-bg{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(16,32,64,.3);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+}
+.p2-modal{
+  background:#fff;border-radius:var(--r3);
+  padding:28px 24px;width:340px;max-height:70vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(16,32,64,.22);
+  animation:modalIn var(--dur-base) var(--ease-out);
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.p2-modal-title{
+  font-size:15px;font-weight:700;color:var(--ink);
+  margin-bottom:16px;text-align:center;
+}
+.p2-modal-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+.p2-modal-item{
+  padding:11px 14px;border-radius:var(--r);cursor:pointer;
+  font-size:14px;font-weight:500;color:var(--ink2);
+  border:1.5px solid var(--border);background:#fff;
+  font-family:'Noto Sans TC',sans-serif;
+  text-align:center;transition:background-color .12s,border-color .12s,color .12s,box-shadow .12s,transform .12s;
+  display:flex;align-items:center;gap:8px;
+}
+.p2-modal-item:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--brand-light)}
+.p2-modal-item.active{border-color:var(--brand);background:var(--brand);color:#fff;font-weight:700}
+.p2-modal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.p2-desc-box{background:rgba(255,255,255,.7);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:26px}
+.p2-chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.p2-chip{background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:999px;padding:7px 18px;font-size:14px;color:var(--ink2);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;font-family:'Noto Sans TC',sans-serif}
+.p2-chip:hover{border-color:var(--brand-mid);color:var(--brand)}
+.p2-chip.active{background:var(--brand-light);border-color:var(--brand);color:var(--brand);font-weight:700}
+.p2-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+@media(max-width:960px){.p2-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.p2-cards{grid-template-columns:1fr}}
+.p2-scard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r3);padding:0 0 16px;
+  box-shadow:var(--sh-card);
+  display:flex;flex-direction:column;gap:0;
+  transition:box-shadow .15s,transform .15s;
+  overflow:hidden;
+}
+.p2-scard:hover{
+  box-shadow:0 12px 36px rgba(var(--brand-rgb),.13);
+  transform:translateY(-2px);
+  border-color:rgba(var(--brand-rgb),.18);
+}
+/* 置中標題區塊 */
+.p2-scard-top{
+  text-align:center;padding:20px 16px 16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:14px;
+}
+.p2-scard-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.p2-scard-tag{font-size:11px;color:var(--brand);background:var(--brand-light);border-radius:var(--r);padding:3px 9px;font-weight:600;font-family:'Noto Sans TC',sans-serif}
+.p2-scard-name{font-size:18px;font-weight:700;color:var(--ink);line-height:1.3}
+.p2-scard-desc{font-size:13px;color:var(--ink2);line-height:1.7;flex:1;padding:0 16px;min-height:56px;margin-bottom:14px}
+.p2-scard-btns{display:flex;gap:8px;padding:0 16px;margin-top:auto}
+.p2-btn-sub{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);font-size:14px;color:var(--ink2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
+.p2-btn-sub:hover{border-color:var(--brand-mid);color:var(--brand)}
+.p2-btn-go{flex:1;padding:10px;border:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 14px rgba(var(--brand-rgb),.25);transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
+.p2-btn-go:hover{background:linear-gradient(135deg,var(--brand),var(--brand-dark));transform:translateY(-2px)}
+.p2-btn-go.is-loading{pointer-events:none;color:transparent;position:relative;transform:none}
+.p2-btn-go.is-loading::after{content:'';position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:btnspin .6s linear infinite}
+@keyframes btnspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.p2-btn-go.is-loading::after{animation:none}}
+
+/* P3 — AI 對話預覽（對照附圖）*/
+.p3-tags{display:flex;gap:8px;margin-bottom:14px;flex-shrink:0}
+.p3-tag-role{display:inline-flex;align-items:center;border-radius:var(--r);padding:5px 14px;font-size:13px;font-weight:700;background:var(--brand);color:#fff}
+.p3-tag-scene{display:inline-flex;align-items:center;border-radius:var(--r);padding:5px 14px;font-size:13px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--ink2)}
+
+/* 對話預覽卡 */
+.p3-preview-card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:16px;
+  padding:0;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;
+  margin-bottom:0;
+}
+.p3-preview-head{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 20px;border-bottom:1px solid var(--border2);
+  font-size:14px;font-weight:700;color:var(--ink);flex-shrink:0;
+}
+.p3-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex-shrink:0}
+.p3-preview-count{
+  margin-left:auto;
+  font-size:12px;color:var(--ink3);
+  background:var(--surface2);border-radius:10px;padding:2px 8px;
+  font-family:'DM Mono',monospace;
+}
+/* 對話視窗：依內容高度，過長才在卡內捲動 */
+.p3-chat{
+  max-height:40vh;
+  padding:16px 20px;display:flex;flex-direction:column;gap:16px;
+  overflow-y:auto;scroll-behavior:smooth;
+}
+.p3-chat::-webkit-scrollbar{width:4px}
+.p3-chat::-webkit-scrollbar-track{background:transparent}
+.p3-chat::-webkit-scrollbar-thumb{background:rgba(18,91,188,.15);border-radius:2px}
+
+/* 訊息列：橫排（頭像 + 氣泡同一行）*/
+.p3-msg{display:flex;align-items:flex-start;gap:10px;max-width:86%}
+.p3-msg.user{flex-direction:row;margin-left:auto}
+.p3-msg.ai{flex-direction:row;margin-right:auto}
+
+/* 頭像（圓形框，可放大頭貼）*/
+.p3-av{
+  position:relative;overflow:hidden;
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;
+  margin-top:2px;
+}
+.p3-av.ai{background:var(--brand2)}
+.p3-av.user{background:var(--ok)}
+/* 使用者大頭貼：填入 USER_AVATAR_URL 後會蓋滿圓形框；留空則顯示職能首字 */
+.p3-av-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* sender label 在氣泡內部頂端 */
+.p3-msg-label{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  margin-bottom:7px;padding:2px 8px;
+  border-radius:5px;
+  font-family:'Noto Sans TC',sans-serif;
+  letter-spacing:.02em;
+}
+.p3-msg.user .p3-msg-label{display:none}
+.p3-msg.ai .p3-msg-label{display:none}
+
+/* 氣泡包含 label + 文字 */
+.p3-bubble{
+  padding:12px 16px;border-radius:18px;
+  font-size:14px;line-height:1.65;
+}
+.p3-msg.user .p3-bubble{
+  background:#1B6035;color:#fff;
+  border-top-right-radius:4px;
+  border-top-left-radius:18px;
+  box-shadow:0 2px 10px rgba(27,96,53,.18);
+}
+.p3-msg.ai .p3-bubble{
+  background:#fff;color:var(--ink);
+  border-top-left-radius:4px;
+  border:1px solid var(--border);
+  box-shadow:0 1px 6px rgba(18,91,188,.06);
+}
+
+/* AI 訊息橫排 wrapper（已由 .p3-msg.ai 處理，不需額外 row） */
+.p3-msg-row{display:contents}
+
+/* 分身召集卡 */
+.p3-join-card{
+  background:#fff;border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px 20px;flex-shrink:0;margin-bottom:0;
+  display:none;
+}
+.p3-join-card.show{display:block;animation:pgwSlideIn .3s var(--ease-out) both}
+.p3-join-head{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px}
+.p3-join-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0}
+.p3-join-avatars{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+.p3-join-av{display:flex;flex-direction:column;align-items:center;gap:6px}
+/* 硬幣翻面動畫 */
+@keyframes coinFlip{
+  0%   {transform:rotateY(0deg)}
+  40%  {transform:rotateY(90deg)}
+  60%  {transform:rotateY(90deg)}
+  100% {transform:rotateY(0deg)}
+}
+@keyframes dotPop{
+  0%  {transform:scale(0)}
+  70% {transform:scale(1.3)}
+  100%{transform:scale(1)}
+}
+.p3-join-circle{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;
+  box-shadow:0 6px 16px rgba(20,50,120,.18);
+  transition:filter .3s;
+  transform-origin:center;
+  position:relative;
+}
+/* 燈號 */
+.p3-join-circle::after{
+  content:'';
+  position:absolute;top:2px;right:2px;
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid #fff;
+  background:#9CA3AF;
+  transition:background .3s;
+}
+/* 離線：整體灰色 */
+.p3-join-circle.offline{
+  filter:grayscale(1) brightness(.85);
+  color:rgba(255,255,255,.6);
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+/* 燈號上線變綠 */
+.p3-join-circle.online::after{
+  background:#22c55e;
+  animation:dotPop .3s ease;
+}
+/* 硬幣翻面 */
+.p3-join-circle.going-online{
+  animation:coinFlip .55s ease-in-out forwards;
+}
+.p3-join-name{font-size:13px;font-weight:600;color:var(--ink)}
+.p3-join-sub{font-size:11px;color:var(--ink3)}
+
+/* 再次確認框（P3 內嵌視角選擇，由 P2 Modal 移來）*/
+.p3-vpick{
+  background:#fff;border:1px solid var(--border);
+  border-radius:16px;padding:16px 20px;flex-shrink:0;
+  display:none;
+}
+.p3-vpick.show{
+  display:block;
+  animation:pgwSlideIn .3s var(--ease-out) both;
+}
+.p3-vpick-head{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.p3-vpick-dot{width:8px;height:8px;border-radius:50%;background:var(--brand2);flex-shrink:0}
+/* 職能選擇：一行 4 個（橫式小卡：頭像在左、名稱置中）*/
+.p3-vpick-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0}
+.p3-vpick-list .vp-option{gap:10px;padding:14px 10px}
+.p3-vpick-list .vp-av{width:46px;height:46px;font-size:14px}
+.p3-vpick-list .vp-info{flex:1;text-align:center;min-width:0}
+.p3-vpick-list .vp-name{font-size:14px;line-height:1.3}
+.p3-vpick-list .vp-badge{margin-top:3px}
+@media(max-width:600px){.p3-vpick-list{grid-template-columns:repeat(2,1fr)}}
+/* ── 職能分身圖片樣式 ── */
+.p3-join-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.p3-join-circle.offline .p3-join-img{filter:grayscale(1) brightness(.85)}
+.p3-join-circle.online .p3-join-img{filter:none;transition:filter .3s}
+.p4-agent-av-img{overflow:hidden}
+.p4-av-img,.rt-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.p4-msg-av{overflow:hidden}
+
+/* 對話結束後的體驗說明 teaser（低調置中樣式）*/
+.p3-teaser{
+  display:none;
+  padding:13px 20px;
+  border-top:1px solid var(--border2);
+  flex-shrink:0;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .4s var(--ease-out),transform .4s var(--ease-out);
+  text-align:center;
+}
+.p3-teaser.show{display:block}
+.p3-teaser.visible{opacity:1;transform:translateY(0)}
+.p3-teaser-icon{display:none}
+.p3-teaser-text{
+  font-size:12px;color:var(--ink3);line-height:1.8;
+  font-family:'Noto Sans TC',sans-serif;
+}
+@keyframes typingBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.p3-typing{display:flex;align-items:center;gap:4px;padding:12px 15px!important;min-width:52px}
+.p3-typing span{width:7px;height:7px;border-radius:50%;background:#94A3B8;display:inline-block;animation:typingBounce 1.2s var(--ease-in-out) infinite}
+.p3-typing span:nth-child(2){animation-delay:.15s}
+.p3-typing span:nth-child(3){animation-delay:.3s}
+.p3-start{max-width:none;margin-top:4px;flex-shrink:0}
+.p3-start.is-loading{pointer-events:none;opacity:.92}
+.cta-spin{display:inline-block;width:15px;height:15px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:btnspin .6s linear infinite}
+@media(prefers-reduced-motion:reduce){.cta-spin{animation:none}}
+
+/* P5 — 分頁 (現況突破 / 分身能力) */
+/* P5 Tab — 對照附圖 */
+.p5-tabs{
+  display:flex;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:var(--r2) var(--r2) 0 0;
+  overflow:hidden;
+}
+.p5-tab{
+  flex:1;padding:16px;border:none;background:transparent;
+  font-size:16px;font-weight:700;color:var(--ink3);
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:color var(--dur-fast) var(--ease-in-out),
+             background var(--dur-fast) var(--ease-in-out),
+             border-bottom-color var(--dur-fast) var(--ease-in-out);
+  border-bottom:3px solid transparent;
+}
+.p5-tab.active{color:var(--brand);border-bottom:3px solid var(--brand);background:#fff}
+.p5-tab:not(.active):hover{color:var(--ink2);background:var(--surface2)}
+.p5-tabpanel{
+  background:#fff;
+  border:1px solid var(--border);border-top:none;
+  border-radius:0 0 var(--r2) var(--r2);
+  padding:24px 22px;margin-bottom:20px;
+}
+.p5-tabpanel .p5-breakthrough{border:none;box-shadow:none;padding:0;margin:0;background:transparent;backdrop-filter:none}
+/* 現況突破：圖表上方的標題 + 說明 */
+.p5-break-intro{
+  margin-bottom:20px;padding-bottom:18px;
+  border-bottom:1px solid var(--border2);
+}
+.p5-break-title{
+  font-size:17px;font-weight:800;color:var(--ink);
+  margin-bottom:10px;line-height:1.4;
+}
+.p5-break-body{
+  font-size:13.5px;color:var(--ink2);line-height:1.85;
+}
+.p5-tab-fade{animation:fadeUp var(--dur-base) var(--ease-out)}
+@media(prefers-reduced-motion:reduce){.p5-tab-fade{animation:none}}
+
+/* P4 — 圓桌會議（動態對話）*/
+.page#p4.active{display:flex;flex-direction:column;min-height:calc(100vh - var(--hud-h))}
+.p4-demo{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 16px;min-height:0;position:relative;z-index:1}
+.p4-wrap{width:100%;max-width:720px;display:flex;flex-direction:column;height:100%}
+.p4-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.p4-badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;font-weight:700;text-transform:uppercase;color:var(--brand);background:rgba(var(--brand-rgb),.08);border:1px solid rgba(var(--brand-rgb),.18);border-radius:6px;padding:3px 10px;margin-bottom:4px}
+.p4-scene-sub{font-size:13px;color:var(--ink3)}
+.p4-agents{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.p4-agent-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.7);box-shadow:0 2px 8px rgba(var(--brand-rgb),.06);font-size:12px}
+.p4-agent-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.p4-agent-name{font-weight:600;color:var(--ink)}
+.p4-agent-sub{color:var(--ink3)}
+.p4-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px;min-height:280px;max-height:calc(100vh - 360px)}
+.chat-scroll::-webkit-scrollbar{width:4px}
+.chat-scroll::-webkit-scrollbar-thumb{background:rgba(var(--brand-rgb),.15);border-radius:4px}
+.p4-sys{width:100%;padding:10px 16px;background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);border-radius:10px;font-size:12px;color:#7F1D1D;text-align:center;line-height:1.6}
+.p4-msg{display:flex;gap:10px;max-width:80%}
+.p4-msg.user{justify-content:flex-end;margin-left:auto;max-width:65%}
+.p4-msg-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.p4-msg-body{background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);border-radius:4px 16px 16px 16px;padding:12px 16px;box-shadow:0 2px 12px rgba(var(--brand-rgb),.06)}
+.p4-bubble-u{background:linear-gradient(135deg,rgba(49,162,239,.12),rgba(18,91,188,.1));border:1px solid rgba(var(--brand-rgb),.2);border-radius:16px 16px 4px 16px;padding:12px 16px}
+.p4-msg-meta{font-size:11px;margin-bottom:4px;font-weight:700;font-family:'DM Mono',monospace}
+.p4-msg-text{font-size:13px;color:var(--ink);line-height:1.7}
+.p4-typing{text-align:center;font-size:12px;color:var(--ink3);padding:8px 0}
+.p4-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--brand2);display:inline-block;margin:0 1px;animation:typingDot 1.2s var(--ease-in-out) infinite}
+@keyframes typingDot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.p4-reply{margin-top:16px}
+.p4-reply-label{font-size:12px;color:var(--ink3);margin-bottom:8px}
+.p4-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.p4-chip{font-size:12px;padding:7px 14px;border-radius:20px;border:1px solid rgba(var(--brand-rgb),.2);color:var(--brand);background:rgba(255,255,255,.8);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s}
+.p4-chip:hover{background:rgba(var(--brand-rgb),.08);border-color:var(--brand)}
+.p4-input-row{display:flex;gap:8px}
+.p4-input{flex:1;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;color:var(--ink);outline:none;font-family:'Noto Sans TC',sans-serif}
+.p4-input:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(var(--brand-rgb),.14)}
+.p4-send{padding:10px 20px;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;box-shadow:0 4px 12px rgba(var(--brand-rgb),.25)}
+
+/* ── PDF Design System 補充樣式 ────────────────────── */
+
+/* Agent Tag（PDF：分身職能標籤帶顏色邊框）*/
+.sc-agent-tag,.p2-scard-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:var(--r);
+  font-size:12px;font-weight:600;
+  font-family:'Noto Sans TC',sans-serif;
+}
+
+/* Role Badge（PDF：帶發光邊框）*/
+
+/* Scene Tag（PDF 樣式：小圓角 tag）*/
+.p2-scard-tag{
+  color:var(--brand);background:var(--brand-light);
+  border-radius:var(--r);border:none;
+}
+
+/* Crisis Box（PDF：紅色左邊線危機框）*/
+.p3-crisis{
+  background:rgba(220,38,38,.04);
+  border:1px solid rgba(220,38,38,.14);
+  border-left:4px solid var(--danger);
+  border-radius:0 var(--r2) var(--r2) 0;
+  padding:16px 20px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.p3-crisis-text{
+  font-size:14px;font-weight:600;
+  color:var(--danger);line-height:1.65;
+}
+
+/* HUD Step Pills（PDF 樣式）*/
+.hud-step.active{
+  background:rgba(255,255,255,.18);
+  color:#fff;border-radius:var(--r);
+}
+
+/* P5 Achievement 橫幅內 em 樣式 */
+.p5-ach-headline .em-win{
+  color:#fff815;font-style:normal;
+  text-shadow:0 0 20px rgba(255,248,21,.45),0 0 6px rgba(255,248,21,.25);
+}
+.p5-ach-headline .em-old{
+  color:rgba(255,255,255,.55);font-style:normal;
+  text-decoration:underline;text-decoration-color:rgba(255,255,255,.35);
+  text-underline-offset:3px;
+}
+
+/* P5 Radar 文字（PDF DM Mono）*/
+.p5-dim-axis{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.p5-dim-num{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;line-height:1}
+
+/* Link / Text Button（PDF 樣式）*/
+.p5-reset,.p2-switch-link{
+  color:var(--brand);font-size:13px;cursor:pointer;
+  background:none;border:none;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:opacity .15s;
+}
+.p5-reset:hover,.p2-switch-link:hover{opacity:.7;text-decoration:underline}
+
+/* ════════════════════════════════════════
+   P2 視角選擇 Modal（方案 D）
+   ════════════════════════════════════════ */
+.vp-modal-bg{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(16,32,64,.38);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.vp-modal{
+  background:#fff;border-radius:20px;
+  width:100%;max-width:420px;
+  box-shadow:0 24px 64px rgba(16,32,64,.24);
+  animation:vpIn .2s var(--ease-spring) both;
+  overflow:hidden;
+}
+@keyframes vpIn{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.vp-modal-header{
+  padding:24px 24px 0;
+  display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;
+  position:relative;
+}
+.vp-modal-title{
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:17px;font-weight:700;color:var(--ink);
+  flex:1;
+}
+.vp-modal-scene{
+  width:100%;font-size:13px;color:var(--ink3);margin-top:2px;
+  font-family:'Noto Sans TC',sans-serif;
+}
+.vp-close{
+  position:absolute;top:20px;right:20px;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--surface2);border:none;cursor:pointer;
+  font-size:14px;color:var(--ink3);display:flex;align-items:center;justify-content:center;
+  transition:background var(--dur-fast),color var(--dur-fast);
+}
+.vp-close:hover{background:var(--border);color:var(--ink)}
+.vp-modal-desc{
+  padding:10px 24px 16px;
+  font-size:13px;color:var(--ink2);line-height:1.6;
+  border-bottom:1px solid var(--border);
+}
+/* 職能選項列表 */
+.vp-list{
+  padding:12px 16px;display:flex;flex-direction:column;gap:8px;
+  max-height:260px;overflow-y:auto;
+}
+.vp-list::-webkit-scrollbar{width:4px}
+.vp-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.vp-option{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 14px;border-radius:12px;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;text-align:left;width:100%;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:border-color var(--dur-fast),background var(--dur-fast),box-shadow var(--dur-fast);
+}
+.vp-option:hover{border-color:var(--brand-mid);background:var(--brand-light)}
+.vp-option.selected{
+  border-color:var(--brand);background:var(--brand-light);
+  box-shadow:0 0 0 3px rgba(var(--brand-rgb),.1);
+}
+.vp-av{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;overflow:hidden;
+}
+.vp-av-img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.vp-info{flex:1;text-align:left}
+.vp-name{font-size:14px;font-weight:600;color:var(--ink)}
+.vp-badge{
+  font-size:11px;color:var(--brand);font-weight:500;
+  margin-top:2px;
+}
+/* 底部按鈕 */
+.vp-modal-footer{
+  padding:14px 16px 20px;
+  display:flex;gap:10px;border-top:1px solid var(--border);
+}
+.vp-btn-cancel{
+  flex:1;padding:12px;
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  font-size:14px;color:var(--ink2);cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  transition:border-color var(--dur-fast);
+}
+.vp-btn-cancel:hover{border-color:var(--brand-mid);color:var(--brand)}
+.vp-btn-confirm{
+  flex:2;padding:12px;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));
+  color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;
+  box-shadow:0 4px 14px rgba(var(--brand-rgb),.28);
+  transition:opacity var(--dur-fast),transform var(--dur-fast);
+}
+.vp-btn-confirm:hover{opacity:.9;transform:translateY(-1px)}
+.vp-btn-confirm:active{transform:scale(.97);opacity:.85}
+.vp-btn-confirm:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ════════════════════════════════════════
+   P4 場景示意佔位
+   ════════════════════════════════════════ */
+.p4-placeholder-wrap{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:14px;
+  background:rgba(242,246,253,.42);
+  border-bottom:1px solid var(--border);
+}
+.p4-placeholder-text{
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:36px;font-weight:900;color:var(--ink);
+  opacity:.2;letter-spacing:-.01em;text-align:center;
+  line-height:1.3;
+}
+.p4-placeholder-note{
+  font-family:'DM Mono',monospace;
+  font-size:12px;color:var(--ink3);letter-spacing:.06em;
+  opacity:.45;
+}
+#p4-footer{
+  padding:14px 24px;border-top:1px solid var(--border2);
+  background:var(--surface);text-align:center;flex-shrink:0;
+}
+#p4.page.active{
+  display:flex;flex-direction:column;
+  height:calc(100vh - var(--hud-h));
+  overflow:hidden;
+}
+/* ════════════════════════════════════════
+   右下角 P5 完成提示 Widget
+   ════════════════════════════════════════ */
+.pgw-wrap{
+  position:fixed;
+  bottom:90px;
+  right:24px;
+  z-index:290;
+  display:flex;flex-direction:column;gap:10px;
+  width:280px;pointer-events:auto;
+}
+/* 每組：小標題 + 卡片 */
+.pgw-group{display:flex;flex-direction:column;gap:4px}
+.pgw-label{display:none}
+/* 卡片本體 */
+@keyframes pgwSlideIn{
+  from{opacity:0;transform:translateX(20px)}
+  to  {opacity:1;transform:translateX(0)}
+}
+.pgw-card{
+  background:#fff;border-radius:var(--r2);
+  border:1px solid var(--border);
+  box-shadow:0 2px 16px rgba(18,91,188,.08);
+  padding:14px 40px 14px 16px;
+  position:relative;
+  animation:pgwSlideIn .3s var(--ease-out) both;
+}
+/* 文字 */
+.pgw-card-text{
+  font-size:14px;font-weight:600;color:var(--ink);
+  line-height:1.4;font-family:'Noto Sans TC',sans-serif;
+}
+/* X 關閉按鈕 */
+.pgw-close{
+  position:absolute;top:10px;right:10px;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border);
+  cursor:pointer;font-size:11px;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--dur-micro),color var(--dur-micro);
+  font-family:'DM Mono',monospace;
+}
+.pgw-close:hover{background:var(--border);color:var(--ink)}
+/* 進度卡 */
+.pgw-progress-text{
+  font-size:14px;font-weight:600;color:var(--ink);
+  margin-bottom:10px;font-family:'Noto Sans TC',sans-serif;
+}
+.pgw-bar-track{
+  height:6px;background:var(--surface2);
+  border-radius:3px;overflow:hidden;
+}
+.pgw-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--brand2),var(--brand));
+  border-radius:3px;transition:width .6s var(--ease-out);
+}
+/* 推薦按鈕列 */
+.pgw-rec-row{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;
+}
+.pgw-rec-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:20px;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--ink2);
+  font-family:'Noto Sans TC',sans-serif;
+  transition:border-color var(--dur-fast),color var(--dur-fast),background var(--dur-fast);
+}
+.pgw-rec-btn:hover{border-color:var(--brand-mid);color:var(--brand);background:var(--brand-light)}
+.pgw-rec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* 小螢幕 */
+@media(max-width:640px){
+  .pgw-wrap{right:12px;bottom:80px;width:240px}
+}
+.pgw-back-btn{
+  margin-top:10px;width:100%;padding:8px;
+  background:var(--brand-light);color:var(--brand);
+  border:1.5px solid rgba(var(--brand-rgb),.2);
+  border-radius:var(--r);font-size:13px;font-weight:600;
+  font-family:'Noto Sans TC',sans-serif;cursor:pointer;
+  transition:background var(--dur-fast),border-color var(--dur-fast);
+  text-align:center;
+}
+.pgw-back-btn:hover{background:rgba(var(--brand-rgb),.12);border-color:var(--brand-mid)}
+/* 返回場景按鈕（Card3 推薦）*/
+.pgw-rec-btn-back{
+  width:100%;justify-content:center;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));
+  color:#fff;border:none;border-radius:var(--r);
+  font-size:13px;font-weight:700;
+  padding:9px 14px;
+  box-shadow:0 2px 10px rgba(var(--brand-rgb),.25);
+}
+.pgw-rec-btn-back:hover{opacity:.9;transform:translateY(-1px)}
+
+@keyframes slideInRight{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInLeft {from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp      {from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn     {from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+
+.page-anim-right{animation:slideInRight var(--dur-page) var(--ease-out) both}
+.page-anim-left {animation:slideInLeft  var(--dur-page) var(--ease-out) both}
+.page-anim-up   {animation:fadeUp       var(--dur-base) var(--ease-out) both}
+.page-anim-scale{animation:scaleIn      var(--dur-base) var(--ease-spring) both}
+
+/* ════════════════════════════════════════
+   Layer 2 — Stagger 進場（卡片、維度列）
+   ════════════════════════════════════════ */
+@keyframes staggerIn{
+  from{opacity:0;transform:translateY(10px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+.stagger-item{
+  opacity:0;
+  animation:staggerIn var(--dur-base) var(--ease-out) both;
+}
+.stagger-item:nth-child(1){animation-delay:.05s}
+.stagger-item:nth-child(2){animation-delay:.10s}
+.stagger-item:nth-child(3){animation-delay:.15s}
+.stagger-item:nth-child(4){animation-delay:.20s}
+.stagger-item:nth-child(5){animation-delay:.25s}
+.stagger-item:nth-child(n+6){animation-delay:.30s}
+
+/* ════════════════════════════════════════
+   Layer 3 — 按鈕 press 回饋（無 !important）
+   ════════════════════════════════════════ */
+.p1-cta:active{transform:scale(.96) translateY(1px);box-shadow:0 2px 6px rgba(var(--brand-rgb),.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p2-btn-go:active{transform:scale(.96) translateY(1px);box-shadow:0 2px 6px rgba(var(--brand-rgb),.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p3-start:active{transform:scale(.97);transition:transform var(--dur-micro)}
+.p5-btn-primary:active{transform:scale(.97);box-shadow:0 2px 8px rgba(8,28,80,.15);transition:transform var(--dur-micro),box-shadow var(--dur-micro)}
+.p2-btn-sub:active,.p5-btn-secondary:active{transform:scale(.97);transition:transform var(--dur-micro)}
+
+/* ════════════════════════════════════════
+   Layer 4 — P1 職能 DD 選取彈跳
+   ════════════════════════════════════════ */
+@keyframes rolePop{
+  0%  {transform:scale(1)}
+  40% {transform:scale(1.06)}
+  70% {transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+.role-dd-item.just-selected{animation:rolePop .3s var(--ease-out)}
+
+/* ════════════════════════════════════════
+   Layer 5 — CTA 呼吸脈動（引導注意）
+   ════════════════════════════════════════ */
+@keyframes ctaPulse{
+  0%,100%{box-shadow:0 6px 20px rgba(var(--brand-rgb),.28)}
+  50%    {box-shadow:0 6px 28px rgba(var(--brand-rgb),.48),0 0 0 5px rgba(var(--brand-rgb),.08)}
+}
+.p1-cta:not(:disabled){animation:ctaPulse 2.6s var(--ease-in-out) infinite}
+.p1-cta:not(:disabled):hover,
+.p1-cta:not(:disabled):active{animation:none}
+
+/* ════════════════════════════════════════
+   Layer 6 — P5 雷達圖線條進場
+   ════════════════════════════════════════ */
+@keyframes radarDraw{
+  from{stroke-dashoffset:400}
+  to  {stroke-dashoffset:0}
+}
+#p5RadarShape{
+  stroke-dasharray:400;
+  stroke-dashoffset:400;
+  animation:radarDraw .7s cubic-bezier(.22,1,.36,1) .2s both;
+}
+
+/* ════════════════════════════════════════
+   prefers-reduced-motion：全部覆寫
+   ════════════════════════════════════════ */
+@media(prefers-reduced-motion:reduce){
+  .page-anim-right,.page-anim-left,.page-anim-up,.page-anim-scale,
+  .stagger-item,.role-dd-item.just-selected,#p5RadarShape,
+  .p1-pain,.ai-bot,.ai-icon,.p1-cta:not(:disabled){
+    animation:none!important;opacity:1!important;transform:none!important;
+    transition:none!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HUD -->
+<nav class="hud" role="navigation" aria-label="體驗進度導覽">
+  <div class="hud-left">
+    <div class="hud-logo">
+      <div class="hud-logo-placeholder" aria-hidden="true"></div>
+      <span class="hud-logo-sep"></span>
+      <span class="hud-logo-title">AI Agent 體驗中心</span>
+    </div>
+    <div class="hud-steps" id="hudSteps">
+      <div class="hud-step active" data-step="1"><div class="hs-dot"></div><span class="hs-num">1</span>選定職能</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="2"><div class="hs-dot"></div><span class="hs-num">2</span>選擇場景</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="3"><div class="hs-dot"></div><span class="hs-num">3</span>啟動分身</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="4"><div class="hs-dot"></div><span class="hs-num">4</span>圓桌會議</div>
+      <div class="hud-sep">›</div>
+      <div class="hud-step" data-step="5"><div class="hs-dot"></div><span class="hs-num">5</span>分身總結</div>
+    </div>
+    <!-- compact progress shown on narrow screens instead of the breadcrumb -->
+    <div class="hud-progress" id="hudProgress" aria-hidden="true">
+      <div class="hud-dots">
+        <span class="hd-dot active"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+        <span class="hd-dot"></span>
+      </div>
+      <span class="hud-cur" id="hudCur">選定職能</span>
+    </div>
+  </div>
+  <div class="hud-right">
+    <div class="hud-role" id="hudRole"></div>
+    <div class="hud-scene" id="hudScene"></div>
+    <div class="hud-back" id="hudBack" onclick="goBack()"><span class="hb-arrow">←</span><span class="hb-text"> 返回上一步</span></div>
+    <div class="hud-home" onclick="gotoPage(1)" title="回到分身大廳">回到分身大廳</div>
+  </div>
+</nav>
+
+<!-- ── PAGE 1: 歡迎大廳 + 選定職能 ── -->
+<!-- 背景圖層：P2-P5 共用，固定存在不重建，避免切換閃爍 -->
+<div id="scene-bg" aria-hidden="true"></div>
+
+<main>
+<section class="page active" id="p1" aria-label="歡迎大廳">
+  <div class="p1-bg" aria-hidden="true"></div>
+
+  <!-- floating pain bubbles：桌機 ≥1200px 懸浮於圖上（內容隨職能替換）-->
+  <div class="p1-pains" id="p1Pains" aria-hidden="true">
+    <div class="p1-pain pain-1"><div class="p1-pain-icon">📋</div>客戶急單，我該跟誰討論供應鏈底線</div>
+    <div class="p1-pain pain-2"><div class="p1-pain-icon">🏭</div>生產時才發現料不夠，只能停線等</div>
+    <div class="p1-pain pain-3"><div class="p1-pain-icon">🔒</div>老闆要確認 ERP 資安，但我們只有 3 人</div>
+  </div>
+
+  <!-- inline pain strip：<1200px 時顯示於內容上方（內容隨職能替換）-->
+  <div class="p1-pain-strip" id="p1PainStrip" aria-label="常見工作挑戰">
+    <div class="p1-pain-strip-item"><span class="p1-pain-strip-icon">📋</span>客戶急單，我該跟誰討論供應鏈</div>
+    <div class="p1-pain-strip-item"><span class="p1-pain-strip-icon">🏭</span>生產時才發現料不夠</div>
+    <div class="p1-pain-strip-item"><span class="p1-pain-strip-icon">🔒</span>ERP 資安只有 3 人確認</div>
+  </div>
+
+  <div class="p1-layout">
+    <div class="p1-content">
+      <h1 class="p1-title">體驗與數智分身<br>協同工作</h1>
+      <p class="p1-sub">選擇你的職能，開啟體驗旅程<br>關鍵時刻，Agent協助你推進決策</p>
+
+      <h2 class="p1-roles-title">選擇你的工作職能</h2>
+
+      <div class="p1-dd" id="roleDD">
+        <button type="button" class="p1-dd-trigger" id="roleDDTrigger" aria-haspopup="listbox" aria-expanded="false" onclick="toggleRoleDD(event)">
+          <span class="p1-dd-dot" id="roleDDDot" style="display:none"></span>
+          <span class="p1-dd-label" id="roleDDLabel">請選擇你的職能…</span>
+          <span class="p1-dd-caret" aria-hidden="true">⌄</span>
+        </button>
+        <div class="p1-dd-panel" id="roleDDPanel" role="listbox" aria-label="職能列表" hidden></div>
+      </div>
+
+      <button class="p1-cta" id="p1Cta" onclick="gotoPage(2)" disabled aria-label="進入數智空間">進入數智空間 &nbsp;›</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── Modal：選擇體驗視角（方案 D）── -->
+<!-- ── PAGE 2: 選擇場景 ── -->
+<!-- Modal：切換職能 -->
+<div class="p2-modal-bg" id="p2ModalBg" onclick="closeP2Modal()" style="display:none" aria-hidden="true">
+  <div class="p2-modal" onclick="event.stopPropagation()" role="dialog" aria-label="選擇職能">
+    <div class="p2-modal-title">選擇你的職能</div>
+    <div class="p2-modal-grid" id="p2ModalGrid"></div>
+  </div>
+</div>
+
+<section class="page" id="p2" aria-label="選擇場景">
+  <div class="p2-body">
+    <div class="p2-role-row">
+      <button class="p2-role-pill" id="p2RolePill" onclick="openP2Modal()" aria-haspopup="dialog" aria-label="目前職能，點擊可切換其他職能">
+        <span class="p2-role-dot" id="p2RoleDot"></span>
+        <span id="p2RoleName">採購</span>
+        <span class="p2-role-switch">切換其他職能</span>
+      </button>
+    </div>
+    <div class="p2-desc-box" id="p2Desc"></div>
+    <div class="p2-section-label">職能的常見工作場景類型</div>
+    <div class="p2-chips" id="p2Chips"></div>
+    <div class="p2-cards" id="p2Cards"></div>
+  </div>
+</section>
+
+<!-- ── PAGE 3: 場景開場（AI 對話預覽）── -->
+<section class="page" id="p3" aria-label="場景開場">
+  <div class="p3-inner">
+    <div class="p3-tags">
+      <span class="p3-tag-role" id="p3TagRole">物控</span>
+      <span class="p3-tag-scene" id="p3SceneTag">急單插單應變</span>
+    </div>
+
+    <div class="p3-preview-card">
+      <div class="p3-preview-head">
+        <span class="p3-preview-dot"></span>AI 數智助理對話預覽
+      </div>
+      <div class="p3-chat" id="p3Chat"></div>
+      <!-- 備註文字（卡片內） -->
+      <div class="p3-teaser" id="p3Teaser">
+        <div class="p3-teaser-text">下載專屬分身，就擁有職能戰力。不用從零訓練—開箱就是一整個主管級專家團隊</div>
+      </div>
+    </div>
+
+    <!-- 再次確認框（由 P2 移來）：你可以選擇的職能 -->
+    <div class="p3-vpick" id="p3Vpick">
+      <div class="p3-vpick-head"><span class="p3-vpick-dot"></span><span id="p3VpickTitle">你可以選擇的職能</span></div>
+      <div class="p3-vpick-list" id="p3VpickList"></div>
+    </div>
+
+    <div class="p3-join-card" id="p3JoinCard">
+      <div class="p3-join-head"><span class="p3-join-dot"></span>數智分身加入會議…</div>
+      <div class="p3-join-avatars" id="p3JoinAvatars"></div>
+    </div>
+    <div class="p3-join-hint" id="p3JoinHint">選擇視角後，其他職能分身將上線</div>
+
+    <button class="p1-cta p3-start" onclick="enterRoundtable(this)" aria-label="開始體驗">開始體驗 &nbsp;›</button>
+  </div>
+</section>
+
+<!-- ── PAGE 4: 圓桌會議 ── -->
+<!--
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  PAGE 4 — 圓桌會議（工程師演示區）                               │
+  │                                                                 │
+  │  此頁面框架由 UX 保留，內部演示內容請工程師自行填入。            │
+  │                                                                 │
+  │  框架結構：                                                      │
+  │  ├── #p4-demo-area   ← 演示主體區（全高彈性區塊）               │
+  │  │    工程師在此放入實際的 AI 會議演示內容                       │
+  │  │    建議尺寸：100% 寬，flex:1（撐滿剩餘高度）                  │
+  │  │                                                              │
+  │  └── #p4-footer      ← 固定底部操作列                           │
+  │       保留「查看分身能力總結」按鈕，連接下一頁                   │
+  │                                                                 │
+  │  頁面進入時機：從 PAGE 3（場景開場）點擊「啟動會議」後觸發       │
+  │  離開時機：點擊底部「查看分身能力總結」→ gotoPage(5)            │
+  │                                                                 │
+  │  可取用的 state 變數（JS）：                                     │
+  │    state.role       → 使用者職能（字串，例如 "採購"）           │
+  │    state.roleColor  → 職能代表色（hex，例如 "#1B5E36"）         │
+  │    state.scene      → 當前場景物件，包含：                      │
+  │      .name          → 場景名稱（例如 "急單插單應變"）           │
+  │      .lead          → 場景引言（使用者身份代入句）               │
+  │      .agents[]      → 參與分身陣列 [{name, color}, ...]         │
+  │      .steps[]       → 三段劇本文字                              │
+  └─────────────────────────────────────────────────────────────────┘
+-->
+<section class="page" id="p4" aria-label="圓桌會議">
+  <div class="p4-placeholder-wrap">
+    <div class="p4-placeholder-text">
+      <span id="p4PlaceholderRole">採購</span> 視角 · <span id="p4PlaceholderName">急單插單應變</span><br>圓桌會議示意
+    </div>
+    <div class="p4-placeholder-note">此處僅為框架佔位，正式圓桌會議的互動內容將由需求方內嵌——這不是最終畫面</div>
+  </div>
+  <div id="p4-footer">
+    <button class="btn-end" onclick="gotoPage(5)" aria-label="查看分身能力總結">查看分身能力總結 &nbsp;›</button>
+  </div>
+</section>
+
+<!-- ── PAGE 5: 分身總結 ── -->
+<section class="page" id="p5" aria-label="分身能力總結">
+  <div class="p5-wrap">
+
+    <!-- ① 你做到了什麼 -->
+    <div class="p5-achievement">
+      <div class="p5-ach-scene" id="p5SceneTag">急單插單應變</div>
+      <div class="p5-ach-headline" id="p5Headline">
+        你剛才用 <em class="em-win">3 分鐘</em>，完成了一個通常要 <em class="em-old">3 天</em> 的決策
+      </div>
+    </div>
+
+    <!-- ②③ 分頁：現況突破 / 分身能力 -->
+    <div class="p5-tabs">
+      <button class="p5-tab active" data-tab="break" onclick="p5Tab('break')">現況突破</button>
+      <button class="p5-tab" data-tab="ability" onclick="p5Tab('ability')">分身能力</button>
+    </div>
+    <div class="p5-tabpanel" id="p5TabBreak">
+      <div class="p5-break-intro">
+        <div class="p5-break-title">思維驅動型·高壓急單決策中樞</div>
+        <div class="p5-break-body">此場景不是單純模擬「是否接單」，而是把急單決策拆成可承諾量、成本邊界、客戶條件與內部執行限制的多層判斷。它最有說服力的地方，在於讓管理者看見：AI 分身不只是提供答案，而是能協助企業建立更成熟的接單決策機制。</div>
+      </div>
+      <div class="p5-breakthrough">
+        <div class="p5-radar-col">
+          <svg width="172" height="150" viewBox="-20 -6 200 172" aria-label="能力突破雷達圖" role="img" style="max-width:100%;height:auto;overflow:visible">
+            <title>分身能力雷達圖</title>
+            <polygon points="80,20 140,80 80,140 20,80" fill="none" stroke="#E8ECF0" stroke-width="1.5"/>
+            <polygon points="80,35 125,80 80,125 35,80" fill="none" stroke="#E8ECF0" stroke-width="1"/>
+            <polygon points="80,50 110,80 80,110 50,80" fill="none" stroke="#E8ECF0" stroke-width="1"/>
+            <polygon id="p5RadarShape" points="80,28 132,80 80,132 28,80" fill="rgba(var(--brand-rgb),.12)" stroke="#125BBC" stroke-width="2"/>
+            <text x="80"  y="10"  text-anchor="middle" font-size="12" font-weight="700" fill="#1B5E36">人力</text>
+            <text x="166" y="84"  text-anchor="middle" font-size="12" font-weight="700" fill="#1565C0">能力</text>
+            <text x="80"  y="160" text-anchor="middle" font-size="12" font-weight="700" fill="#4A148C">思維</text>
+            <text x="-6"  y="84"  text-anchor="middle" font-size="12" font-weight="700" fill="#E65100">時空</text>
+          </svg>
+          <div class="p5-radar-caption" id="p5RadarCaption">突破四個維度的限制</div>
+        </div>
+        <div class="p5-dims-col" id="p5DimsCol"></div>
+      </div>
+    </div>
+    <div class="p5-tabpanel" id="p5TabAbility" style="display:none">
+      <div class="p5-takeaway-grid" id="p5TakeawayGrid"></div>
+    </div>
+
+    <!-- 轉換區：CTA 在情緒最高點 -->
+    <div class="p5-convert">
+      <div class="p5-convert-text">
+        <div class="p5-convert-headline">開箱即用，<em style="color:#fff;font-style:normal;text-decoration:underline;text-underline-offset:3px;">不需要從零訓練 AI</em></div>
+        <div class="p5-convert-sub">下載分身，預置能力立即可用——並且會隨著使用習慣持續強化，<strong>越用越懂你的企業</strong>。</div>
+      </div>
+      <div class="p5-convert-cta" style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="p5-btn-secondary" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.45);color:#fff" aria-label="訂閱最新消息">訂閱最新消息</button>
+        <button class="p5-btn-primary" aria-label="索取方案">索取方案 &nbsp;→</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+</main>
+
+
+
+<!-- ── 右下角 P5 完成提示 Widget（三張依序跳出）── -->
+<div class="pgw-wrap" id="pgWidget">
+
+  <!-- 卡片 1：完成通知 -->
+  <div class="pgw-group" id="pgwCard1" style="display:none">
+    <div class="pgw-label">完成通知</div>
+    <div class="pgw-card">
+      <div class="pgw-card-text" id="pgwAchText">你完成了急單接單應變分身</div>
+      <button class="pgw-close" onclick="closePgwCard('pgwCard1')" aria-label="關閉">✕</button>
+    </div>
+  </div>
+
+  <!-- 卡片 2：進度 -->
+  <div class="pgw-group" id="pgwCard2" style="display:none">
+    <div class="pgw-label">進度</div>
+    <div class="pgw-card">
+      <div class="pgw-progress-text" id="pgwProgressText">場景：採購　您已經完成了　<strong id="pgwFrac">1 / 5</strong></div>
+      <button class="pgw-close" onclick="closePgwCard('pgwCard2')" aria-label="關閉">✕</button>
+      <div class="pgw-bar-track"><div class="pgw-bar-fill" id="pgwBarFill" style="width:20%"></div></div>
+
+    </div>
+  </div>
+
+  <!-- 卡片 3：推薦 -->
+  <div class="pgw-group" id="pgwCard3" style="display:none">
+    <div class="pgw-label">推薦</div>
+    <div class="pgw-card">
+      <div class="pgw-card-text">推薦你下個體驗場景：</div>
+      <button class="pgw-close" onclick="closePgwCard('pgwCard3')" aria-label="關閉">✕</button>
+      <div class="pgw-rec-row" id="pgwRecRow"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- AI avatar：右下角常駐，P5 後點擊可展開通知 widget -->
+<div class="ai-bot" id="aiBotWrap">
+  <div class="ai-bubble" id="aiBubble" style="display:none">
+    <span class="ai-bubble-top" id="aiBubbleTop"></span>
+    <span class="ai-bubble-main" id="aiBubbleMain">可以點開看訊息喔 ▼</span>
+  </div>
+  <div class="ai-avatar" onclick="onAiAvatarClick()" style="cursor:pointer">
+    <img src="https://agent-exp.apps.digiwincloud.com/assets/images/onboarding/icon-assistant.png" alt="AI 助理" onerror="this.style.display='none'">
+  </div>
+</div>
+
+<script>
+/* ── 職能分身圖片對照表 ── */
+var AGENT_IMG = {
+  '專案經理':   'images/Functions-PM.png',
+  'PM':         'images/Functions-PM.png',
+  '採購':       'images/Functions-PR.png',
+  'PR':         'images/Functions-PR.png',
+  '業務':       'images/Functions-Sales.png',
+  'Sales':      'images/Functions-Sales.png',
+  '廠長':       'images/Functions-FM.png',
+  'FM':         'images/Functions-FM.png',
+  '生管':       'images/Functions-PC.png',
+  'PC':         'images/Functions-PC.png',
+  '倉管':       'images/Functions-WH.png',
+  'WH':         'images/Functions-WH.png',
+  '物控':       'images/Functions-MC.png',
+  'MC':         'images/Functions-MC.png',
+  '產線班組長': 'images/Functions-SV.png',
+  'SV':         'images/Functions-SV.png',
+  'IT資訊人員': 'images/Functions-IT.png',
+  'IT資訊':     'images/Functions-IT.png',
+  'IT':         'images/Functions-IT.png',
+  '資材':       'images/Functions-PMC.png',
+  'PMC':        'images/Functions-PMC.png'
+};
+function agentImg(name){ return AGENT_IMG[name] || null; }
+
+var state = { page: 1, role: '', roleColor: '', scene: null, history: [1],
+              viewpointRole: '', viewpointColor: '',
+              pendingScene: null, pendingViewpoint: null };
+
+/* ────────────────────────────────────────────────────────────
+   使用者大頭貼（P3 對話預覽的人類頭像）
+   之後要換成真實大頭貼時，把圖片網址填到這裡即可；
+   留空字串時會顯示職能首字當作預留位置。
+   例：var USER_AVATAR_URL = 'https://your-cdn.com/avatar.png';
+   ──────────────────────────────────────────────────────────── */
+var USER_AVATAR_URL = '';
+
+var SCENES = {
+  採購: [
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['專案經理','採購','業務','廠長'], lead:'客戶突然要追加，身為採購，你將與數智分身一同擬定策略', steps:['客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。',' AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。'], agents:[{name:'PM',color:'#A660BE'},{name:'業務',color:'#C46734'},{name:'廠長',color:'#794EAD'}] },
+    { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','資材'], lead:'身為採購，你將協同 AI 分身快速掌握缺料風險', steps:['生產線急等用料，但採購人員還在忙著翻查數百項品號的可用庫存，光是轉單就耗掉一整天。','讓採購分身自動盤點缺口、比對替代料源，你只需要拍板關鍵決策。','擁有這組職能分身，你不用再當「打單機器人」，確保料件準時到位。'], agents:[{name:'採購',color:'#36684A'},{name:'倉管',color:'#006064'}] },
+    { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['採購','倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓採購進貨與進貨驗收批退 Agent 聯手——自動辨識廠商單據生成進貨單，加速驗收流程。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#36684A'},{name:'驗收',color:'#006064'}] },
+    { id:'s7', name:'供應商績效評比', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','供應商'], lead:'你需要在季末快速評估哪些供應商值得續約', steps:['每季末都要評估幾十家供應商的交期準確率、品質良率和價格競爭力，但資料分散在多個系統，光是彙整就要一週。','AI 採購評鑑分身自動彙整交期、品質、成本三維指標，產出供應商評分矩陣與換廠建議。','下載供應商管理分身，每季評鑑從一週壓縮到當天完成，精準決定續約或替換。'], agents:[{name:'採購',color:'#36684A'},{name:'供應商分析',color:'#0277BD'}] },
+    { id:'s8', name:'詢比價智能加速', cat:'採購與供應鏈 › 採購詢比價', tags:['採購'], lead:'一張報價單等了三天，客戶的交期已經不夠了', steps:['臨時需求湧入，採購要同步詢問五家供應商、比較規格、確認交期——人工來回至少三天，黃金處理窗口就這樣白白流失。','AI 詢比價分身自動發送詢價單、彙整回覆、比對最佳報價，整個流程壓縮到 4 小時內完成。','下載詢比價加速分身，讓供應商回覆自動彙整，你只需要在最後環節拍板最優選擇。'], agents:[{name:'採購',color:'#36684A'},{name:'比價AI',color:'#E65100'}] }
+  ],
+  生管: [
+    { id:'s3', name:'物料運補監管', cat:'生產管理 › 生產排程與插單管理', tags:['生管','倉管','物控'], lead:'身為生管，你將與分身一同確認開工前的料況安全', steps:['客戶臨時插單時、工單上線生產前，你真的知道料夠不夠嗎？多數情況，是開始生產了才發現缺料。','職能分身在工單開工前自動解析用料需求、即時比對庫存，並預測料況風險。','下載職能分身，協助預測缺料風險，準確驅動開工決策，提升生產效率。'], agents:[{name:'生管',color:'#376BA7'},{name:'物控',color:'#00838F'},{name:'倉管',color:'#006064'}] },
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['專案經理','採購','業務','廠長'], lead:'你的產線剛接到急單，數智分身協助你快速重排', steps:['客戶突然追加 7 倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。',' AI 職能分身各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力。不用從零訓練——開箱就是一整個主管級專家團隊。'], agents:[{name:'PM',color:'#A660BE'},{name:'業務',color:'#C46734'},{name:'廠長',color:'#794EAD'}] }
+  ],
+  業務: [
+    { id:'s4', name:'名片商機獵取', cat:'行銷與銷售 › 潛客開發與名單管理', tags:['業務'], lead:'身為業務，你將讓 AI 分身幫你把展覽名片變成有效商機', steps:['每次參展後，大量名片堆積造成資訊落差，手動整理耗時，無法第一時間進行名單貼標。',' AI 職能分身已預置光學掃描與爬蟲能力，精準解析各式名片格式，自動查補缺漏。','下載名單收集能力，開箱即用，越用越懂你的目標產業，能力持續增強！'], agents:[{name:'業務',color:'#C46734'},{name:'商機',color:'#1B5E36'}] },
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['業務','採購','廠長'], lead:'這次急單，你身為業務要在有限時間給客戶一個確定的答案', steps:['客戶突然追加 7 倍急單——備料不足、產線排滿。你需要馬上協調內部給出交期承諾。',' AI 職能分身——業務、廠長、採購，各自預置專業思維，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力，開箱就是一整個主管級專家團隊。'], agents:[{name:'廠長',color:'#794EAD'},{name:'採購',color:'#36684A'},{name:'PM',color:'#A660BE'}] }
+  ],
+  廠長: [
+    { id:'s1', name:'急單插單應變', cat:'生產管理 › 生產排程與插單管理', tags:['廠長','採購','業務'], lead:'身為廠長，你需要在產線已滿的情況下決定是否接這張急單', steps:['客戶突然追加 7 倍急單——備料不足、產線排滿。你若判斷錯誤，不是丟單就是虧損。',' AI 職能分身各自預置專業思維，把跨部門喬三天的事，現在同步算好等你拍板。','下載專屬分身，就擁有職能戰力，開箱就是一整個主管級專家團隊。'], agents:[{name:'採購',color:'#36684A'},{name:'業務',color:'#C46734'},{name:'PM',color:'#A660BE'}] },
+    { id:'s3', name:'物料運補監管', cat:'生產管理 › 生產排程與插單管理', tags:['生管','倉管','物控'], lead:'身為廠長，你要確保產線開工前料況無虞', steps:['工單上線生產前，你真的知道料夠不夠嗎？多數情況，是開始生產了才發現缺料，造成停線。','職能分身在工單開工前自動解析用料需求、即時比對庫存，並預測料況風險。','下載職能分身，協助預測缺料風險，準確驅動開工決策，提升生產效率。'], agents:[{name:'生管',color:'#376BA7'},{name:'物控',color:'#00838F'}] }
+  ],
+  IT資訊: [
+    { id:'s5', name:'資安漏洞速補', cat:'合規與風險 › 資安風險管理', tags:['IT資訊'], lead:'老闆要你本週確認 ERP 系統資安，但你的團隊只有 3 個人', steps:['老闆今天早上傳來訊息：「最近資安事件頻傳，我們的 ERP 系統確定沒問題嗎？你這週給我確認。」','你的團隊只有 3 個人，資安專家在休假。你手上有一個工具——法規遵循顧問 Agent。','你不需要懂 SBOM，不需要會 Linux。你只需要說一句話。'], agents:[{name:'法規',color:'#B71C1C'},{name:'IT',color:'#3E885F'}] }
+  ],
+  資材: [
+    { id:'s6', name:'高效入庫檢驗', cat:'採購與供應鏈 › 倉儲與庫存管理', tags:['倉管'], lead:'月底進貨高峰，你與 AI 分身聯手讓進貨不再塞車', steps:['月底進貨高峰，碼頭塞滿了貨車。倉管要一筆筆核對訂單，品管還要手寫驗收，現場大塞車。','讓「採購進貨」與「進貨驗收批退」Agent 聯手——自動辨識廠商單據生成進貨單。','擁有這組職能分身，讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'], agents:[{name:'採購',color:'#36684A'},{name:'驗收',color:'#006064'}] },
+    { id:'s2', name:'缺料斷鏈救援', cat:'採購與供應鏈 › 採購詢比價', tags:['資材'], lead:'身為資材，你要在最短時間解決緊急缺料危機', steps:['生產線急等用料，採購還在翻查數百項品號的庫存，光是轉單就耗掉一整天。','讓採購進貨分身自動辨識廠商單據、生成進貨單，你只需要輸入驗收數即可。','擁有這組職能分身，從需求偵測到正式下單一氣呵成，確保料件準時到位。'], agents:[{name:'採購',color:'#36684A'},{name:'倉管',color:'#006064'}] }
+  ],
+  採購ext: [
+    { id:'s7', name:'供應商績效評比', cat:'採購與供應鏈 › 採購詢比價', tags:['採購','供應商'], lead:'你需要在季末快速評估哪些供應商值得續約', steps:['每季末都要評估幾十家供應商的交期準確率、品質良率和價格競爭力，但資料分散在多個系統，光是彙整就要一週。','AI 採購評鑑分身自動彙整交期、品質、成本三維指標，產出供應商評分矩陣與換廠建議。','下載供應商管理分身，每季評鑑從一週壓縮到當天完成，精準決定續約或替換。'], agents:[{name:'採購',color:'#36684A'},{name:'供應商分析',color:'#0277BD'}] },
+    { id:'s8', name:'詢比價智能加速', cat:'採購與供應鏈 › 採購詢比價', tags:['採購'], lead:'一張報價單等了三天，客戶的交期已經不夠了', steps:['臨時需求湧入，採購要同步詢問五家供應商、比較規格、確認交期——人工來回至少三天，黃金處理窗口就這樣白白流失。','AI 詢比價分身自動發送詢價單、彙整回覆、比對最佳報價，整個流程壓縮到 4 小時內完成。','下載詢比價加速分身，讓供應商回覆自動彙整，你只需要在最後環節拍板最優選擇。'], agents:[{name:'採購',color:'#36684A'},{name:'比價AI',color:'#E65100'}] }
+  ]
+};
+
+// New roles from the landing grid that don't have their own scene sets
+// are routed to the closest existing scene set, keeping their own display name.
+var ROLE_ALIAS = {
+  'IT資訊人員':'IT資訊',
+  '倉管':'資材',
+  '物控':'生管',
+  '產線班組長':'廠長',
+  '專案經理':'採購'
+};
+function scenesFor(role){ return SCENES[ROLE_ALIAS[role]||role] || []; }
+
+/* ── 視角（主角）解析 ──
+   state.role        = 使用者在 P1 選定的「本職」
+   state.viewpointRole = 在 P2 確認 Modal 選定、要以哪個視角體驗此場景（主角）
+   未選視角時，主角即為本職。 */
+function effRole(){ return state.viewpointRole || state.role; }
+function effColor(){ return state.viewpointColor || state.roleColor || '#125BBC'; }
+
+// 完整參與名單 = 本職 + 場景分身（依名稱去重）
+function sceneCast(s){
+  var cast=[], seen={};
+  var baseName=state.role;
+  if(baseName){ cast.push({name:baseName,color:state.roleColor||roleColorOf(baseName)}); seen[baseName]=true; }
+  (s.agents||[]).forEach(function(a){ if(!seen[a.name]){ cast.push({name:a.name,color:roleColorOf(a.name,a.color)}); seen[a.name]=true; } });
+  return cast;
+}
+// 數智分身（加入會議者）= 全名單去掉目前主角
+function joiningAgents(s){
+  var hero=effRole();
+  var others=sceneCast(s).filter(function(a){ return a.name!==hero; });
+  if(others.length) return others;
+  return (s.agents||[]).map(function(a){ return {name:a.name,color:roleColorOf(a.name,a.color)}; });
+}
+
+var ABILITIES = {
+  s1:[{n:'GM決策協調分身',r:'急單決策',d:'跨部門協調，快速評估急單可行性與風險'},{n:'業務談判分身',r:'客戶溝通',d:'即時提供交期承諾與談判話術支援'},{n:'生產排程分身',r:'產能評估',d:'自動重排產線，計算最優插單位置'},{n:'供應鏈風控分身',r:'備料風控',d:'即時比對庫存，預測備料缺口與交期風險'},{n:'財務成本分身',r:'成本邊界',d:'試算 TCO 與獲利邊界，守住接單不虧損的紅線'},{n:'採購尋源分身',r:'替代料源',d:'快速比對替代料與供應商，補上缺口並評估交期'}],
+  s3:[{n:'生管主管分身',long:'生管主管分身是專為生產管理打造的數智職能代理，把橫跨研發、採購、製造與倉儲的繁瑣協調工作，濃縮成一套可隨時調用的決策支援能力。當一張工單下達，它會自動解析其中的物料需求、用量與工序順序，逐項比對現有庫存、在途數量與既有訂單佔用，第一時間判斷這張單到底能不能如期開工，而不必等人逐筆翻查 BOM 與庫存報表。<br><br>它最有價值的地方，在於把「會不會缺料、會缺多久、缺多少」這類原本仰賴資深生管經驗的判斷加以標準化。分身會即時偵測潛在缺口與瓶頸，依交期壓力與產線負載自動排序預警，把最可能造成停工的關鍵料件與工序推到最前面，讓主管一眼掌握風險全貌，並提早做出延後開工、緊急調撥或改派產線等應變決策。<br><br>在跨部門協作上，它扮演資訊樞紐的角色：把採購、物控、倉管等環節的狀態彙整在同一個視圖，當工單異動時自動同步交期並通知相關人員，減少來回確認的時間成本，也降低因資訊落差造成的排程誤判。<br><br>對企業而言，導入這組分身，等於把資深生管的判斷邏輯封裝成隨時可用的代理：能單獨部署、與既有 ERP、MES 串接，從第一天起承接工單解析、缺料預警與排程協調等重複又攸關交期的工作，讓團隊專注在真正需要人為權衡的產能策略決策。'},{n:'物控專員分身',r:'庫存比對',d:'即時比對庫存與在途料，預測料況風險'},{n:'倉庫管理員分身',r:'倉儲調度',d:'協調倉儲調度，確保開工前料件到位'}],
+  s4:[{n:'名單收集分身',r:'OCR 辨識',d:'光學掃描與爬蟲能力，精準解析各式名片'},{n:'商機評估分身',r:'客戶分級',d:'依職稱、產業、規模自動評分並分配業務'}],
+  s5:[{n:'法規遵循顧問Agent',r:'資安掃描',d:'依 NIST CSF 框架評估風險，產出修復清單'},{n:'IT資訊分身',r:'系統稽核',d:'檢查存取控制、MFA 與稽核日誌完整性'}],
+  s6:[{n:'採購進貨Agent',r:'單據辨識',d:'自動辨識廠商送貨單，產生進貨草稿'},{n:'進貨驗收批退Agent',r:'驗收流程',d:'自動判定驗收結果，產出批退資料'}],
+  s2:[{n:'採購分身',r:'缺料盤點',d:'掃描品號庫存，排序急迫性等候拍板',long:'採購分身是專為「缺料斷鏈救援」情境打造的數智職能代理。當生產線急等用料、採購人員卻還困在數百項品號的庫存翻查時，它能在數秒內完成過去得耗上大半天的盤點：自動串接 ERP 與倉儲系統，逐一比對每個品號的現有庫存、在途數量、安全存量與既有訂單佔用，立即標示出真正會斷料的關鍵品項。<br><br>更重要的是，它不只是列出缺料清單，而是依急迫性自動排序——把影響當日開工、交期最緊、又沒有替代來源的品號排在最前面，讓你一眼看出該先處理什麼。對於可替代的料件，分身會同步比對替代料號與替代供應商，附上可用數量、前置天期與價格差異，供你快速評估取捨。<br><br>在判斷邏輯上，採購分身內建缺料風險評分、替代可行性分析與緊急採購建議等專業思維，等於把一位資深採購的經驗封裝成隨時可用的代理。它把所有資訊整理成「等候拍板」的決策卡，將零散模糊的庫存數據轉化為清楚的行動選項，你只需要做最後的關鍵決定，不必再把心力耗在繁瑣的查找與核對上。<br><br>這組分身可單獨部署到你的企業，與既有的 ERP、WMS 及採購流程無縫串接，從第一天起就能承接缺料盤點與替代尋源這類重複性工作，讓採購團隊把時間留給真正需要人為判斷的談判與策略決策。'},{n:'倉管分身',r:'替代料源',d:'即時查找替代料與替代供應商備選方案'}]
+};
+
+function gotoPage(n){
+  var prev=state.page;
+  var prevEl=document.getElementById('p'+prev);
+  var nextEl=document.getElementById('p'+n);
+  var animClasses=['page-anim-right','page-anim-left','page-anim-up','page-anim-scale'];
+
+  // 清掉舊的 anim class
+  animClasses.forEach(function(cls){
+    if(prevEl)prevEl.classList.remove(cls);
+    if(nextEl)nextEl.classList.remove(cls);
+  });
+
+  if(prevEl)prevEl.classList.remove('active');
+  if(nextEl){
+    nextEl.classList.add('active');
+    // reflow 讓動畫重新觸發
+    void nextEl.offsetWidth;
+    if(n===5){
+      nextEl.classList.add('page-anim-scale');
+    } else if(n>prev){
+      nextEl.classList.add('page-anim-right');
+    } else {
+      nextEl.classList.add('page-anim-left');
+    }
+  }
+
+  if(n!==prev)state.history.push(n);
+  state.page=n;
+  updateHUD(n);
+  updatePgWidget(n);
+  document.getElementById('scene-bg').classList.toggle('show',n>=2);
+  window.scrollTo(0,0);
+  if(n===2)buildScenePage();
+  if(n===4)initRoundtable();
+  if(n===5)buildSummary();
+}
+
+function goBack(){
+  if(state.history.length>1){
+    state.history.pop();
+    // 找到上一個不同於當前頁的頁碼
+    var prev=state.history[state.history.length-1];
+    // 直接操作 DOM，不再 push，避免 history 再次增長
+    document.getElementById('p'+state.page).classList.remove('active');
+    document.getElementById('p'+prev).classList.add('active');
+    state.page=prev;
+    updateHUD(prev);
+    document.getElementById('scene-bg').classList.toggle('show', prev >= 2);
+    window.scrollTo(0,0);
+    if(prev===2)buildScenePage();
+    if(prev===3){ var pb=document.querySelector('.p3-start'); if(pb){pb.classList.remove('is-loading');pb.innerHTML='開始體驗 &nbsp;›';pb.style.display='';} }
+  }
+}
+
+function updateHUD(n){
+  var steps=document.querySelectorAll('.hud-step');
+  steps.forEach(function(s,i){
+    s.classList.remove('active','done');
+    if(i+1===n)s.classList.add('active');
+    else if(i+1<n)s.classList.add('done');
+  });
+  // compact (mobile) progress
+  var names=['選定職能','選擇場景','啟動分身','圓桌會議','分身總結'];
+  var cur=document.getElementById('hudCur');
+  if(cur)cur.textContent=names[n-1]||'';
+  document.querySelectorAll('.hd-dot').forEach(function(d,i){
+    d.classList.remove('active','done');
+    if(i+1===n)d.classList.add('active');
+    else if(i+1<n)d.classList.add('done');
+  });
+  var role=document.getElementById('hudRole');
+  var scene=document.getElementById('hudScene');
+  var back=document.getElementById('hudBack');
+  // 頁面 3 起：header 顯示「目前主角」（若在 P2 確認時選了不同視角）
+  var dispRole=(n>=3 && state.viewpointRole) ? state.viewpointRole : state.role;
+  if(dispRole&&n>1){role.textContent='你的職能：'+dispRole;role.classList.add('show');}
+  else{role.classList.remove('show');}
+  if(state.scene&&n>=3){scene.textContent='場景：'+state.scene.name;scene.classList.add('show');}
+  else{scene.classList.remove('show');}
+  if(n>1){back.classList.add('show');}
+  else{back.classList.remove('show');}
+}
+
+var ROLE_COLORS={'採購':'#36684A','業務':'#C46734','廠長':'#794EAD','生管':'#376BA7','倉管':'#006064','物控':'#00838F','產線班組長':'#125BBC','IT資訊人員':'#3E885F','資材':'#91873E','專案經理':'#A660BE'};
+
+// 分身名稱（簡寫）對應到職能名稱，讓場景分身沿用同一套職能顏色
+var AGENT_ALIAS={
+  'PM':'專案經理','IT':'IT資訊人員',
+  // 圓桌會議（P4）分身名稱 → 職能，沿用同一套職能色
+  '業務分身':'業務','廠長分身':'廠長','採購分身':'採購','倉管分身':'倉管',
+  '生管分身':'生管','物控分身':'物控','IT資訊分身':'IT資訊人員','採購進貨Agent':'採購'
+};
+// 若分身名稱本身是個職能，回傳該職能色；否則用場景自帶的 fallback 色
+function roleColorOf(name,fallback){ var k=AGENT_ALIAS[name]||name; return ROLE_COLORS[k]||fallback||'#125BBC'; }
+
+// 每個職能對應 3 句痛點（替換左側白色氣泡內容）
+var PAIN_DEFAULT=[
+  {icon:'📋',text:'客戶急單，我該跟誰討論供應鏈底線'},
+  {icon:'🏭',text:'生產時才發現料不夠，只能停線等'},
+  {icon:'⚙️',text:'總是在幫產線救火，沒時間看數據'}
+];
+var PAIN_SETS={
+  '採購':[{icon:'📋',text:'客戶急單，我該跟誰確認供應鏈底線'},{icon:'⚡',text:'備料不夠，產線開工前才發現缺口'},{icon:'🔄',text:'跨部門喬交期，三天的事怎麼今天就要拍板'}],
+  '業務':[{icon:'💼',text:'這個客戶跟了兩年，不能讓他跑掉'},{icon:'⏱',text:'急單要給交期承諾，但不知道產線有沒有空'},{icon:'📊',text:'報價超時，對方等不了就轉給競爭對手了'}],
+  '廠長':[{icon:'⚙️',text:'總是在幫產線救火，沒時間看數據'},{icon:'🚨',text:'插單進來，原本排好的排程全部亂掉'},{icon:'📦',text:'料況不明，開工前才知道備料缺口'}],
+  '生管':[{icon:'🏭',text:'生產時才發現料不夠，只能停線等'},{icon:'🔀',text:'業務插急單，整條排程要重排一次'},{icon:'📉',text:'缺料預警太晚，錯過最佳補料時機'}],
+  '倉管':[{icon:'📦',text:'手動核對進貨單，一整天都在對數字'},{icon:'🔍',text:'月底盤點，幾百筆品項一筆筆清查'},{icon:'⚠️',text:'出貨品項搞錯，退貨才發現記錯庫位'}],
+  '物控':[{icon:'📋',text:'手動翻查幾百項品號，一整天都在轉單'},{icon:'📊',text:'庫存預測不準，不是備過頭就是缺貨'},{icon:'🔄',text:'替代料找不到，採購還在問我要換哪個'}],
+  '產線班組長':[{icon:'🛑',text:'等料停線，班組長只能乾等通知'},{icon:'📝',text:'作業指導文件找不到，直接用記憶做'},{icon:'❗',text:'品質異常要回報，但流程跑一圈太慢'}],
+  'IT資訊人員':[{icon:'🔒',text:'老闆要確認 ERP 資安，但我們只有 3 人'},{icon:'🛡',text:'資安漏洞報告，看不懂也不知從哪改'},{icon:'📋',text:'系統稽核要提報，手動彙整要花好幾天'}],
+  '資材':[{icon:'📦',text:'手動翻查幾百項品號，一整天都在轉單'},{icon:'📥',text:'月底進貨高峰，碼頭塞滿了等核對的貨車'},{icon:'🔢',text:'庫存對帳數字兜不攏，要一筆筆追回去'}],
+  '專案經理':[{icon:'🎯',text:'跨部門急單協調，每個人說法都不一樣'},{icon:'⏳',text:'進度追蹤全靠電話，沒有人知道真實狀況'},{icon:'🔗',text:'採購、生管、業務各說各話，沒有共識'}]
+};
+
+function updatePainBubbles(role){
+  var set=PAIN_SETS[role]||PAIN_DEFAULT;
+  document.querySelectorAll('#p1Pains .p1-pain').forEach(function(b,i){
+    var d=set[i]||set[0];
+    b.innerHTML='<div class="p1-pain-icon">'+d.icon+'</div>'+d.text;
+  });
+  document.querySelectorAll('#p1PainStrip .p1-pain-strip-item').forEach(function(b,i){
+    var d=set[i]||set[0];
+    b.innerHTML='<span class="p1-pain-strip-icon">'+d.icon+'</span>'+d.text;
+  });
+}
+
+function onRoleSelect(val){
+  if(!val)return;
+  state.role=val;
+  state.roleColor=ROLE_COLORS[val]||'#125BBC';
+  state.viewpointRole='';state.viewpointColor='';
+  document.getElementById('p1Cta').disabled=false;
+  updatePainBubbles(val);   // 白色氣泡，依職能替換內容
+}
+
+function buildRoleDD(){
+  var panel=document.getElementById('roleDDPanel');
+  if(!panel)return;
+  panel.innerHTML='';
+  Object.keys(ROLE_COLORS).forEach(function(role){
+    var it=document.createElement('div');
+    it.className='p1-dd-item';it.setAttribute('role','option');it.tabIndex=0;
+    it.innerHTML='<span class="p1-dd-item-dot" style="background:'+ROLE_COLORS[role]+'"></span>'+role;
+    it.onclick=function(){pickRole(role);};
+    it.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pickRole(role);}};
+    panel.appendChild(it);
+  });
+}
+function toggleRoleDD(e){
+  if(e)e.stopPropagation();
+  var dd=document.getElementById('roleDD');
+  var open=dd.classList.toggle('open');
+  document.getElementById('roleDDPanel').hidden=!open;
+  document.getElementById('roleDDTrigger').setAttribute('aria-expanded',open?'true':'false');
+}
+function closeRoleDD(){
+  var dd=document.getElementById('roleDD');if(!dd)return;
+  dd.classList.remove('open');
+  document.getElementById('roleDDPanel').hidden=true;
+  document.getElementById('roleDDTrigger').setAttribute('aria-expanded','false');
+}
+function pickRole(role){
+  var trig=document.getElementById('roleDDTrigger');
+  trig.classList.add('has-val');
+  document.getElementById('roleDDLabel').textContent=role;
+  var dot=document.getElementById('roleDDDot');
+  dot.style.display='inline-block';dot.style.background=ROLE_COLORS[role]||'#125BBC';
+  closeRoleDD();
+  onRoleSelect(role);
+}
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('roleDD');
+  if(dd&&!dd.contains(e.target))closeRoleDD();
+});
+
+function selectRole(card){
+  document.querySelectorAll('.p1-role-card').forEach(function(c){
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed','false');
+  });
+  card.classList.add('selected');
+  card.setAttribute('aria-pressed','true');
+  state.role=card.dataset.role;
+  state.roleColor=card.dataset.color;
+
+  // Enable the CTA and personalise its label
+  var btn=document.getElementById('p1Cta');
+  btn.disabled=false;
+  btn.textContent='查看'+state.role+'的推薦場景 \u00A0›';
+
+  // Map aliased roles to a pain bubble data-role for highlight
+  var PAIN_MAP={
+    '採購':'採購','生管':'生管','業務':'業務','廠長':'廠長',
+    'IT資訊人員':'IT資訊人員','資材':'資材',
+    '倉管':'資材','物控':'生管','產線班組長':'廠長','專案經理':'採購'
+  };
+  var painTarget=PAIN_MAP[state.role]||state.role;
+  // 懸浮泡泡 highlight（桌機）
+  document.querySelectorAll('.p1-pain').forEach(function(p){
+    p.classList.toggle('highlight', p.dataset.role===painTarget);
+  });
+  // inline strip highlight（窄螢幕）
+  document.querySelectorAll('.p1-pain-strip-item').forEach(function(p){
+    p.classList.toggle('highlight', p.dataset.role===painTarget);
+  });
+}
+
+function roleDesc(role){
+  return '身為「'+role+'」，以下是你日常最常遇到的工作場景。每個場景都模擬一個真實挑戰，由數智分身在你身旁協同分析、推進決策，你只需要在關鍵處拍板。';
+}
+
+function buildScenePage(){
+  var role=state.role;
+  var color=state.roleColor||'#125BBC';
+  document.getElementById('p2RoleName').textContent=role;
+  document.getElementById('p2RoleDot').style.background=color;
+  document.getElementById('p2Desc').textContent=roleDesc(role);
+
+  var roleScenes=scenesFor(role);
+  var chipsEl=document.getElementById('p2Chips');
+  var cardsEl=document.getElementById('p2Cards');
+
+  // 收集此職能的場景分類（for filter tab）
+  var cats=['全部'];
+  roleScenes.forEach(function(s){
+    var mainCat=(s.cat||''). split(' › ')[0].trim();
+    if(mainCat&&cats.indexOf(mainCat)===-1)cats.push(mainCat);
+  });
+
+  var activeFilter='全部';
+
+  function renderCards(){
+    cardsEl.innerHTML='';
+    roleScenes.forEach(function(s){
+      var mainCat=(s.cat||''). split(' › ')[0].trim();
+      if(activeFilter!=='全部'&&mainCat!==activeFilter)return;
+      cardsEl.appendChild(buildSceneCard(s,color));
+    });
+  }
+
+  // 建立 filter chips
+  chipsEl.innerHTML='';
+  cats.forEach(function(cat){
+    var chip=document.createElement('button');
+    chip.className='p2-chip'+(cat===activeFilter?' active':'');
+    chip.textContent=cat;
+    chip.onclick=function(){
+      activeFilter=cat;
+      chipsEl.querySelectorAll('.p2-chip').forEach(function(c){c.classList.toggle('active',c.textContent===activeFilter);});
+      renderCards();
+    };
+    chipsEl.appendChild(chip);
+  });
+  renderCards();
+}
+
+function buildSceneCard(s, accentColor){
+  var el=document.createElement('div');
+  el.className='p2-scard stagger-item';
+  var cats=(s.cat||'').split('›').map(function(t){return t.trim();}).filter(Boolean);
+  var tagsHtml=cats.map(function(c){return '<span class="p2-scard-tag">'+c+'</span>';}).join('');
+  el.innerHTML=
+    '<div class="p2-scard-top">'+
+      '<div class="p2-scard-tags">'+tagsHtml+'</div>'+
+      '<div class="p2-scard-name">'+s.name+'</div>'+
+    '</div>'+
+    '<div class="p2-scard-desc">'+s.steps[0]+'</div>'+
+    '<div class="p2-scard-btns">'+
+      '<button class="p2-btn-sub" type="button">前往訂閱</button>'+
+      '<button class="p2-btn-go" type="button">開始體驗</button>'+
+    '</div>';
+  el.querySelector('.p2-btn-go').onclick=function(){
+    var b=this; b.classList.add('is-loading');
+    setTimeout(function(){ selectScene(s); }, 300);
+  };
+  return el;
+}
+
+/* ── P3 內嵌「再次確認框」：你可以選擇的職能 ── */
+// 進入 P3、對話跑完後呼叫：建立職能選項並預選目前職能
+function buildP3RoleSelect(s){
+  var box=document.getElementById('p3Vpick');
+  var list=document.getElementById('p3VpickList');
+  if(!box||!list)return;
+  list.innerHTML='';
+
+  // 標題＝場景名 + 你可以選擇的職能
+  var title=document.getElementById('p3VpickTitle');
+  if(title) title.textContent=s.name+' 你可以選擇的職能';
+
+  var currentRole=state.role;
+  var currentColor=state.roleColor||roleColorOf(currentRole);
+  var options=[{name:currentRole,color:currentColor,isCurrent:true}];
+  (s.agents||[]).forEach(function(a){
+    if(a.name!==currentRole){
+      options.push({name:a.name,color:roleColorOf(a.name,a.color),isCurrent:false});
+    }
+  });
+
+  var autoTimer=null;
+  options.forEach(function(opt){
+    var btn=document.createElement('button');
+    btn.className='vp-option'+(opt.isCurrent?' selected':'');
+    btn.type='button';
+    btn.setAttribute('aria-pressed',opt.isCurrent?'true':'false');
+    var img=agentImg(opt.name);
+    var avHtml=img?'<img src="'+img+'" alt="'+opt.name+'" class="vp-av-img" onerror="this.remove()">':'';
+    btn.innerHTML=
+      '<div class="vp-av" style="background:'+opt.color+'">'+avHtml+(img?'':opt.name.slice(0,2))+'</div>'+
+      '<div class="vp-info"><div class="vp-name">'+opt.name+'</div>'+
+        (opt.isCurrent?'<div class="vp-badge">目前職能</div>':'')+'</div>';
+    btn.onclick=function(){
+      if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}  // 使用者先點了就取消自動
+      list.querySelectorAll('.vp-option').forEach(function(b){b.classList.remove('selected');b.setAttribute('aria-pressed','false');});
+      btn.classList.add('selected');btn.setAttribute('aria-pressed','true');
+      pickP3Viewpoint(opt.name, opt.color);
+    };
+    list.appendChild(btn);
+  });
+
+  // 〔階段 2〕顯示視角框並捲入視野
+  box.classList.add('show');
+  setTimeout(function(){ try{ box.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} }, 60);
+
+  // 〔階段 3〕稍候（讓使用者看到視角框）再以預選職能讓其他分身加入會議
+  state.viewpointRole=currentRole;
+  state.viewpointColor=currentColor;
+  autoTimer=setTimeout(function(){ pickP3Viewpoint(currentRole, currentColor); }, 1050);
+}
+
+// 選定（或切換）視角主角
+function pickP3Viewpoint(name,color){
+  state.viewpointRole=name;
+  state.viewpointColor=color;
+  var p3rt=document.getElementById('p3TagRole');
+  if(p3rt){p3rt.textContent=name;p3rt.style.background=color;}
+  if(typeof updateHUD==='function'){ updateHUD(state.page); }
+  renderP3Join(state.scene);   // 重建並讓「其他職能」分身上線
+}
+
+// 依目前視角，將其他職能的數智分身加入會議（含上線動畫）
+function renderP3Join(s){
+  var card=document.getElementById('p3JoinCard');
+  var join=document.getElementById('p3JoinAvatars');
+  var hint=document.getElementById('p3JoinHint');
+  if(!join||!s)return;
+  if(hint){hint.style.display='none';}
+  // 〔階段 3〕顯示「數智分身加入會議」卡（首次帶滑入動畫）
+  var firstReveal=card && !card.classList.contains('show');
+  if(card) card.classList.add('show');
+  if(firstReveal && card){ setTimeout(function(){ try{ card.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} }, 80); }
+
+  join.innerHTML='';
+  var circles=[];
+  joiningAgents(s).forEach(function(a){
+    var el=document.createElement('div');
+    el.className='p3-join-av';
+    var circle=document.createElement('div');
+    circle.className='p3-join-circle offline';
+    circle.style.background=a.color;
+    circle.dataset.color=a.color;
+    var img=agentImg(a.name);
+    if(img){
+      var imgEl=document.createElement('img');
+      imgEl.src=img;imgEl.alt=a.name;imgEl.className='p3-join-img';
+      imgEl.onerror=function(){this.remove();circle.textContent=a.name.slice(0,2);};
+      circle.appendChild(imgEl);
+    } else {
+      circle.style.color='rgba(255,255,255,.6)';
+      circle.textContent=a.name.slice(0,2);
+    }
+    circles.push(circle);
+    el.appendChild(circle);
+    var nm=document.createElement('div');nm.className='p3-join-name';nm.textContent=a.name;
+    var sub=document.createElement('div');sub.className='p3-join-sub';sub.textContent='數智分身';
+    el.appendChild(nm);el.appendChild(sub);
+    join.appendChild(el);
+  });
+  // 分身依序上線（稍微放緩）
+  circles.forEach(function(circle,ci){
+    setTimeout(function(){
+      circle.classList.add('going-online');
+      setTimeout(function(){circle.classList.remove('offline');circle.style.color='#fff';circle.classList.add('online');},300);
+      setTimeout(function(){circle.classList.remove('going-online');},650);
+    }, ci*300);
+  });
+
+  // 〔階段 4〕分身全部上線後才顯示「開始體驗」按鈕
+  var allOnline=(circles.length-1)*300 + 650 + 150;
+  setTimeout(function(){ revealP3Start(); }, Math.max(allOnline, 500));
+}
+
+// 顯示 P3「開始體驗」按鈕（最後一個階段）
+function revealP3Start(){
+  var b=document.querySelector('.p3-start');
+  if(!b) return;
+  b.style.display='';
+  if(b.dataset.revealed==='1') return;
+  b.dataset.revealed='1';
+  b.style.opacity='0';b.style.transform='translateY(8px)';
+  b.style.transition='opacity .3s var(--ease-out),transform .3s var(--ease-out)';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){b.style.opacity='1';b.style.transform='translateY(0)';});});
+  setTimeout(function(){ try{ b.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} }, 120);
+}
+
+function buildOtherSceneRow(s, num){
+  var el=document.createElement('div');
+  el.className='p2-other-scene';
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label','進入場景：'+s.name);
+  el.onclick=function(){selectScene(s);};
+  el.onkeydown=function(e){if(e.key==='Enter'||e.key===' ')selectScene(s);};
+  var agentTagsHtml=s.agents.map(function(a){
+    var bg=a.color+'18';
+    return '<span class="pos-agent-tag" style="color:'+a.color+';background:'+bg+';border-color:'+a.color+'40">'+
+      '<span class="pos-agent-dot"></span>'+a.name+
+    '</span>';
+  }).join('');
+  el.innerHTML=
+    '<div class="pos-num">'+num+'</div>'+
+    '<div class="pos-body">'+
+      '<div class="pos-name">'+s.name+'</div>'+
+      '<div class="pos-pain">'+s.steps[0].slice(0,55)+'…</div>'+
+      '<div class="pos-agents">'+agentTagsHtml+'</div>'+
+    '</div>'+
+    '<div style="color:var(--ink3);font-size:18px;flex-shrink:0">›</div>';
+  return el;
+}
+
+function selectScene(s){
+  state.scene=s;
+  // 預設視角 = 本職（使用者可在 P3 視角框再次選擇）
+  state.viewpointRole = state.role;
+  state.viewpointColor = state.roleColor || roleColorOf(state.role);
+
+  // 還原「開始體驗」按鈕狀態（從 P4 返回時）
+  var startBtn=document.querySelector('.p3-start');
+  if(startBtn){startBtn.classList.remove('is-loading');startBtn.innerHTML='開始體驗 &nbsp;›';}
+  var p3rt=document.getElementById('p3TagRole');
+  p3rt.textContent=effRole();
+  p3rt.style.background=effColor();
+  document.getElementById('p3SceneTag').textContent=s.name;
+
+  // 兩則固定開場對話（小秘書）
+  var msgs=[
+    {who:'user', text:'客戶突然追加7倍急單，三天後要出貨——備料不足、產線排滿。判斷失誤，不是丟單就是虧損。'},
+    {who:'ai',   text:'鼎新 AI 職能分身——業務、廠長、採購、GM，各自預置專業思維，跨部門喬三天的事，現在同步算好等你拍板。'}
+  ];
+  var chat=document.getElementById('p3Chat');
+  chat.innerHTML='';
+
+  // 重置區塊狀態
+  var teaser=document.getElementById('p3Teaser');
+  if(teaser){teaser.classList.remove('show','visible');}
+  var vpick=document.getElementById('p3Vpick');
+  if(vpick){vpick.classList.remove('show');}
+  var join=document.getElementById('p3JoinAvatars');
+  if(join) join.innerHTML='';
+  var joinCard=document.getElementById('p3JoinCard');
+  if(joinCard) joinCard.classList.remove('show');   // 階段 3 前先隱藏
+  var hint=document.getElementById('p3JoinHint');
+  if(hint){hint.style.display='none';}
+  // 開始體驗按鈕先隱藏（最後階段才出現）
+  if(startBtn){startBtn.style.display='none';startBtn.dataset.revealed='0';startBtn.style.opacity='';startBtn.style.transform='';}
+
+  // 對話逐條顯示（打字感，整體稍微放緩）
+  var delays=[0, 1150];
+  var aiTyping=[0, 1050];
+  msgs.forEach(function(m, i){
+    var totalDelay=0;
+    for(var j=0;j<i;j++){ totalDelay+=delays[j]+(msgs[j].who==='ai'?aiTyping[j]:0); }
+    totalDelay+=delays[i];
+
+    if(m.who==='ai'){
+      setTimeout(function(){
+        var typing=document.createElement('div');
+        typing.className='p3-msg ai p3-typing-row';
+        typing.innerHTML='<div class="p3-av ai">AI</div><div class="p3-bubble p3-typing"><span></span><span></span><span></span></div>';
+        chat.appendChild(typing);
+        chat.scrollTop=chat.scrollHeight;
+      }, totalDelay);
+    }
+
+    var showDelay=totalDelay+(m.who==='ai'?aiTyping[i]:0);
+    setTimeout(function(msg,idx){
+      var t=chat.querySelector('.p3-typing-row');
+      if(t)t.remove();
+
+      var row=document.createElement('div');
+      row.className='p3-msg '+msg.who;
+      row.style.opacity='0';
+      row.style.transform='translateY(8px)';
+      row.style.transition='opacity .32s,transform .32s';
+
+      if(msg.who==='user'){
+        row.innerHTML=
+          '<div class="p3-bubble">'+msg.text+'</div>'+
+          '<div class="p3-av user">'+
+            (USER_AVATAR_URL
+              ? '<img class="p3-av-img" src="'+USER_AVATAR_URL+'" alt="使用者大頭貼" onerror="this.remove()">'
+              : '')+
+            (effRole()||'你').slice(0,1)+
+          '</div>';
+      } else {
+        row.innerHTML=
+          '<div class="p3-av ai">AI</div>'+
+          '<div class="p3-bubble">'+msg.text+'</div>';
+      }
+      chat.appendChild(row);
+      chat.scrollTop=chat.scrollHeight;
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          row.style.opacity='1';
+          row.style.transform='translateY(0)';
+        });
+      });
+
+      // 〔階段 1 完成〕最後一則 → 卡片內顯示備註文字，稍後再顯示「再次確認框」
+      if(idx===msgs.length-1){
+        if(teaser){
+          setTimeout(function(){
+            teaser.classList.add('show');
+            requestAnimationFrame(function(){
+              requestAnimationFrame(function(){ teaser.classList.add('visible'); });
+            });
+          },550);
+        }
+        // 〔階段 2〕備註出現後再顯示視角選擇框（內部會接續觸發階段 3、4）
+        setTimeout(function(){ buildP3RoleSelect(s); },1700);
+      }
+    }, showDelay, m, i);
+  });
+
+  gotoPage(3);
+}
+
+/* P2 切換職能下拉 */
+/* ── 右下角 P5 Widget ── */
+var _pgwCollapseTimer=null;
+
+function closePgwCard(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.style.transition='opacity .2s,transform .2s';
+  el.style.opacity='0';
+  el.style.transform='translateX(10px)';
+  setTimeout(function(){
+    el.style.display='none';
+    el.dataset.dismissed='1';
+    // 如果三張都關掉了，收合成鈴鐺
+    var allHidden=['pgwCard1','pgwCard2','pgwCard3'].every(function(cid){
+      var cel=document.getElementById(cid);
+      return !cel||cel.style.display==='none';
+    });
+    if(allHidden) collapseToBell();
+  },220);
+}
+
+function collapseToBell(){
+  // 收合 widget cards，顯示右下角 AI 頭像
+  var wrap=document.getElementById('pgWidget');
+  if(wrap) wrap.style.display='none';
+  var bot=document.getElementById('aiBotWrap');
+  if(bot) bot.style.display='flex';
+}
+
+function onAiAvatarClick(){
+  if(state.page!==5) return;
+  // 如果 widget 目前是收合狀態（bubble 可見），點擊展開
+  expandPgWidget();
+}
+
+function expandPgWidget(){
+  var wrap=document.getElementById('pgWidget');
+  if(wrap) wrap.style.display='flex';
+  // 展開卡片時隱藏頭像
+  var bot=document.getElementById('aiBotWrap');
+  if(bot) bot.style.display='none';
+
+  ['pgwCard2','pgwCard3'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.style.display='flex';
+    el.style.opacity='';
+    el.style.transform='';
+    el.style.animation='none';
+    void el.offsetWidth;
+    el.style.animation='pgwSlideIn .28s var(--ease-out) '+(i*120)+'ms both';
+  });
+  var c1=document.getElementById('pgwCard1');
+  if(c1) c1.style.display='none';
+}
+
+function updatePgWidget(page){
+  var wrap=document.getElementById('pgWidget');
+  var bot=document.getElementById('aiBotWrap');
+  if(page!==5){
+    // P1-P4：隱藏 widget 和頭像
+    ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){el.style.display='none';el.style.opacity='';el.style.transform='';}
+    });
+    if(wrap) wrap.style.display='none';
+    if(bot) bot.style.display='none';
+  }
+}
+
+function buildPgSummary(s){
+  if(!s)return;
+  var ROLE_COLORS={
+    '採購':'#1B5E36','業務':'#E65100','廠長':'#4A148C','生管':'#1565C0',
+    '倉管':'#006064','物控':'#00838F','產線班組長':'#5D4037',
+    'IT資訊人員':'#B71C1C','資材':'#0277BD','專案經理':'#283593'
+  };
+
+  // 先隱藏 + 重置
+  ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.style.display='none';el.style.opacity='';el.style.transform='';}
+  });
+
+  // ── 卡片 1 內容：完成通知 ──
+  var achText=document.getElementById('pgwAchText');
+  if(achText) achText.textContent='你完成了'+s.name+'分身';
+
+  // ── 卡片 2 內容：進度 ──
+  var role=effRole()||state.role||'採購';
+  var roleScenes=scenesFor(role);
+  var total=roleScenes?roleScenes.length:1;
+  var done=1;
+  var pct=Math.round(done/total*100);
+  var progText=document.getElementById('pgwProgressText');
+  var fracEl=document.getElementById('pgwFrac');
+  var barFill=document.getElementById('pgwBarFill');
+  var backBtn=document.getElementById('pgwBackBtn');
+
+  if(progText){
+    progText.innerHTML='場景：'+role+'　您已經完成了　<strong id="pgwFrac">'+done+' / '+total+'</strong>';
+  }
+  if(barFill){
+    barFill.style.width='0%';
+    setTimeout(function(){barFill.style.width=pct+'%';},100);
+  }
+
+
+  // ── 卡片 3 內容：推薦 ── 單一「返回場景頁面」按鈕
+  var recRow=document.getElementById('pgwRecRow');
+  if(recRow){
+    recRow.innerHTML='';
+    var btn=document.createElement('button');
+    btn.className='pgw-rec-btn pgw-rec-btn-back';
+    btn.textContent='返回場景選擇頁面 ›';
+    btn.onclick=function(){
+      gotoPage(2);
+      setTimeout(buildScenePage,50);
+    };
+    recRow.appendChild(btn);
+  }
+
+  // ── 3 秒後依序顯示三張卡片（不自動收合，需手動點 ✕ 才收起） ──
+  if(_pgwCollapseTimer) clearTimeout(_pgwCollapseTimer);
+  var wrap=document.getElementById('pgWidget');
+  var bot=document.getElementById('aiBotWrap');
+  if(wrap) wrap.style.display='flex';
+  if(bot) bot.style.display='none'; // 卡片顯示期間頭像先隱藏
+  // 重置 dismissed 狀態
+  ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.dataset.dismissed='0';el.style.display='none';el.style.opacity='';el.style.transform='';}
+  });
+
+  var delays=[3000,3500,4000];
+  ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id,i){
+    setTimeout(function(){
+      var el=document.getElementById(id);
+      if(!el)return;
+      el.style.display='flex';
+      el.style.animation='none';
+      void el.offsetWidth;
+      el.style.animation='pgwSlideIn .3s var(--ease-out) both';
+    }, delays[i]);
+  });
+
+  // 不再自動收合：卡片會保留，直到使用者手動點各卡的 ✕ 關閉
+  // （三張都關閉後才會收合成右下角頭像，由 closePgwCard 處理）
+}
+var ALL_ROLES_LIST=[
+  {name:'採購',color:'#36684A'},{name:'業務',color:'#C46734'},
+  {name:'廠長',color:'#794EAD'},{name:'生管',color:'#376BA7'},
+  {name:'倉管',color:'#006064'},{name:'物控',color:'#00838F'},
+  {name:'產線班組長',color:'#125BBC'},{name:'IT資訊人員',color:'#3E885F'},
+  {name:'資材',color:'#91873E'},{name:'專案經理',color:'#A660BE'}
+];
+
+function openP2Modal(){
+  var bg=document.getElementById('p2ModalBg');
+  var grid=document.getElementById('p2ModalGrid');
+  if(!bg||!grid)return;
+  grid.innerHTML='';
+  ALL_ROLES_LIST.forEach(function(r){
+    var item=document.createElement('button');
+    item.className='p2-modal-item'+(r.name===state.role?' active':'');
+    item.innerHTML='<span class="p2-modal-dot" style="background:'+r.color+'"></span>'+r.name;
+    item.onclick=function(){
+      state.role=r.name;
+      state.roleColor=r.color;
+      state.viewpointRole='';state.viewpointColor='';
+      closeP2Modal();
+      buildScenePage();
+    };
+    grid.appendChild(item);
+  });
+  bg.style.display='flex';
+  document.addEventListener('keydown',onModalKey);
+}
+
+function closeP2Modal(){
+  var bg=document.getElementById('p2ModalBg');
+  if(bg)bg.style.display='none';
+  document.removeEventListener('keydown',onModalKey);
+}
+
+function onModalKey(e){if(e.key==='Escape')closeP2Modal();}
+
+function p5Tab(name){
+  document.querySelectorAll('.p5-tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===name);});
+  var show=name==='break'?document.getElementById('p5TabBreak'):document.getElementById('p5TabAbility');
+  var hide=name==='break'?document.getElementById('p5TabAbility'):document.getElementById('p5TabBreak');
+  hide.style.display='none';
+  show.style.display='block';
+  // 淡入過場
+  show.classList.remove('p5-tab-fade');
+  void show.offsetWidth;
+  show.classList.add('p5-tab-fade');
+  if(name==='ability')revealTakeawayCards();
+}
+
+// 進入圓桌會議：先 loading（情緒銜接「進入會議室」），再跳轉
+function enterRoundtable(btn){
+  if(btn.classList.contains('is-loading'))return;
+  btn.classList.add('is-loading');
+  btn.innerHTML='<span class="cta-spin" aria-hidden="true"></span>進入會議室…';
+  setTimeout(function(){ gotoPage(4); }, 550);
+}
+
+function revealTakeawayCards(){
+  var cards=document.querySelectorAll('#p5TakeawayGrid .p5-takeaway-card');
+  cards.forEach(function(c,i){
+    c.classList.remove('reveal');
+    void c.offsetWidth;            // 重置動畫
+    c.style.animationDelay=(i*0.09)+'s';
+    c.classList.add('reveal');
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PAGE 4 圓桌會議 — 工程師演示區 Hook
+// 進入 PAGE 4 時會呼叫此函數，工程師可在此初始化演示內容
+// 可透過 state.scene、state.role、state.roleColor 取得當前情境資料
+// ─────────────────────────────────────────────────────────────────
+// ── 圓桌會議劇本資料（自 Figma 專案移植）──
+var ROUNDTABLE_SCRIPTS={
+  s1:[
+    {sender:'系統',roleLabel:'警報',color:'#DC2626',content:'⚠️ 急單警報：A 公司要求 7 倍追加量（原 100 件→700 件），三天後出貨，現在備料不足、產線排滿。',isSystem:true},
+    {sender:'業務分身',roleLabel:'客戶溝通',color:'#C46734',content:'我已確認客戶需求。A 公司要求週五 17:00 前到貨 700 組，這是關鍵訂單，失去後競爭對手將直接取代我們。建議評估最大可承諾量。'},
+    {sender:'廠長分身',roleLabel:'產能評估',color:'#794EAD',content:'產線目前排滿 80%，正常每天出 150 組。三天內完成 700 組需啟動雙班加班、暫停低優先訂單。預估影響 3 個現有客戶，建議同步通知。'},
+    {sender:'採購分身',roleLabel:'備料風控',color:'#36684A',content:'庫存可支撐 200 組。剩餘 500 組用料最快明晨到貨，緊急物流費約 NT$15,000。替代供應商有一家可在 36 小時內補足差額。'},
+    {sender:'GM分身',roleLabel:'決策支援',color:'#125BBC',content:'綜合評估建議：接單，但加收 8% 緊急服務費；同時提前通知受影響客戶並給出延期補償方案。預估本次毛利仍高於正常訂單 2.3 倍。請您拍板。'}
+  ],
+  s2:[
+    {sender:'系統',roleLabel:'缺料警報',color:'#DC2626',content:'⚠️ 庫存警報：料號 A-204 僅剩 3 天用量，主供應商停工中，生產線面臨停工風險。',isSystem:true},
+    {sender:'採購分身',roleLabel:'缺料盤點',color:'#36684A',content:'已自動掃描 386 項品號庫存。A-204 現存 1,200kg，日耗 400kg，確實僅剩 3 天。高急迫性品號共 12 項，已排序等候拍板。'},
+    {sender:'倉管分身',roleLabel:'替代料源',color:'#006064',content:'已找到 3 家備用供應商。台南廠 48 小時可供 800kg，溢價 12%；高雄廠 72 小時可供 1,200kg，溢價 6%。建議先行採購台南廠確保不停線。'}
+  ],
+  s3:[
+    {sender:'系統',roleLabel:'工單預警',color:'#DC2626',content:'⚠️ 工單開工前料況確認：WO-2024-0892 預計明日 08:00 開線，自動解析用料需求中…',isSystem:true},
+    {sender:'生管分身',roleLabel:'工單管理',color:'#376BA7',content:'WO-2024-0892 用料需求已解析完畢，共 47 項物料。其中 B-317 庫存不足，需求 500 個，現存 180 個，缺口 320 個。建議延後開工或緊急調撥。'},
+    {sender:'物控分身',roleLabel:'庫存比對',color:'#006064',content:'B-317 在途料 400 個，預計後天到貨。建議：工單延後 48 小時開工，可避免停線且不影響最終交期。同時建議調高 B-317 安全庫存至 600 個。'}
+  ],
+  s4:[
+    {sender:'系統',roleLabel:'任務啟動',color:'#1565C0',content:'📇 名片轉化任務：本次展覽共收集 237 張名片，開始 OCR 辨識與商機評估…',isSystem:true},
+    {sender:'名單收集分身',roleLabel:'OCR 辨識',color:'#E65100',content:'237 張名片已辨識完成，成功率 98.3%（5 張模糊已標記人工複核）。聯絡資訊、職稱、公司已結構化，正在匯入 CRM。'},
+    {sender:'商機評估分身',roleLabel:'客戶分級',color:'#1B5E36',content:'依職稱+產業+規模評分完成。A 級潛客 18 家（製造業決策層），建議今天開始跟進；B 級 67 家本週聯繫；C 級 152 家加入滴灌序列。'}
+  ],
+  s5:[
+    {sender:'系統',roleLabel:'資安稽核',color:'#DC2626',content:'🔒 ERP 資安評估任務：依 NIST CSF 框架，開始掃描存取控制、備份機制與漏洞狀態…',isSystem:true},
+    {sender:'法規顧問Agent',roleLabel:'資安掃描',color:'#B71C1C',content:'掃描完成。發現 3 項高風險：① MFA 尚未啟用（建議 3 天內完成）② 稽核日誌保留僅 30 天（建議延長至 90 天）③ 2 個服務帳號超過 180 天未輪換密碼。'},
+    {sender:'IT資訊分身',roleLabel:'系統稽核',color:'#3E885F',content:'修復清單已產出，含操作步驟與負責人建議。預估修復工時：MFA 4 小時、日誌設定 1 小時、密碼輪換 2 小時。全部完成後可向老闆提交合規報告。'}
+  ],
+  s6:[
+    {sender:'系統',roleLabel:'進貨任務',color:'#1565C0',content:'📦 月底進貨高峰：今日預計到貨 12 家廠商，共 847 筆品項，開始自動辨識…',isSystem:true},
+    {sender:'採購進貨Agent',roleLabel:'單據辨識',color:'#36684A',content:'已辨識 12 家廠商送貨單，成功生成進貨草稿 847 筆。其中 3 筆數量與採購單不符（已標紅），其餘 844 筆正常，等待您確認過帳。'},
+    {sender:'驗收批退Agent',roleLabel:'驗收流程',color:'#006064',content:'品質檢驗結果：844 筆合格自動過帳完成；3 筆異常已產出批退單，通知廠商改期補送。整體進貨作業耗時 38 分鐘，較人工作業縮短 84%。'}
+  ]
+};
+var USER_REPLIES={
+  s1:['接受訂單，請加收服務費','先確認加班人員意願','通知受影響客戶並協商'],
+  s2:['採購台南廠供料','兩家同時下單確保安全','等待原廠復工再決定'],
+  s3:['同意延後 48 小時開工','從其他工單調撥 B-317','提高安全庫存立即採購'],
+  s4:['今天聯繫所有 A 級潛客','優先跟進製造業決策層','匯出名單交給業務分配'],
+  s5:['本週完成三項修復','先處理 MFA 最高風險','提交報告給老闆確認'],
+  s6:['確認過帳 844 筆','處理 3 筆異常批退','今天完成所有廠商確認']
+};
+var FOLLOWUP_MSGS={
+  s1:[
+    {sender:'GM分身',roleLabel:'決策支援',color:'#125BBC',content:'收到您的決策，立即啟動：① 通知 3 位受影響客戶並提供補償方案 ② 批准雙班加班申請（45 人）③ 確認緊急物流採購，預計 15 分鐘內完成通知。'},
+    {sender:'業務分身',roleLabel:'客戶溝通',color:'#C46734',content:'已向 A 公司確認接單並說明 8% 緊急服務費條款。客戶接受，電子合約已簽署。預估本次訂單為公司帶來 NT$2.1M 營收，高於正常訂單 134%。'},
+    {sender:'系統',roleLabel:'完成',color:'#16A34A',content:'✅ 圓桌會議完成！AI 分身在 3 分鐘內完成了傳統需要 3 天的跨部門協調，可以查看分身總結了。',isSystem:true}
+  ],
+  s2:[
+    {sender:'採購分身',roleLabel:'備料風控',color:'#36684A',content:'已向台南廠確認下單 800kg，預計 36 小時到貨。同時提醒：建議對主供應商的依賴度做結構性調整，避免單一供應商風險。'},
+    {sender:'系統',roleLabel:'完成',color:'#16A34A',content:'✅ 缺料危機已解除！數智分身自動盤點了 386 項品號，找到替代方案，讓你避免了產線停工損失。',isSystem:true}
+  ],
+  s3:[
+    {sender:'生管分身',roleLabel:'工單管理',color:'#376BA7',content:'已更新 WO-2024-0892 開工日期延後 48 小時，並自動通知相關產線人員。B-317 在途料到貨後將自動觸發開工確認通知。'},
+    {sender:'系統',roleLabel:'完成',color:'#16A34A',content:'✅ 料況確認完成！提前攔截了這個缺料風險，避免產線停線損失。',isSystem:true}
+  ],
+  'default':[
+    {sender:'系統',roleLabel:'完成',color:'#16A34A',content:'✅ 圓桌會議完成！AI 分身協助您完成了本場景的關鍵決策，可以查看分身能力總結了。',isSystem:true}
+  ]
+};
+var _rtTimers=[];
+function _rtClear(){_rtTimers.forEach(clearTimeout);_rtTimers=[];}
+
+function rtAppend(chat,m,roleAbbr){
+  var el=document.createElement('div');
+  if(m.isSystem){el.className='p4-sys';el.textContent=m.content;}
+  else if(m.isUser){
+    el.className='p4-msg user';
+    el.innerHTML='<div class="p4-bubble-u"><div class="p4-msg-meta" style="color:var(--brand)">'+m.roleLabel+'</div><div class="p4-msg-text">'+m.content+'</div></div>';
+  }else{
+    el.className='p4-msg';
+    var c=roleColorOf(m.sender,m.color);
+    var img=agentImg(m.sender);
+    var avInner=img
+      ? '<img src="'+img+'" alt="'+m.sender+'" class="rt-img" onerror="this.parentNode.textContent=\''+m.sender.slice(0,2)+'\'">'
+      : m.sender.slice(0,2);
+    el.innerHTML='<div class="p4-msg-av" style="background:'+c+'">'+avInner+'</div>'+
+      '<div class="p4-msg-body"><div class="p4-msg-meta" style="color:'+c+'">'+m.sender+' · '+m.roleLabel+'</div><div class="p4-msg-text">'+m.content+'</div></div>';
+  }
+  chat.appendChild(el);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function initRoundtable(){
+  var s=state.scene; if(!s)return;
+  var ph=document.getElementById('p4PlaceholderName');
+  if(ph) ph.textContent=s.name;
+  var pr=document.getElementById('p4PlaceholderRole');
+  if(pr) pr.textContent=effRole();
+}
+
+function rtShowReplies(s){
+  var reply=document.getElementById('p4Reply');
+  var replies=USER_REPLIES[s.id]||USER_REPLIES.s1;
+  reply.style.display='block';
+  reply.innerHTML='<div class="p4-reply-label">快速回覆：</div><div class="p4-chips" id="p4Chips"></div>'+
+    '<div class="p4-input-row"><input class="p4-input" id="p4Input" placeholder="輸入你的決策或問題…" aria-label="輸入決策或問題"><button class="p4-send" id="p4Send">送出</button></div>';
+  var chips=document.getElementById('p4Chips');
+  replies.forEach(function(r){
+    var b=document.createElement('button');b.className='p4-chip';b.type='button';b.textContent=r;
+    b.onclick=function(){rtSend(s,r);};
+    chips.appendChild(b);
+  });
+  var inp=document.getElementById('p4Input');
+  document.getElementById('p4Send').onclick=function(){var v=inp.value.trim();if(v)rtSend(s,v);};
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=this.value.trim();if(v)rtSend(s,v);}});
+}
+
+function rtSend(s,text){
+  var chat=document.getElementById('p4Chat');
+  rtAppend(chat,{roleLabel:(effRole()||'您')+'（您）',content:text,isUser:true});
+  document.getElementById('p4Reply').style.display='none';
+  var typing=document.createElement('div');typing.className='p4-typing';typing.id='p4Typing';
+  typing.innerHTML='<span class="p4-typing-dot"></span><span class="p4-typing-dot" style="animation-delay:.2s"></span><span class="p4-typing-dot" style="animation-delay:.4s"></span> AI 分身正在回應中…';
+  chat.appendChild(typing);chat.scrollTop=chat.scrollHeight;
+  var follow=FOLLOWUP_MSGS[s.id]||FOLLOWUP_MSGS['default'];
+  var delay=900;
+  follow.forEach(function(m){
+    var t=setTimeout(function(){
+      var tp=document.getElementById('p4Typing');if(tp)tp.remove();
+      rtAppend(chat,m);
+    },delay);
+    _rtTimers.push(t);delay+=1000;
+  });
+}
+
+// Per-scene achievement headline (第一段：你做到了什麼)
+var ACHIEVEMENT = {
+  s1:{
+    headline:'你剛才用 <em class="em-win">3 分鐘</em>，完成了一個通常要 <em class="em-old">3 天</em> 的 <em class="em-old">急單</em> 決策',
+    sub:'身為{role}，你與數智分身協同處理了急單缺料、產線排程與交期承諾，做出了一個跨部門都能接受的判斷。'
+  },
+  s2:{
+    headline:'你剛才用 <em class="em-win">AI 分身</em>，掃完了人工需要 <em class="em-old">一整天</em> 的 <em class="em-old">缺料清單</em>',
+    sub:'身為{role}，你不再是「打單機器人」——數智分身幫你盤點缺口、比對替代料源，你只需要拍板。'
+  },
+  s3:{
+    headline:'你剛才在 <em class="em-win">工單開工前</em>，提前攔截了一個會讓產線 <em class="em-old">停線</em> 的 <em class="em-old">缺料風險</em>',
+    sub:'身為{role}，你與分身一起完成了料況確認，從被動救火轉為主動預測，準確驅動開工決策。'
+  },
+  s4:{
+    headline:'你剛才把 <em class="em-old">237 張堆積的名片</em>，變成 <em class="em-win">今天就能跟進</em> 的 18 個商機',
+    sub:'身為{role}，你不再手動輸入名片資料——數智分身完成了辨識、分級與 CRM 匯入，你只需要打電話。'
+  },
+  s5:{
+    headline:'你剛才讓 <em class="em-win">3 人團隊</em>，完成了原本要 <em class="em-old">資安顧問</em> 才能做的 <em class="em-old">ERP 風險評估</em>',
+    sub:'身為{role}，你不需要懂 SBOM 或 Linux——法規顧問 Agent 幫你掃描、產出修復清單，老闆可以放心了。'
+  },
+  s6:{
+    headline:'你剛才讓 <em class="em-old">月底碼頭大塞車</em>，變成 <em class="em-win">40 分鐘</em> 順暢完成',
+    sub:'身為{role}，你與分身聯手讓進貨、驗收、過帳一氣呵成，收貨區不再大排長龍。'
+  }
+};
+
+// 打字機效果：逐字浮現，並保留 <em> 高亮樣式
+function typeHeadline(el, html, speed){
+  if(!el)return;
+  speed=speed||55;
+  // 解析成片段，保留每段是否為 em 及其 class
+  var tmp=document.createElement('div'); tmp.innerHTML=html;
+  var segs=[];
+  Array.prototype.forEach.call(tmp.childNodes,function(n){
+    if(n.nodeType===3) segs.push({t:n.textContent, c:''});
+    else if(n.nodeType===1) segs.push({t:n.textContent, c:n.className||''});
+  });
+  var total=segs.reduce(function(a,s){return a+s.t.length;},0);
+  // 尊重「減少動態」設定：直接顯示完整內容
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    el.innerHTML=html; return;
+  }
+  clearInterval(el._typeTimer);
+  var i=0;
+  el._typeTimer=setInterval(function(){
+    i++;
+    var remaining=i, out='';
+    for(var k=0;k<segs.length && remaining>0;k++){
+      var s=segs[k], take=Math.min(s.t.length, remaining), chunk=s.t.slice(0,take);
+      out += s.c ? '<em class="'+s.c+'">'+chunk+'</em>' : chunk;
+      remaining-=take;
+    }
+    el.innerHTML=out + (i<total ? '<span class="type-caret"></span>' : '');
+    if(i>=total) clearInterval(el._typeTimer);
+  }, speed);
+}
+
+function buildSummary(){
+  var s=state.scene;
+  if(!s)return;
+
+  // ① 你做到了什麼
+  var ach=ACHIEVEMENT[s.id]||{headline:'你剛完成了一場 AI 決策體驗',sub:'身為{role}，你與數智分身協同完成了這個場景。'};
+  document.getElementById('p5SceneTag').textContent=s.name;
+  typeHeadline(document.getElementById('p5Headline'), ach.headline, 55);
+
+  // ② 突破了什麼 — 雷達形狀更新 + 橫向說明列
+  var dims=DIMS[s.id]||DIMS.s1;
+  // 雷達：人力=上(top), 能力=右(right), 思維=下(bottom), 時空=左(left)
+  var cx=80,cy=80,maxR=60;
+  function axisPoint(axisName,val){
+    var ratio=val/100;
+    var r=maxR*ratio;
+    var angles={人力:270,能力:0,思維:90,時空:180};
+    var deg=angles[axisName]||0;
+    var rad=deg*Math.PI/180;
+    return (cx+r*Math.cos(rad)).toFixed(1)+','+(cy+r*Math.sin(rad)).toFixed(1);
+  }
+  var pts=dims.map(function(d){return axisPoint(d.axis,d.val);}).join(' ');
+  var shape=document.getElementById('p5RadarShape');
+  if(shape)shape.setAttribute('points',pts);
+
+  var dimsCol=document.getElementById('p5DimsCol');
+  dimsCol.innerHTML='';
+  dims.forEach(function(d,idx){
+    var badgeBg=d.color+'22';
+    var row=document.createElement('div');
+    row.className='p5-dim-row stagger-item';
+    row.innerHTML=
+      '<div class="p5-dim-bar" style="background:'+d.color+'"></div>'+
+      '<div class="p5-dim-left">'+
+        '<div class="p5-dim-axis" style="color:'+d.color+'">'+d.axis+'</div>'+
+        '<div class="p5-dim-num" style="color:'+d.color+'" data-target="'+d.val+'">0</div>'+
+        '<div class="p5-dim-badge" style="color:'+d.color+';background:'+badgeBg+'">'+d.badge+'</div>'+
+      '</div>'+
+      '<div class="p5-dim-right">'+
+        '<div class="p5-dim-text" style="color:'+d.color+'">'+d.desc+'</div>'+
+      '</div>';
+    dimsCol.appendChild(row);
+  });
+
+  // 數字從 0 計數到目標值
+  setTimeout(function(){
+    dimsCol.querySelectorAll('.p5-dim-num[data-target]').forEach(function(el,i){
+      var target=parseInt(el.dataset.target)||0;
+      var start=performance.now();
+      var dur=600+i*80;
+      function tick(now){
+        var t=Math.min((now-start)/dur,1);
+        var ease=1-Math.pow(1-t,3);
+        el.textContent=Math.round(ease*target);
+        if(t<1)requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  },300);
+
+  // ③ 可以帶走什麼 — 分身能力卡
+  var abs=ABILITIES[s.id]||[];
+  var grid=document.getElementById('p5TakeawayGrid');
+  grid.innerHTML='';
+  abs.forEach(function(a){
+    var card=document.createElement('div');
+    card.className='p5-takeaway-card'+(a.long?' is-detail':'');
+    var html='<div class="p5-tk-name">'+a.n+'</div>';
+    if(a.r){ html+='<div class="p5-tk-role">'+a.r+'</div>'; }
+    if(a.d){ html+='<div class="p5-tk-value">'+a.d+'</div>'; }
+    if(a.long){ html+='<div class="p5-tk-long">'+a.long+'</div>'; }
+    card.innerHTML=html;
+    grid.appendChild(card);
+  });
+
+  // ④ 右下角 Widget：成就 + 推薦
+  buildPgSummary(s);
+}
+
+var DIMS = {
+  s1:[
+    {axis:'人力',val:75,badge:'突破',color:'#1B5E36',desc:'場景已把 PM、採購、業務與廠長納入同一決策框架，大幅縮短急單跨部門往返協調時間'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置 STP、ATP/CTP、TCO、供應風控與談判腳本等職能，具備高可用的專家代理雛形'},
+    {axis:'思維',val:100,badge:'完整展現',color:'#4A148C',desc:'將「接單機會」拆解為可承諾量、條件式上修、風險轉嫁與獲利邊界的多因子決策思維'},
+    {axis:'時空',val:25,badge:'初探',color:'#E65100',desc:'強調 3 分鐘完成決策，但目前仍以單場會議為主，尚未展現跨廠協調與持續監控能力'}
+  ],
+  s2:[
+    {axis:'人力',val:70,badge:'突破',color:'#1B5E36',desc:'採購分身自動掃描品號，大幅減少人工翻查庫存所需的人力投入'},
+    {axis:'能力',val:80,badge:'突破',color:'#1565C0',desc:'預置缺料盤點、替代料比對與緊急詢價等採購職能，開箱即用'},
+    {axis:'思維',val:60,badge:'展現',color:'#4A148C',desc:'能針對缺料緊急程度自動排序，協助採購聚焦在高優先決策'},
+    {axis:'時空',val:50,badge:'展現',color:'#E65100',desc:'支援即時庫存比對，不受辦公時間與地點限制'}
+  ],
+  s3:[
+    {axis:'人力',val:80,badge:'突破',color:'#1B5E36',desc:'工單開工前自動解析用料需求，減少生管人工比對的重複勞動'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置料況預測、安全庫存比對與缺料預警等生產管理職能'},
+    {axis:'思維',val:70,badge:'展現',color:'#4A148C',desc:'從被動救火轉為主動預測，建立開工前料況確認機制'},
+    {axis:'時空',val:60,badge:'展現',color:'#E65100',desc:'可在工單開工前提早偵測缺料風險，爭取補料時間'}
+  ],
+  s4:[
+    {axis:'人力',val:85,badge:'突破',color:'#1B5E36',desc:'OCR 自動辨識名片，業務人員不再需要手動輸入聯絡資訊'},
+    {axis:'能力',val:80,badge:'突破',color:'#1565C0',desc:'預置名片掃描、客戶分級與 CRM 串接能力，展覽後立即可用'},
+    {axis:'思維',val:65,badge:'展現',color:'#4A148C',desc:'自動依職稱、產業、規模評分分級，協助業務聚焦高潛力客戶'},
+    {axis:'時空',val:70,badge:'展現',color:'#E65100',desc:'展覽當天即可完成名單整理，第一時間觸達潛在客戶'}
+  ],
+  s5:[
+    {axis:'人力',val:90,badge:'突破',color:'#1B5E36',desc:'3 人 IT 團隊即可完成原本需要資安顧問的 ERP 系統評估'},
+    {axis:'能力',val:85,badge:'突破',color:'#1565C0',desc:'預置 NIST CSF 框架掃描與修復清單，不需要懂 SBOM 或 Linux'},
+    {axis:'思維',val:75,badge:'突破',color:'#4A148C',desc:'將資安風險轉化為可執行的優先處理清單，讓管理者看懂風險'},
+    {axis:'時空',val:55,badge:'展現',color:'#E65100',desc:'隨時可發起資安評估，不受資安專家在場與否的限制'}
+  ],
+  s6:[
+    {axis:'人力',val:80,badge:'突破',color:'#1B5E36',desc:'自動辨識廠商送貨單並產生進貨草稿，倉管不再逐筆核對'},
+    {axis:'能力',val:75,badge:'突破',color:'#1565C0',desc:'預置進貨辨識、驗收批退與自動過帳等倉儲管理職能'},
+    {axis:'思維',val:60,badge:'展現',color:'#4A148C',desc:'異常品項自動標紅提醒，讓驗收人員聚焦例外處理'},
+    {axis:'時空',val:65,badge:'展現',color:'#E65100',desc:'月底進貨高峰時，同時處理多批進貨不再造成碼頭塞車'}
+  ]
+};
+
+// Scene core summary per scene id
+var SCENE_CORE = {
+  s1:{label:'急單料況決策中樞：',text:'快速完成缺料、排程、換線、退料與交付承諾的整體判斷。'},
+  s2:{label:'缺料應變指揮中樞：',text:'即時盤點缺口、比對替代料源，從偵測到下單一氣呵成。'},
+  s3:{label:'開工料況安全守門：',text:'工單開工前自動確認料況，提前預警、準確驅動開工決策。'},
+  s4:{label:'名片商機轉化引擎：',text:'展覽名片秒變結構化名單，A 類潛客當天即可開始跟進。'},
+  s5:{label:'資安風險速診中樞：',text:'3 人 IT 團隊本週內完成 ERP 資安確認，老闆放心。'},
+  s6:{label:'進貨驗收自動化：',text:'廠商送貨單自動辨識轉單，進貨、驗收、過帳一氣呵成。'}
+};
+
+// Scene type tag per scene id
+var SCENE_TYPE = {
+  s1:'思維驅動型・高壓急單決策中樞',
+  s2:'流程自動化型・採購缺料應變',
+  s3:'預警監控型・生產料況管理',
+  s4:'資訊轉化型・商機開發加速',
+  s5:'合規防禦型・資安風險管理',
+  s6:'作業自動化型・倉儲進貨管理'
+};
+
+function resetExperience(){
+  state={page:1,role:'',roleColor:'',scene:null,history:[1],viewpointRole:'',viewpointColor:'',pendingScene:null,pendingViewpoint:null};
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('p1').classList.add('active');
+  var trig=document.getElementById('roleDDTrigger');
+  if(trig){trig.classList.remove('has-val');document.getElementById('roleDDLabel').textContent='請選擇你的職能…';document.getElementById('roleDDDot').style.display='none';closeRoleDD();}
+  var btn=document.getElementById('p1Cta');
+  btn.disabled=true;
+  btn.textContent='進入數智空間 \u00A0›';
+  // 還原氣泡為預設內容
+  if(typeof updatePainBubbles==='function')updatePainBubbles('');
+  document.getElementById('scene-bg').classList.remove('show');
+  document.getElementById('hudRole').classList.remove('show');
+  document.getElementById('hudBack').classList.remove('show');
+  updateHUD(1);
+  window.scrollTo(0,0);
+}
+// Init on load
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('p1Cta').disabled=true;
+  buildRoleDD();
+});
+</script>
+<!-- ── Footer ── -->
+<footer style="
+  width:100%;
+  background:var(--ink);
+  color:rgba(255,255,255,.45);
+  text-align:center;
+  padding:16px 24px;
+  font-size:14px;
+  font-family:'DM Mono',monospace;
+  letter-spacing:.04em;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+">
+  Copyright&copy; 2026 鼎新數智股份有限公司 DATA SYSTEMS CO., LTD. All rights reserved.
+</footer>
+
+</body>
+</html>
