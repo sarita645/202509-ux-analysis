@@ -809,34 +809,35 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 }
 
 /* ── Floating AI assistant (bottom-right, presentational) ──── */
-.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:flex;align-items:center;gap:11px;animation:botIn .5s var(--ease-out) .3s both;pointer-events:none}
+.ai-bot{position:fixed;right:24px;bottom:24px;z-index:300;display:none;align-items:center;gap:11px;pointer-events:auto;cursor:pointer}
 @keyframes botIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.ai-bubble{
-  position:relative;
-  background:linear-gradient(135deg,#ece8fb,#e3ecfe);
-  border:1px solid rgba(110,99,230,.18);
-  border-radius:16px;padding:11px 17px;
-  box-shadow:0 14px 36px rgba(45,35,120,.2);
-  display:flex;flex-direction:column;gap:2px;line-height:1.4;
-}
-.ai-bubble::after{
-  content:'';position:absolute;right:-7px;top:50%;transform:translateY(-50%);
-  border-left:8px solid #e3ecfe;border-top:7px solid transparent;border-bottom:7px solid transparent;
-}
-.ai-bubble-top{font-size:14px;color:#7c7a92}
-.ai-bubble-main{font-size:14.5px;font-weight:700;color:#3f3ca8;white-space:nowrap}
+.ai-bubble{display:none} /* 不使用，改為 hover tooltip */
+.ai-bubble-top,.ai-bubble-main{display:none}
 .ai-avatar{
   width:62px;height:62px;border-radius:50%;flex-shrink:0;
   background:radial-gradient(circle at 35% 30%,#9a8ff5,#6c63e6 70%);
   box-shadow:0 10px 28px rgba(108,99,230,.42);
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   animation:botFloat 4s var(--ease-in-out) infinite;
+  position:relative;
 }
 .ai-avatar img{width:100%;height:100%;object-fit:cover}
+/* Hover tooltip */
+.ai-avatar::after{
+  content:'可以點開看訊息';
+  position:absolute;
+  right:calc(100% + 10px);
+  top:50%;transform:translateY(-50%);
+  background:rgba(22,36,59,.82);color:#fff;
+  font-size:12px;font-family:'Noto Sans TC',sans-serif;
+  white-space:nowrap;padding:5px 12px;border-radius:6px;
+  pointer-events:none;
+  opacity:0;transition:opacity .2s;
+}
+.ai-avatar:hover::after{opacity:1}
 @keyframes botFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @media(max-width:560px){
-  .ai-bot{right:14px;bottom:14px;gap:8px}
-  .ai-bubble{display:none}        /* avatar only on small screens */
+  .ai-bot{right:14px;bottom:14px}
   .ai-avatar{width:52px;height:52px}
 }
 @media(prefers-reduced-motion:reduce){.ai-bot,.ai-avatar{animation:none}}
@@ -1424,8 +1425,8 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
    ════════════════════════════════════════ */
 .pgw-wrap{
   position:fixed;
-  top:calc(var(--hud-h) + 12px);
-  right:16px;
+  bottom:90px;
+  right:24px;
   z-index:290;
   display:flex;flex-direction:column;gap:10px;
   width:280px;pointer-events:auto;
@@ -1492,44 +1493,28 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 .pgw-rec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 /* 小螢幕 */
 @media(max-width:640px){
-  .pgw-wrap{right:8px;width:240px}
+  .pgw-wrap{right:12px;bottom:80px;width:240px}
 }
-/* 收合成鈴鐺圓點 */
-@keyframes bellSway{
-  0%,100%{transform:rotate(0deg)}
-  20%   {transform:rotate(6deg)}
-  60%   {transform:rotate(-5deg)}
-  80%   {transform:rotate(3deg)}
+.pgw-back-btn{
+  margin-top:10px;width:100%;padding:8px;
+  background:var(--brand-light);color:var(--brand);
+  border:1.5px solid rgba(var(--brand-rgb),.2);
+  border-radius:var(--r);font-size:13px;font-weight:600;
+  font-family:'Noto Sans TC',sans-serif;cursor:pointer;
+  transition:background var(--dur-fast),border-color var(--dur-fast);
+  text-align:center;
 }
-.pgw-bell{
-  position:fixed;
-  top:calc(var(--hud-h) + 10px);
-  right:16px;
-  z-index:291;
-  width:38px;height:38px;border-radius:50%;
-  background:#FACC15;
-  border:none;cursor:pointer;
-  display:none;align-items:center;justify-content:center;
-  font-size:18px;
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
-  animation:bellSway 3s ease-in-out infinite;
-  transition:transform var(--dur-fast);
-  transform-origin:top center;
+.pgw-back-btn:hover{background:rgba(var(--brand-rgb),.12);border-color:var(--brand-mid)}
+/* 返回場景按鈕（Card3 推薦）*/
+.pgw-rec-btn-back{
+  width:100%;justify-content:center;
+  background:linear-gradient(135deg,var(--brand2),var(--brand));
+  color:#fff;border:none;border-radius:var(--r);
+  font-size:13px;font-weight:700;
+  padding:9px 14px;
+  box-shadow:0 2px 10px rgba(var(--brand-rgb),.25);
 }
-.pgw-bell:hover{transform:scale(1.12)}
-/* Tooltip */
-.pgw-bell::after{
-  content:'可以點開看訊息喔';
-  position:absolute;
-  right:calc(100% + 8px);
-  top:50%;transform:translateY(-50%);
-  background:rgba(22,36,59,.82);color:#fff;
-  font-size:12px;font-family:'Noto Sans TC',sans-serif;
-  white-space:nowrap;padding:5px 10px;border-radius:6px;
-  pointer-events:none;
-  opacity:0;transition:opacity .2s;
-}
-.pgw-bell:hover::after{opacity:1}
+.pgw-rec-btn-back:hover{opacity:.9;transform:translateY(-1px)}
 
 @keyframes slideInRight{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideInLeft {from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
@@ -1874,11 +1859,6 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 
 
 
-<!-- 收合後的鈴鐺圓點 -->
-<button class="pgw-bell" id="pgwBell" onclick="expandPgWidget()" aria-label="查看體驗通知">
-  🔔
-</button>
-
 <!-- ── 右下角 P5 完成提示 Widget（三張依序跳出）── -->
 <div class="pgw-wrap" id="pgWidget">
 
@@ -1898,6 +1878,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
       <div class="pgw-progress-text" id="pgwProgressText">場景：採購　您已經完成了　<strong id="pgwFrac">1 / 5</strong></div>
       <button class="pgw-close" onclick="closePgwCard('pgwCard2')" aria-label="關閉">✕</button>
       <div class="pgw-bar-track"><div class="pgw-bar-fill" id="pgwBarFill" style="width:20%"></div></div>
+
     </div>
   </div>
 
@@ -1905,7 +1886,7 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
   <div class="pgw-group" id="pgwCard3" style="display:none">
     <div class="pgw-label">推薦</div>
     <div class="pgw-card">
-      <div class="pgw-card-text">推薦您！下一個體驗：</div>
+      <div class="pgw-card-text">推薦你下個體驗場景：</div>
       <button class="pgw-close" onclick="closePgwCard('pgwCard3')" aria-label="關閉">✕</button>
       <div class="pgw-rec-row" id="pgwRecRow"></div>
     </div>
@@ -1913,13 +1894,13 @@ input[type=checkbox],input[type=radio],input[type=range]{accent-color:var(--bran
 
 </div>
 
-<!-- Floating AI assistant (presentational only) -->
-<div class="ai-bot" role="img" aria-label="AI 數智助理">
-  <div class="ai-bubble">
-    <span class="ai-bubble-top">在開始體驗前…</span>
-    <span class="ai-bubble-main">先了解未來工作新樣貌 ▼</span>
+<!-- AI avatar：右下角常駐，P5 後點擊可展開通知 widget -->
+<div class="ai-bot" id="aiBotWrap">
+  <div class="ai-bubble" id="aiBubble" style="display:none">
+    <span class="ai-bubble-top" id="aiBubbleTop"></span>
+    <span class="ai-bubble-main" id="aiBubbleMain">可以點開看訊息喔 ▼</span>
   </div>
-  <div class="ai-avatar">
+  <div class="ai-avatar" onclick="onAiAvatarClick()" style="cursor:pointer">
     <img src="https://agent-exp.apps.digiwincloud.com/assets/images/onboarding/icon-assistant.png" alt="AI 助理" onerror="this.style.display='none'">
   </div>
 </div>
@@ -2612,20 +2593,26 @@ function closePgwCard(id){
 }
 
 function collapseToBell(){
+  // 收合 widget cards，顯示右下角 AI 頭像
   var wrap=document.getElementById('pgWidget');
-  var bell=document.getElementById('pgwBell');
   if(wrap) wrap.style.display='none';
-  if(bell) bell.style.display='flex';
+  var bot=document.getElementById('aiBotWrap');
+  if(bot) bot.style.display='flex';
+}
+
+function onAiAvatarClick(){
+  if(state.page!==5) return;
+  // 如果 widget 目前是收合狀態（bubble 可見），點擊展開
+  expandPgWidget();
 }
 
 function expandPgWidget(){
-  var bell=document.getElementById('pgwBell');
-  if(bell) bell.style.display='none';
-
   var wrap=document.getElementById('pgWidget');
   if(wrap) wrap.style.display='flex';
+  // 展開卡片時隱藏頭像
+  var bot=document.getElementById('aiBotWrap');
+  if(bot) bot.style.display='none';
 
-  // 只顯示進度（Card2）和推薦（Card3），跳過完成通知（Card1）
   ['pgwCard2','pgwCard3'].forEach(function(id,i){
     var el=document.getElementById(id);
     if(!el) return;
@@ -2636,19 +2623,21 @@ function expandPgWidget(){
     void el.offsetWidth;
     el.style.animation='pgwSlideIn .28s var(--ease-out) '+(i*120)+'ms both';
   });
-
-  // Card1 確保隱藏
   var c1=document.getElementById('pgwCard1');
   if(c1) c1.style.display='none';
 }
 
 function updatePgWidget(page){
-  // 非 P5 時隱藏全部卡片
+  var wrap=document.getElementById('pgWidget');
+  var bot=document.getElementById('aiBotWrap');
   if(page!==5){
+    // P1-P4：隱藏 widget 和頭像
     ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
       var el=document.getElementById(id);
       if(el){el.style.display='none';el.style.opacity='';el.style.transform='';}
     });
+    if(wrap) wrap.style.display='none';
+    if(bot) bot.style.display='none';
   }
 }
 
@@ -2673,58 +2662,43 @@ function buildPgSummary(s){
   // ── 卡片 2 內容：進度 ──
   var role=effRole()||state.role||'採購';
   var roleScenes=scenesFor(role);
-  // 計算完成數（目前完成 1，分母為該職能總場景數）
   var total=roleScenes?roleScenes.length:1;
-  var done=1; // 目前 session 完成 1 個（後續可擴充 completedScenes 陣列）
+  var done=1;
   var pct=Math.round(done/total*100);
-  var fracEl=document.getElementById('pgwFrac');
   var progText=document.getElementById('pgwProgressText');
+  var fracEl=document.getElementById('pgwFrac');
   var barFill=document.getElementById('pgwBarFill');
-  if(fracEl) fracEl.textContent=done+' / '+total;
+  var backBtn=document.getElementById('pgwBackBtn');
+
   if(progText){
-    progText.innerHTML='場景：'+role+'&nbsp;&nbsp;您已經完成了&nbsp;&nbsp;<strong>'+done+' / '+total+'</strong>';
+    progText.innerHTML='場景：'+role+'　您已經完成了　<strong id="pgwFrac">'+done+' / '+total+'</strong>';
   }
   if(barFill){
     barFill.style.width='0%';
     setTimeout(function(){barFill.style.width=pct+'%';},100);
   }
 
-  // ── 卡片 3 內容：推薦 ──
+
+  // ── 卡片 3 內容：推薦 ── 單一「返回場景頁面」按鈕
   var recRow=document.getElementById('pgwRecRow');
   if(recRow){
     recRow.innerHTML='';
-    var recRoles=[];
-    (s.agents||[]).forEach(function(a){
-      if(a.name!==state.role&&recRoles.length<4) recRoles.push({name:a.name,color:a.color});
-    });
-    var fallbacks=['採購','業務','廠長','生管','IT資訊人員'];
-    fallbacks.forEach(function(r){
-      if(r!==state.role&&!recRoles.find(function(x){return x.name===r;})&&recRoles.length<4){
-        recRoles.push({name:r,color:ROLE_COLORS[r]||'#125BBC'});
-      }
-    });
-    recRoles.forEach(function(role){
-      var btn=document.createElement('button');
-      btn.className='pgw-rec-btn';
-      btn.innerHTML='<span class="pgw-rec-dot" style="background:'+role.color+'"></span>'+role.name;
-      btn.onclick=(function(rn,rc){
-        return function(){
-          state.role=rn; state.roleColor=rc;
-          gotoPage(2);
-          setTimeout(buildScenePage,50);
-        };
-      })(role.name,role.color);
-      recRow.appendChild(btn);
-    });
+    var btn=document.createElement('button');
+    btn.className='pgw-rec-btn pgw-rec-btn-back';
+    btn.textContent='返回場景選擇頁面 ›';
+    btn.onclick=function(){
+      gotoPage(2);
+      setTimeout(buildScenePage,50);
+    };
+    recRow.appendChild(btn);
   }
 
-  // ── 3 秒後依序顯示三張卡片，8 秒後自動收合 ──
+  // ── 3 秒後依序顯示三張卡片，10s 後自動收合 ──
   if(_pgwCollapseTimer) clearTimeout(_pgwCollapseTimer);
   var wrap=document.getElementById('pgWidget');
+  var bot=document.getElementById('aiBotWrap');
   if(wrap) wrap.style.display='flex';
-  var bell=document.getElementById('pgwBell');
-  if(bell) bell.style.display='none';
-
+  if(bot) bot.style.display='none'; // 卡片顯示期間頭像先隱藏
   // 重置 dismissed 狀態
   ['pgwCard1','pgwCard2','pgwCard3'].forEach(function(id){
     var el=document.getElementById(id);
@@ -2746,7 +2720,7 @@ function buildPgSummary(s){
   // 8 秒後（卡片全出現後 4 秒）自動收合
   _pgwCollapseTimer=setTimeout(function(){
     collapseToBell();
-  }, 8000);
+  }, 10000);
 }
 var ALL_ROLES_LIST=[
   {name:'採購',color:'#36684A'},{name:'業務',color:'#C46734'},
